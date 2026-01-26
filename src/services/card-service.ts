@@ -131,9 +131,20 @@ export async function getCardBySlug(slug: string) {
         console.error('Error fetching public card contents:', contentError)
     }
 
+    // Fetch profile avatar
+    // Ensure we access user_id safely. card is typed as any in select but we know it matches Card structure partially.
+    const userId = (card as unknown as Card).user_id
+
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', userId)
+        .single() as { data: { avatar_url: string | null } | null, error: unknown }
+
     return {
         ...(card as unknown as Card),
-        contents: (contents as unknown as CardContent[]) || []
+        contents: (contents as unknown as CardContent[]) || [],
+        avatar_url: profile?.avatar_url || null
     }
 }
 
