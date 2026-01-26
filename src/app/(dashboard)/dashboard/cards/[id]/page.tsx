@@ -96,6 +96,7 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
                         initialSlug={card.slug || ''}
                         initialDescription={card.description}
                         initialIsPublished={card.is_published}
+                        initialMaterialType={card.material_type || 'sugi'}
                     />
                 </div>
             </div>

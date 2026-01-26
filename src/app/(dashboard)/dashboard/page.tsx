@@ -8,100 +8,102 @@ export default async function DashboardPage() {
     const cards = await getCards()
 
     return (
-        <div>
+        <div className="space-y-12">
             {/* Header Area */}
-            <div className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-[#e6e2d3] pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-[#e6e2d3] pb-6">
                 <div>
-                    <h2 className="text-2xl font-serif font-bold text-[#3d3126]">Dashboard</h2>
-                    <p className="mt-1 text-sm text-[#8c7b6c]">作成した名刺の管理・分析</p>
+                    <h2 className="text-3xl font-serif font-bold text-[#2c3e50]">My Studio</h2>
+                    <p className="mt-1 text-sm text-[#8c7b6c] font-medium">Manage your wood cards. / 名刺の管理</p>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                {/* Left Column: Create Form */}
-                <div className="lg:col-span-2 xl:col-span-1">
+            {/* Create Area */}
+            <section>
+                <div className="bg-white/50 border border-[#e6e2d3] rounded-3xl p-1 shadow-sm">
                     <CreateCardForm />
                 </div>
+            </section>
 
-                {/* Right Column: Card List (or Full width if needed, but grid usually better) */}
-                {/* Actually, let's keep the Create Form above or to the side? The request implies a list of cards. 
-                    Let's put Create Form at the top or separately.  Existing layout had CreateForm then List.
-                    Let's keep the vertical flow but style it better.
-                 */}
-            </div>
+            {/* List Area */}
+            <section>
+                <div className="flex items-center gap-2 mb-8">
+                    <span className="w-1.5 h-6 bg-[#d4a373] rounded-full"></span>
+                    <h3 className="text-xl font-serif font-bold text-[#2c3e50] tracking-tight">Collection</h3>
+                    <span className="text-sm text-[#8c7b6c] font-medium ml-2">/ 作品一覧</span>
+                </div>
 
-            <div className="space-y-12">
-                {/* Create Area */}
-                <section>
-                    <CreateCardForm />
-                </section>
+                <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                    {cards.map((card) => (
+                        <Link href={`/dashboard/cards/${card.id}`} key={card.id} className="block group relative">
+                            {/* Card Body with Wood Texture Simulation */}
+                            <div className={`
+                                relative h-60 rounded-[2rem] transition-all duration-500 ease-out overflow-hidden
+                                ${card.is_published
+                                    ? 'bg-[#e8dec5] shadow-[0_10px_30px_-10px_rgba(140,123,108,0.4)] group-hover:shadow-[0_20px_40px_-10px_rgba(140,123,108,0.5)] group-hover:-translate-y-1 group-hover:scale-[1.01]'
+                                    : 'bg-[#faf9f6]/80 border-2 border-dashed border-[#e6e2d3] hover:border-[#d4c5ae] hover:-translate-y-0.5'}
+                            `}>
+                                {/* Wood Grain Overlay for Published Cards */}
+                                {card.is_published && (
+                                    <>
+                                        {/* Grain 1: Fine texture */}
+                                        <div className="absolute inset-0 opacity-30 mix-blend-multiply bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] pointer-events-none"></div>
+                                        {/* Grain 2: Warm gradient overlay */}
+                                        <div className="absolute inset-0 bg-gradient-to-br from-[#f4f0e6]/40 via-transparent to-[#d4c5ae]/30 pointer-events-none"></div>
+                                    </>
+                                )}
 
-                {/* List Area */}
-                <section>
-                    <div className="flex items-center gap-2 mb-6">
-                        <h3 className="text-xl font-bold text-[#3d3126]">Your Cards</h3>
-                        <span className="text-sm text-[#8c7b6c] font-medium">/ 作成した名刺一覧</span>
-                    </div>
-
-                    <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                        {cards.map((card) => (
-                            <Link href={`/dashboard/cards/${card.id}`} key={card.id} className="block group relative">
-                                {/* Card Body simulating Wood */}
-                                <div className={`
-                                    relative h-56 rounded-xl border-2 transition-all duration-300 overflow-hidden
-                                    ${card.is_published
-                                        ? 'bg-[#f4f0e6] border-[#d4c5ae] shadow-lg group-hover:shadow-xl group-hover:scale-[1.02] group-hover:border-[#cbb89d]'
-                                        : 'bg-[#faf9f6] border-dashed border-[#e6e2d3] opacity-90 hover:opacity-100'}
-                                `}>
-                                    {/* Wood Grain Pattern (CSS Opacity) */}
-                                    {card.is_published && (
-                                        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] pointer-events-none"></div>
-                                    )}
-
-                                    <div className="absolute px-6 py-6 inset-0 flex flex-col justify-between">
-                                        <div>
-                                            <div className="flex justify-between items-start">
-                                                <h3 className="text-xl font-serif font-bold text-[#3d3126] group-hover:text-[#2c3e50] line-clamp-1">
-                                                    {card.title}
-                                                </h3>
-                                                <span className={`
-                                                    inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium tracking-wide border
-                                                    ${card.is_published
-                                                        ? 'bg-green-50 text-green-700 border-green-200'
-                                                        : 'bg-gray-50 text-gray-500 border-gray-200'}
-                                                `}>
-                                                    {card.is_published ? 'LIVE' : 'DRAFT'}
-                                                </span>
-                                            </div>
-                                            <p className="mt-2 text-sm text-[#8c7b6c] line-clamp-2">
-                                                {card.description || 'No description / 説明文なし'}
-                                            </p>
+                                <div className="absolute inset-0 p-7 flex flex-col justify-between z-10">
+                                    {/* Top: Status & Title */}
+                                    <div>
+                                        <div className="flex justify-between items-start mb-4">
+                                            <span className={`
+                                                inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold tracking-widest uppercase
+                                                ${card.is_published
+                                                    ? 'bg-[#2c3e50] text-[#fdfbf7] shadow-sm'
+                                                    : 'bg-[#e6e2d3] text-[#8c7b6c]'}
+                                            `}>
+                                                {card.is_published ? 'LIVE' : 'DRAFT'}
+                                            </span>
+                                            {card.is_published && (
+                                                <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)] animate-pulse"></div>
+                                            )}
                                         </div>
 
-                                        <div className="flex items-end justify-between border-t border-[#d4c5ae]/40 pt-4 mt-auto">
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] uppercase tracking-wider text-[#8c7b6c]">Total Views</span>
-                                                <span className="text-2xl font-bold text-[#3d3126] font-mono">
-                                                    {card.view_count || 0}
-                                                </span>
-                                            </div>
-                                            <span className="text-xs text-[#2c3e50] font-medium group-hover:underline underline-offset-2">
-                                                Edit / 編集 &rarr;
+                                        <h3 className={`text-2xl font-serif font-bold leading-tight group-hover:underline decoration-2 decoration-[#d4a373] underline-offset-4 ${card.is_published ? 'text-[#3d3126]' : 'text-[#8c7b6c]'}`}>
+                                            {card.title}
+                                        </h3>
+                                        <p className="mt-2 text-xs text-[#8c7b6c] line-clamp-2 opacity-80">
+                                            {card.description || 'No description...'}
+                                        </p>
+                                    </div>
+
+                                    {/* Bottom: Stats & Action */}
+                                    <div className={`flex items-end justify-between pt-4 ${card.is_published ? 'border-t border-[#3d3126]/10' : 'border-t border-[#e6e2d3]'}`}>
+                                        <div className="flex flex-col">
+                                            <span className="text-[9px] uppercase tracking-[0.2em] text-[#8c7b6c] mb-0.5">Views</span>
+                                            <span className="text-3xl font-serif font-bold text-[#2c3e50] leading-none">
+                                                {card.view_count || 0}
                                             </span>
                                         </div>
+                                        <span className="h-10 w-10 bg-[#fdfbf7]/80 backdrop-blur-sm rounded-full flex items-center justify-center text-[#2c3e50] opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-sm hover:bg-[#2c3e50] hover:text-white">
+                                            &rarr;
+                                        </span>
                                     </div>
                                 </div>
-                            </Link>
-                        ))}
-
-                        {cards.length === 0 && (
-                            <div className="col-span-full py-12 text-center border-2 border-dashed border-[#e6e2d3] rounded-xl bg-[#faf9f6]">
-                                <p className="text-[#8c7b6c]">No cards yet. / 名刺がまだありません。</p>
                             </div>
-                        )}
-                    </div>
-                </section>
-            </div>
+                        </Link>
+                    ))}
+
+                    {/* Empty State / Add New Placeholder */}
+                    {cards.length === 0 && (
+                        <div className="col-span-full py-20 text-center border-2 border-dashed border-[#e6e2d3] rounded-[2rem] bg-[#faf9f6]/50">
+                            <span className="block text-4xl mb-4 opacity-30">🌱</span>
+                            <p className="text-[#3d3126] font-bold text-lg mb-1">Your studio is empty</p>
+                            <p className="text-[#8c7b6c] text-sm">Create your first wood card above. / 新しい名刺を作りましょう</p>
+                        </div>
+                    )}
+                </div>
+            </section>
         </div>
     )
 }

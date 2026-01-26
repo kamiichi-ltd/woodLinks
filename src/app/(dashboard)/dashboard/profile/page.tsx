@@ -43,6 +43,7 @@ export default async function SettingsPage() {
                             initialSlug={primaryCard.slug || ''}
                             initialDescription={primaryCard.description}
                             initialIsPublished={primaryCard.is_published}
+                            initialMaterialType={primaryCard.material_type || 'sugi'}
                         />
                     ) : (
                         <div className="rounded-md bg-yellow-50 p-4">

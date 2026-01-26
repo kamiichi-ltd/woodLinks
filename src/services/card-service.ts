@@ -189,7 +189,7 @@ export async function createCard(formData: FormData) {
     return data
 }
 
-export async function updateCard(id: string, updates: { title?: string; description?: string; is_published?: boolean; slug?: string }) {
+export async function updateCard(id: string, updates: { title?: string; description?: string; is_published?: boolean; slug?: string; material_type?: 'sugi' | 'hinoki' | 'walnut' }) {
     const supabase = await createClient()
     const {
         data: { user },
@@ -199,7 +199,7 @@ export async function updateCard(id: string, updates: { title?: string; descript
         throw new Error('Unauthorized')
     }
 
-    const updatePayload: { title?: string; description?: string; is_published?: boolean; slug?: string } = { ...updates }
+    const updatePayload: { title?: string; description?: string; is_published?: boolean; slug?: string; material_type?: 'sugi' | 'hinoki' | 'walnut' } = { ...updates }
 
     // Logic to ensure slug exists if not already, or if title changes and slug is empty (though slug is usually persistent)
     // For now, if we are updating title, let's check if we want to regenerate slug? 

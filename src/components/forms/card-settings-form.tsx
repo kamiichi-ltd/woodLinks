@@ -10,13 +10,15 @@ interface CardSettingsFormProps {
     initialSlug: string
     initialDescription: string | null
     initialIsPublished: boolean
+    initialMaterialType: 'sugi' | 'hinoki' | 'walnut'
 }
 
-export default function CardSettingsForm({ cardId, initialTitle, initialSlug, initialDescription, initialIsPublished }: CardSettingsFormProps) {
+export default function CardSettingsForm({ cardId, initialTitle, initialSlug, initialDescription, initialIsPublished, initialMaterialType }: CardSettingsFormProps) {
     const [title, setTitle] = useState(initialTitle)
     const [slug, setSlug] = useState(initialSlug)
     const [description, setDescription] = useState(initialDescription || '')
     const [isPublished, setIsPublished] = useState(initialIsPublished)
+    const [materialType, setMaterialType] = useState(initialMaterialType || 'sugi')
     const [isLoading, setIsLoading] = useState(false)
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
     const router = useRouter()
@@ -32,6 +34,7 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                 slug,
                 description,
                 is_published: isPublished,
+                material_type: materialType,
             })
             setMessage({ type: 'success', text: '設定を更新しました' })
             router.refresh()
@@ -109,6 +112,85 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                             className="block w-full rounded-xl border-0 py-3 text-[#2c3e50] shadow-sm ring-1 ring-inset ring-[#d4c5ae] placeholder:text-[#a4998e] focus:ring-2 focus:ring-inset focus:ring-[#2c3e50] sm:text-sm sm:leading-6 bg-[#fcfbf9]"
                             placeholder="Brief bio, title, or tagline..."
                         />
+                    </div>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-bold leading-6 text-[#2c3e50] uppercase tracking-wider mb-3">
+                        Material Selection <span className="text-xs font-normal text-[#8c7b6c] ml-1 normal-case">/ 名刺の素材（テーマ）</span>
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        {/* Sugi */}
+                        <label className={`
+                            relative flex flex-col items-center p-4 rounded-xl cursor-pointer border-2 transition-all duration-200
+                            ${materialType === 'sugi'
+                                ? 'border-[#d4a373] bg-[#fdfbf7] ring-1 ring-[#d4a373]'
+                                : 'border-[#e6e2d3] bg-white hover:border-[#d4c5ae]'}
+                        `}>
+                            <input
+                                type="radio"
+                                name="material_type"
+                                value="sugi"
+                                checked={materialType === 'sugi'}
+                                onChange={(e) => setMaterialType(e.target.value as 'sugi' | 'hinoki' | 'walnut')}
+                                className="sr-only"
+                            />
+                            <div className="w-full h-24 rounded-lg bg-[#fdfbf7] mb-3 relative overflow-hidden border border-[#e6e2d3]">
+                                <div className="absolute inset-x-0 top-0 h-1 bg-[#d4a373]"></div>
+                                <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] mix-blend-multiply"></div>
+                                <div className="absolute inset-0 flex items-center justify-center text-3xl">🌲</div>
+                            </div>
+                            <span className="font-bold text-[#3d3126]">杉 (Sugi)</span>
+                            <span className="text-xs text-[#8c7b6c] mt-1 text-center">親しみやすさ・直感<br />Light & Friendly</span>
+                        </label>
+
+                        {/* Hinoki */}
+                        <label className={`
+                            relative flex flex-col items-center p-4 rounded-xl cursor-pointer border-2 transition-all duration-200
+                            ${materialType === 'hinoki'
+                                ? 'border-[#e9d8a6] bg-[#fdfbf7] ring-1 ring-[#e9d8a6]'
+                                : 'border-[#e6e2d3] bg-white hover:border-[#d4c5ae]'}
+                        `}>
+                            <input
+                                type="radio"
+                                name="material_type"
+                                value="hinoki"
+                                checked={materialType === 'hinoki'}
+                                onChange={(e) => setMaterialType(e.target.value as 'sugi' | 'hinoki' | 'walnut')}
+                                className="sr-only"
+                            />
+                            <div className="w-full h-24 rounded-lg bg-[#fdfbf7] mb-3 relative overflow-hidden border border-[#e6e2d3]">
+                                <div className="absolute inset-x-0 top-0 h-1 bg-[#e9d8a6]"></div>
+                                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] mix-blend-multiply"></div>
+                                <div className="absolute inset-0 flex items-center justify-center text-3xl">🪵</div>
+                            </div>
+                            <span className="font-bold text-[#3d3126]">桧 (Hinoki)</span>
+                            <span className="text-xs text-[#8c7b6c] mt-1 text-center">信頼・高貴・清潔感<br />Trust & Dignity</span>
+                        </label>
+
+                        {/* Walnut */}
+                        <label className={`
+                            relative flex flex-col items-center p-4 rounded-xl cursor-pointer border-2 transition-all duration-200
+                            ${materialType === 'walnut'
+                                ? 'border-[#6b4c3e] bg-[#fdfbf7] ring-1 ring-[#6b4c3e]'
+                                : 'border-[#e6e2d3] bg-white hover:border-[#d4c5ae]'}
+                        `}>
+                            <input
+                                type="radio"
+                                name="material_type"
+                                value="walnut"
+                                checked={materialType === 'walnut'}
+                                onChange={(e) => setMaterialType(e.target.value as 'sugi' | 'hinoki' | 'walnut')}
+                                className="sr-only"
+                            />
+                            <div className="w-full h-24 rounded-lg bg-[#2c1810] mb-3 relative overflow-hidden border border-[#6b4c3e]">
+                                <div className="absolute inset-x-0 top-0 h-1 bg-[#6b4c3e]"></div>
+                                <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] mix-blend-overlay"></div>
+                                <div className="absolute inset-0 flex items-center justify-center text-3xl text-white">🕰️</div>
+                            </div>
+                            <span className="font-bold text-[#3d3126]">胡桃 (Walnut)</span>
+                            <span className="text-xs text-[#8c7b6c] mt-1 text-center">知性・モダン・重厚<br />Intellect & Modern</span>
+                        </label>
                     </div>
                 </div>
 

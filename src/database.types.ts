@@ -43,6 +43,7 @@ export interface Database {
           slug: string | null
           is_published: boolean
           view_count: number
+          material_type: 'sugi' | 'hinoki' | 'walnut'
         }
         Insert: {
           id?: string

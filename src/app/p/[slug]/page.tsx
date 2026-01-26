@@ -48,6 +48,40 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
 }
 
+// Theme Configurations
+const themes = {
+    sugi: {
+        bg: 'bg-[#faf9f6]',
+        text: 'text-stone-800',
+        accent: 'text-[#d4a373]',
+        border: 'border-[#d4a373]',
+        fontHead: 'font-sans',
+        pattern: 'opacity-10 bg-[url("https://www.transparenttextures.com/patterns/wood-pattern.png")]',
+        button: 'bg-[#d4a373] hover:bg-[#c5915d] text-white',
+        cardBg: 'bg-white',
+    },
+    hinoki: {
+        bg: 'bg-[#fdfbf7]',
+        text: 'text-[#2c3e50]',
+        accent: 'text-[#e9d8a6]',
+        border: 'border-[#e9d8a6]',
+        fontHead: 'font-serif',
+        pattern: 'opacity-5 bg-[url("https://www.transparenttextures.com/patterns/wood-pattern.png")]',
+        button: 'bg-[#2c3e50] hover:bg-[#1a252f] text-[#fdfbf7]',
+        cardBg: 'bg-[#ffffff]',
+    },
+    walnut: {
+        bg: 'bg-[#1a1a1a]',
+        text: 'text-[#e6e2d3]',
+        accent: 'text-[#6b4c3e]',
+        border: 'border-[#6b4c3e]',
+        fontHead: 'font-serif',
+        pattern: 'opacity-20 bg-[url("https://www.transparenttextures.com/patterns/wood-pattern.png")]',
+        button: 'bg-[#6b4c3e] hover:bg-[#5a3b2f] text-[#fdfbf7]',
+        cardBg: 'bg-[#2c2c2c] border-[#444]',
+    },
+}
+
 export default async function PublicCardPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params
     const card = await getCardBySlug(slug)
@@ -56,18 +90,22 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
         notFound()
     }
 
+    const material = card.material_type || 'sugi'
+    const theme = themes[material]
+
     return (
-        <div className="min-h-screen bg-[#fdfbf7] flex flex-col items-center py-12 sm:px-6 lg:px-8 font-sans text-stone-800">
+        <div className={`min-h-screen ${theme.bg} flex flex-col items-center py-12 sm:px-6 lg:px-8 font-sans ${theme.text} relative overflow-hidden transition-colors duration-500`}>
+            {/* Background Texture */}
+            <div className={`absolute inset-0 ${theme.pattern} pointer-events-none mix-blend-multiply`}></div>
+
             <ViewCounter slug={slug} />
-            <div className="w-full max-w-sm space-y-6 bg-white p-6 shadow-xl shadow-stone-200/50 rounded-2xl border border-stone-100">
+
+            <div className={`w-full max-w-sm space-y-6 ${theme.cardBg} p-8 shadow-2xl rounded-[2rem] border ${material === 'walnut' ? 'border-[#444]' : 'border-stone-100'} relative z-10`}>
 
                 {/* Header */}
                 <div className="text-center pt-2">
                     {/* Logo/Avatar */}
-                    <div className="mx-auto h-24 w-24 bg-gradient-to-br from-stone-100 to-stone-50 rounded-full flex items-center justify-center text-5xl mb-6 shadow-md ring-4 ring-white overflow-hidden relative">
-                        {/* 
-                            We cast card to include avatar_url which is joined in service.
-                        */}
+                    <div className={`mx-auto h-28 w-28 rounded-full flex items-center justify-center text-5xl mb-6 shadow-lg overflow-hidden relative border-4 ${material === 'walnut' ? 'border-[#3d3126]' : 'border-white'} bg-stone-100`}>
                         {(card as { avatar_url?: string | null } & typeof card).avatar_url ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
@@ -76,26 +114,26 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
                                 className="h-full w-full object-cover"
                             />
                         ) : (
-                            <span className="text-3xl font-bold text-stone-300">
+                            <span className="text-4xl">
                                 {card.title ? card.title.charAt(0).toUpperCase() : '🌲'}
                             </span>
                         )}
                     </div>
-                    <h1 className="text-2xl font-bold tracking-tight text-stone-900 leading-tight">
+                    <h1 className={`text-3xl ${theme.fontHead} font-bold tracking-tight mb-3`}>
                         {card.title}
                     </h1>
                     {card.description && (
-                        <p className="mt-3 text-sm text-stone-500 whitespace-pre-wrap leading-relaxed">
+                        <p className={`text-sm ${material === 'walnut' ? 'text-stone-400' : 'text-stone-500'} whitespace-pre-wrap leading-relaxed`}>
                             {card.description}
                         </p>
                     )}
                 </div>
 
                 {/* Action Buttons */}
-                <div className="mt-6">
+                <div className="mt-8">
                     <a
                         href={`/api/cards/${card.id}/vcard`}
-                        className="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-semibold text-white bg-stone-800 hover:bg-stone-700 active:scale-[0.98] transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500"
+                        className={`w-full flex justify-center items-center py-4 px-4 rounded-xl shadow-md text-sm font-bold tracking-wide transform transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] ${theme.button}`}
                     >
                         <UserPlus className="h-4 w-4 mr-2" />
                         Add to Contacts
@@ -103,7 +141,7 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
                 </div>
 
                 {/* Contents List */}
-                <div className="mt-8 space-y-4">
+                <div className="mt-10 space-y-4">
                     {card.contents.length === 0 && (
                         <div className="text-center py-10">
                             <p className="text-stone-400 text-sm">表示できる情報がありません</p>
@@ -116,26 +154,32 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
                             const config = platformConfig[platform] || { icon: LinkIcon, label: platform, color: 'text-gray-600' }
                             const Icon = config.icon
 
+                            // Customizing icon colors for walnut/dark theme if needed, or keeping brand colors
+                            // For consistency, let's keep brand colors but ensure visibility
+
                             return (
                                 <a
                                     key={item.id}
                                     href={url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="w-full flex items-center px-5 py-4 border border-stone-100 rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] bg-white hover:bg-[#faf9f6] hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] transition-all duration-300 group"
+                                    className={`
+                                        w-full flex items-center px-6 py-4 rounded-xl transition-all duration-300 group
+                                        ${material === 'walnut'
+                                            ? 'bg-[#333] border border-[#444] hover:bg-[#444] text-stone-300 hover:text-white shadow-none'
+                                            : 'bg-white border border-stone-100 hover:bg-[#faf9f6] hover:shadow-md text-stone-700 hover:text-stone-900 shadow-sm'}
+                                    `}
                                 >
-                                    <Icon className={`h-5 w-5 mr-3 ${config.color}`} />
-                                    <span className="flex-1 text-base font-medium text-stone-700 group-hover:text-stone-900 capitalize transition-colors">{config.label}</span>
-                                    {platform !== 'phone' && platform !== 'email' && (
-                                        <span className="text-stone-300 group-hover:text-stone-500 transition-colors">↗</span>
-                                    )}
+                                    <Icon className={`h-5 w-5 mr-4 ${config.color} ${material === 'walnut' ? 'opacity-90' : ''}`} />
+                                    <span className="flex-1 text-base font-bold capitalize">{config.label}</span>
+                                    <span className={`${material === 'walnut' ? 'text-stone-600' : 'text-stone-300'} group-hover:text-stone-500`}>↗</span>
                                 </a>
                             )
                         }
 
                         if (item.type === 'text' && isTextContent(item.content)) {
                             return (
-                                <div key={item.id} className="bg-[#faf9f6] rounded-xl p-5 text-center text-sm text-stone-600 leading-relaxed border border-stone-100">
+                                <div key={item.id} className={`rounded-xl p-6 text-center text-sm leading-relaxed border ${material === 'walnut' ? 'bg-[#333] border-[#444] text-stone-400' : 'bg-[#faf9f6] border-stone-100 text-stone-600'}`}>
                                     <p className="whitespace-pre-wrap">{item.content.text}</p>
                                 </div>
                             )
@@ -146,8 +190,8 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
                 </div>
 
                 {/* Footer */}
-                <div className="mt-10 text-center text-xs text-stone-400">
-                    Powered by <Link href="/" className="hover:text-stone-600 transition-colors">WoodLinks</Link>
+                <div className="mt-12 text-center text-xs opacity-50">
+                    <span className="font-serif">WoodLinks</span> Digital Card
                 </div>
 
             </div>
