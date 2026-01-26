@@ -42,7 +42,7 @@ export default async function SettingsPage() {
                             initialTitle={primaryCard.title || ''}
                             initialSlug={primaryCard.slug || ''}
                             initialDescription={primaryCard.description}
-                            initialIsPublished={primaryCard.is_published}
+                            initialStatus={primaryCard.status}
                             initialMaterialType={primaryCard.material_type || 'sugi'}
                         />
                     ) : (

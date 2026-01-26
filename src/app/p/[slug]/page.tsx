@@ -98,7 +98,7 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
             {/* Background Texture */}
             <div className={`absolute inset-0 ${theme.pattern} pointer-events-none mix-blend-multiply`}></div>
 
-            <ViewCounter slug={slug} />
+            <ViewCounter cardId={card.id} />
 
             <div className={`w-full max-w-sm space-y-6 ${theme.cardBg} p-8 shadow-2xl rounded-[2rem] border ${material === 'walnut' ? 'border-[#444]' : 'border-stone-100'} relative z-10`}>
 

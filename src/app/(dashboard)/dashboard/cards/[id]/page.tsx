@@ -39,10 +39,10 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
                     </nav>
                 </div>
                 <div className="flex items-center gap-3">
-                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold tracking-wide border ${card.is_published ? 'bg-[#f4f1ea] text-[#3d3126] border-[#3d3126]' : 'bg-[#e6e2d3] text-[#8c7b6c] border-transparent'}`}>
-                        {card.is_published ? 'LIVE' : 'DRAFT'}
+                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold tracking-wide border ${card.status === 'published' ? 'bg-[#f4f1ea] text-[#3d3126] border-[#3d3126]' : 'bg-[#e6e2d3] text-[#8c7b6c] border-transparent'}`}>
+                        {card.status === 'published' ? 'LIVE' : card.status.toUpperCase()}
                     </span>
-                    {card.slug && card.is_published && (
+                    {card.slug && card.status === 'published' && (
                         <a
                             href={`/p/${card.slug}`}
                             target="_blank"
@@ -57,7 +57,7 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
             </div>
 
             {/* Validation Alert */}
-            {(!card.is_published || !card.slug) && (
+            {(card.status !== 'published' || !card.slug) && (
                 <div className="mb-8 rounded-lg bg-[#faf9f6] p-4 border-l-4 border-[#d4a373] shadow-sm">
                     <div className="flex">
                         <div className="flex-shrink-0">
@@ -95,7 +95,7 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
                         initialTitle={card.title || ''}
                         initialSlug={card.slug || ''}
                         initialDescription={card.description}
-                        initialIsPublished={card.is_published}
+                        initialStatus={card.status}
                         initialMaterialType={card.material_type || 'sugi'}
                     />
                 </div>

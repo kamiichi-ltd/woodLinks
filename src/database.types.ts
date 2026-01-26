@@ -44,6 +44,7 @@ export interface Database {
           is_published: boolean
           view_count: number
           material_type: 'sugi' | 'hinoki' | 'walnut'
+          status: 'draft' | 'published' | 'lost_reissued' | 'disabled' | 'transferred'
         }
         Insert: {
           id?: string
@@ -55,6 +56,8 @@ export interface Database {
           slug?: string | null
           is_published?: boolean
           view_count?: number
+          material_type?: 'sugi' | 'hinoki' | 'walnut'
+          status?: 'draft' | 'published' | 'lost_reissued' | 'disabled' | 'transferred'
         }
         Update: {
           id?: string
@@ -66,6 +69,8 @@ export interface Database {
           slug?: string | null
           is_published?: boolean
           view_count?: number
+          material_type?: 'sugi' | 'hinoki' | 'walnut'
+          status?: 'draft' | 'published' | 'lost_reissued' | 'disabled' | 'transferred'
         }
       }
       card_contents: {
@@ -91,6 +96,32 @@ export interface Database {
           type?: string
           content?: Json
           order_index?: number
+          created_at?: string
+        }
+      }
+      card_lifecycle_logs: {
+        Row: {
+          id: string
+          card_id: string
+          event_type: string
+          reason: string | null
+          meta: Json | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          card_id: string
+          event_type: string
+          reason?: string | null
+          meta?: Json | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          card_id?: string
+          event_type?: string
+          reason?: string | null
+          meta?: Json | null
           created_at?: string
         }
       }

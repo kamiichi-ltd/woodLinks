@@ -9,15 +9,15 @@ interface CardSettingsFormProps {
     initialTitle: string
     initialSlug: string
     initialDescription: string | null
-    initialIsPublished: boolean
+    initialStatus: 'draft' | 'published' | 'lost_reissued' | 'disabled' | 'transferred'
     initialMaterialType: 'sugi' | 'hinoki' | 'walnut'
 }
 
-export default function CardSettingsForm({ cardId, initialTitle, initialSlug, initialDescription, initialIsPublished, initialMaterialType }: CardSettingsFormProps) {
+export default function CardSettingsForm({ cardId, initialTitle, initialSlug, initialDescription, initialStatus, initialMaterialType }: CardSettingsFormProps) {
     const [title, setTitle] = useState(initialTitle)
     const [slug, setSlug] = useState(initialSlug)
     const [description, setDescription] = useState(initialDescription || '')
-    const [isPublished, setIsPublished] = useState(initialIsPublished)
+    const [status, setStatus] = useState(initialStatus || 'draft')
     const [materialType, setMaterialType] = useState(initialMaterialType || 'sugi')
     const [isLoading, setIsLoading] = useState(false)
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
@@ -33,7 +33,7 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                 title,
                 slug,
                 description,
-                is_published: isPublished,
+                status,
                 material_type: materialType,
             })
             setMessage({ type: 'success', text: '設定を更新しました' })
@@ -197,19 +197,27 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                 <div className="flex items-center gap-x-4 bg-[#fdfbf7] p-5 rounded-2xl border border-[#e6e2d3] hover:border-[#d4c5ae] transition-colors">
                     <div className="flex h-6 items-center">
                         <input
-                            id="is_published"
-                            name="is_published"
+                            id="status"
+                            name="status"
                             type="checkbox"
-                            checked={isPublished}
-                            onChange={(e) => setIsPublished(e.target.checked)}
-                            className="h-5 w-5 rounded border-[#d4c5ae] text-[#2c3e50] focus:ring-[#2c3e50] cursor-pointer"
+                            checked={status === 'published'}
+                            onChange={(e) => setStatus(e.target.checked ? 'published' : 'draft')}
+                            disabled={['lost_reissued', 'disabled', 'transferred'].includes(status)}
+                            className="h-5 w-5 rounded border-[#d4c5ae] text-[#2c3e50] focus:ring-[#2c3e50] cursor-pointer disabled:opacity-50"
                         />
                     </div>
                     <div className="text-sm leading-6">
-                        <label htmlFor="is_published" className="font-bold text-[#2c3e50] cursor-pointer select-none">
+                        <label htmlFor="status" className="font-bold text-[#2c3e50] cursor-pointer select-none">
                             Publish Card <span className="font-normal text-[#8c7b6c]">/ 名刺を公開する</span>
                         </label>
-                        <p className="text-[#8c7b6c] text-xs">Make your card visible to the world.</p>
+                        <p className="text-[#8c7b6c] text-xs">
+                            {status === 'published' ? 'Your card is visible to the world.' : 'Your card is currently private (Draft).'}
+                        </p>
+                        {['lost_reissued', 'disabled', 'transferred'].includes(status) && (
+                            <p className="text-red-600 text-xs font-bold mt-1">
+                                Status: {status.toUpperCase()} (Cannot be changed here)
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>

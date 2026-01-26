@@ -38,12 +38,12 @@ export default async function DashboardPage() {
                             {/* Card Body with Wood Texture Simulation */}
                             <div className={`
                                 relative h-60 rounded-[2rem] transition-all duration-500 ease-out overflow-hidden
-                                ${card.is_published
+                                ${card.status === 'published'
                                     ? 'bg-[#e8dec5] shadow-[0_10px_30px_-10px_rgba(140,123,108,0.4)] group-hover:shadow-[0_20px_40px_-10px_rgba(140,123,108,0.5)] group-hover:-translate-y-1 group-hover:scale-[1.01]'
                                     : 'bg-[#faf9f6]/80 border-2 border-dashed border-[#e6e2d3] hover:border-[#d4c5ae] hover:-translate-y-0.5'}
                             `}>
                                 {/* Wood Grain Overlay for Published Cards */}
-                                {card.is_published && (
+                                {card.status === 'published' && (
                                     <>
                                         {/* Grain 1: Fine texture */}
                                         <div className="absolute inset-0 opacity-30 mix-blend-multiply bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] pointer-events-none"></div>
@@ -58,18 +58,18 @@ export default async function DashboardPage() {
                                         <div className="flex justify-between items-start mb-4">
                                             <span className={`
                                                 inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold tracking-widest uppercase
-                                                ${card.is_published
+                                                ${card.status === 'published'
                                                     ? 'bg-[#2c3e50] text-[#fdfbf7] shadow-sm'
                                                     : 'bg-[#e6e2d3] text-[#8c7b6c]'}
                                             `}>
-                                                {card.is_published ? 'LIVE' : 'DRAFT'}
+                                                {card.status === 'published' ? 'LIVE' : card.status.toUpperCase()}
                                             </span>
-                                            {card.is_published && (
+                                            {card.status === 'published' && (
                                                 <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)] animate-pulse"></div>
                                             )}
                                         </div>
 
-                                        <h3 className={`text-2xl font-serif font-bold leading-tight group-hover:underline decoration-2 decoration-[#d4a373] underline-offset-4 ${card.is_published ? 'text-[#3d3126]' : 'text-[#8c7b6c]'}`}>
+                                        <h3 className={`text-2xl font-serif font-bold leading-tight group-hover:underline decoration-2 decoration-[#d4a373] underline-offset-4 ${card.status === 'published' ? 'text-[#3d3126]' : 'text-[#8c7b6c]'}`}>
                                             {card.title}
                                         </h3>
                                         <p className="mt-2 text-xs text-[#8c7b6c] line-clamp-2 opacity-80">
@@ -78,7 +78,7 @@ export default async function DashboardPage() {
                                     </div>
 
                                     {/* Bottom: Stats & Action */}
-                                    <div className={`flex items-end justify-between pt-4 ${card.is_published ? 'border-t border-[#3d3126]/10' : 'border-t border-[#e6e2d3]'}`}>
+                                    <div className={`flex items-end justify-between pt-4 ${card.status === 'published' ? 'border-t border-[#3d3126]/10' : 'border-t border-[#e6e2d3]'}`}>
                                         <div className="flex flex-col">
                                             <span className="text-[9px] uppercase tracking-[0.2em] text-[#8c7b6c] mb-0.5">Views</span>
                                             <span className="text-3xl font-serif font-bold text-[#2c3e50] leading-none">

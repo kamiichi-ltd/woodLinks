@@ -111,7 +111,7 @@ export async function getCardBySlug(slug: string) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .select('*' as any)
         .eq('slug', slug)
-        .eq('is_published', true)
+        .eq('status', 'published')
         .single()
 
     if (cardError || !card) {
@@ -171,7 +171,7 @@ export async function createCard(formData: FormData) {
         user_id: user.id,
         title,
         slug,
-        is_published: false,
+        status: 'draft',
     }
 
     const { data, error } = await supabase
@@ -189,7 +189,7 @@ export async function createCard(formData: FormData) {
     return data
 }
 
-export async function updateCard(id: string, updates: { title?: string; description?: string; is_published?: boolean; slug?: string; material_type?: 'sugi' | 'hinoki' | 'walnut' }) {
+export async function updateCard(id: string, updates: { title?: string; description?: string; status?: 'draft' | 'published' | 'lost_reissued' | 'disabled' | 'transferred'; slug?: string; material_type?: 'sugi' | 'hinoki' | 'walnut' }) {
     const supabase = await createClient()
     const {
         data: { user },
@@ -199,7 +199,7 @@ export async function updateCard(id: string, updates: { title?: string; descript
         throw new Error('Unauthorized')
     }
 
-    const updatePayload: { title?: string; description?: string; is_published?: boolean; slug?: string; material_type?: 'sugi' | 'hinoki' | 'walnut' } = { ...updates }
+    const updatePayload: { title?: string; description?: string; status?: 'draft' | 'published' | 'lost_reissued' | 'disabled' | 'transferred'; slug?: string; material_type?: 'sugi' | 'hinoki' | 'walnut' } = { ...updates }
 
     // Logic to ensure slug exists if not already, or if title changes and slug is empty (though slug is usually persistent)
     // For now, if we are updating title, let's check if we want to regenerate slug? 
@@ -359,7 +359,7 @@ export async function getPublicCardById(id: string) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .select('*' as any)
         .eq('id', id)
-        .eq('is_published', true)
+        .eq('status', 'published')
         .single()
 
     if (cardError || !card) {
@@ -396,10 +396,15 @@ export async function getPublicCardById(id: string) {
     }
 }
 
-export async function incrementViewCount(slug: string) {
+export async function incrementViewCount(id: string) {
     const supabase = await createClient()
+
+    // RPC now accepts card_id directly (after running refine_infrastructure_safety.sql)
+    // The RPC function signature expected is increment_view_count(card_id uuid)
+    // We cast to any because Types might not be updated yet
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await supabase.rpc('increment_view_count', { card_slug: slug } as any)
+    const { error } = await supabase.rpc('increment_view_count', { card_id: id } as any)
+
     if (error) {
         console.error('Error incrementing view count:', error)
     }

@@ -3,15 +3,15 @@
 import { incrementViewCount } from '@/services/card-service'
 import { useEffect, useRef } from 'react'
 
-export function ViewCounter({ slug }: { slug: string }) {
+export function ViewCounter({ cardId }: { cardId: string }) {
     const hasIncremented = useRef(false)
 
     useEffect(() => {
         if (!hasIncremented.current) {
-            incrementViewCount(slug)
+            incrementViewCount(cardId)
             hasIncremented.current = true
         }
-    }, [slug])
+    }, [cardId])
 
     return null
 }
