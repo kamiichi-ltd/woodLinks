@@ -1,0 +1,76 @@
+import { getCard } from '@/services/card-service'
+import { notFound } from 'next/navigation'
+import ContentEditor, { ContentItem } from './content-editor'
+import Link from 'next/link'
+
+export default async function CardEditPage({ params }: { params: { id: string } }) {
+    // Await params in case it's a promise (Next.js future changes) though currently object in older versions, 
+    // but safest is to treat validly. In standard Next.js 13/14 app router params is prop.
+    // Actually params is just an object. 
+
+    const card = await getCard(params.id)
+
+    if (!card) {
+        notFound()
+    }
+
+    return (
+        <div>
+            <div className="mb-6 flex items-center justify-between">
+                <div>
+                    <nav className="sm:hidden" aria-label="Back">
+                        <Link href="/dashboard" className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
+                            Back to Dashboard
+                        </Link>
+                    </nav>
+                    <nav className="hidden sm:flex" aria-label="Breadcrumb">
+                        <ol role="list" className="flex items-center space-x-4">
+                            <li>
+                                <div className="flex">
+                                    <Link href="/dashboard" className="text-sm font-medium text-gray-500 hover:text-gray-700">Dashboard</Link>
+                                </div>
+                            </li>
+                            <li>
+                                <div className="flex items-center">
+                                    <svg className="h-5 w-5 flex-shrink-0 text-gray-300" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                        <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
+                                    </svg>
+                                    <span className="ml-4 text-sm font-medium text-gray-500">{card.title}</span>
+                                </div>
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+                <div className="mt-2 flex md:ml-4 md:mt-0">
+                    <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${card.is_published ? 'bg-green-50 text-green-700 ring-green-600/20' : 'bg-yellow-50 text-yellow-800 ring-yellow-600/20'}`}>
+                        {card.is_published ? 'Published' : 'Draft'}
+                    </span>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <div>
+                    <h2 className="text-lg font-medium text-gray-900 mb-4">Content Editor</h2>
+                    <ContentEditor cardId={card.id} initialContents={card.contents as unknown as ContentItem[]} />
+                </div>
+
+                <div>
+                    {/* Preview or other details can go here */}
+                    <div className="bg-white shadow sm:rounded-lg p-6">
+                        <h3 className="text-base font-semibold leading-6 text-gray-900">Card Details</h3>
+                        <dl className="mt-4 divide-y divide-gray-100">
+                            <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                                <dt className="text-sm font-medium leading-6 text-gray-900">Slug</dt>
+                                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{card.slug || 'Not generated'}</dd>
+                            </div>
+                            <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                                <dt className="text-sm font-medium leading-6 text-gray-900">Description</dt>
+                                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{card.description || 'No description'}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}

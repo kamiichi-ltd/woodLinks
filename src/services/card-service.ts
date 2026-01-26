@@ -2,8 +2,19 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { Database, Json } from '@/database.types'
 
-export async function getCards() {
+type Card = Database['public']['Tables']['cards']['Row']
+type CardContent = Database['public']['Tables']['card_contents']['Row']
+
+function generateSlug(title: string): string {
+    return title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '') + '-' + Math.random().toString(36).substring(2, 7)
+}
+
+export async function getCards(): Promise<Card[]> {
     const supabase = await createClient()
     const {
         data: { user },
@@ -24,7 +35,48 @@ export async function getCards() {
         throw new Error('Failed to fetch cards')
     }
 
-    return data
+    return (data as unknown as Card[]) ?? []
+}
+
+export async function getCard(id: string) {
+    const supabase = await createClient()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+        return null
+    }
+
+    const { data: card, error: cardError } = await supabase
+        .from('cards')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .select('*' as any)
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .single()
+
+    if (cardError) {
+        console.error('Error fetching card:', cardError)
+        return null
+    }
+
+    const { data: contents, error: contentError } = await supabase
+        .from('card_contents')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .select('*' as any)
+        .eq('card_id', id)
+        .order('order_index', { ascending: true })
+
+    if (contentError) {
+        console.error('Error fetching card contents:', contentError)
+        // defaulting to empty contents if fetch fails
+    }
+
+    return {
+        ...(card as unknown as Card),
+        contents: (contents as unknown as CardContent[]) || []
+    }
 }
 
 export async function createCard(formData: FormData) {
@@ -43,13 +95,19 @@ export async function createCard(formData: FormData) {
         throw new Error('Title is required')
     }
 
+    const slug = generateSlug(title)
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const insertPayload: any = {
+        user_id: user.id,
+        title,
+        slug,
+        is_published: false,
+    }
+
     const { data, error } = await supabase
         .from('cards')
-        .insert({
-            user_id: user.id,
-            title,
-            is_published: false,
-        })
+        .insert(insertPayload)
         .select()
         .single()
 
@@ -72,9 +130,23 @@ export async function updateCard(id: string, updates: { title?: string; descript
         throw new Error('Unauthorized')
     }
 
+    const updatePayload: { title?: string; description?: string; is_published?: boolean; slug?: string } = { ...updates }
+
+    // Logic to ensure slug exists if not already, or if title changes and slug is empty (though slug is usually persistent)
+    // For now, if we are updating title, let's check if we want to regenerate slug? 
+    // Requirement says: "cards table slug is empty, auto generate from title at create or update"
+    if (updates.title) {
+        const { data: currentCard } = await supabase.from('cards').select('slug').eq('id', id).single()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if (currentCard && !(currentCard as any).slug) {
+            updatePayload.slug = generateSlug(updates.title)
+        }
+    }
+
     const { data, error } = await supabase
         .from('cards')
-        .update(updates)
+        // @ts-expect-error Supabase types issue
+        .update(updatePayload)
         .eq('id', id)
         .eq('user_id', user.id)
         .select()
@@ -111,4 +183,87 @@ export async function deleteCard(id: string) {
     }
 
     revalidatePath('/dashboard')
+}
+
+export async function addCardContent(cardId: string, type: 'sns_link' | 'text', content: Json) {
+    const supabase = await createClient()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+        throw new Error('Unauthorized')
+    }
+
+    // Checking ownership
+    const { count } = await supabase.from('cards').select('*', { count: 'exact', head: true }).eq('id', cardId).eq('user_id', user.id)
+    if (!count) {
+        throw new Error('Card not found or access denied')
+    }
+
+    // Get current max order
+    const { data: maxOrderData } = await supabase
+        .from('card_contents')
+        .select('order_index')
+        .eq('card_id', cardId)
+        .order('order_index', { ascending: false })
+        .limit(1)
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const nextOrder = ((maxOrderData?.[0] as any)?.order_index ?? -1) + 1
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const contentPayload: any = {
+        card_id: cardId,
+        type,
+        content,
+        order_index: nextOrder,
+    }
+
+    const { data, error } = await supabase
+        .from('card_contents')
+        .insert(contentPayload)
+        .select()
+        .single()
+
+    if (error) {
+        console.error('Error adding content:', error)
+        throw new Error('Failed to add content')
+    }
+
+    revalidatePath(`/dashboard/cards/${cardId}`)
+    return data
+}
+
+export async function deleteCardContent(contentId: string, cardId: string) {
+    const supabase = await createClient()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+        throw new Error('Unauthorized')
+    }
+
+    // Verify ownership of the card via the content relation is tricky without a join or multiple queries 
+    // or RLS (which should handle it, but we are in server action)
+    // Let's verify card ownership first
+    const { count } = await supabase.from('cards').select('*', { count: 'exact', head: true }).eq('id', cardId).eq('user_id', user.id)
+
+    if (!count) {
+        throw new Error('Card not found or access denied')
+    }
+
+    const { error } = await supabase
+        .from('card_contents')
+        .delete()
+        .eq('id', contentId)
+        .eq('card_id', cardId) // Extra safety to ensure it belongs to the card we checked
+
+    if (error) {
+        console.error('Error deleting content:', error)
+        throw new Error('Failed to delete content')
+    }
+
+    revalidatePath(`/dashboard/cards/${cardId}`)
 }
