@@ -38,20 +38,20 @@ export default async function PublicCardPage({ params }: { params: { slug: strin
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center py-12 sm:px-6 lg:px-8">
-            <div className="w-full max-w-md space-y-8 bg-white p-8 shadow-2xl rounded-xl">
+        <div className="min-h-screen bg-slate-50 flex flex-col items-center py-12 sm:px-6 lg:px-8 font-sans text-gray-800">
+            <div className="w-full max-w-sm space-y-6 bg-white p-6 shadow-xl rounded-2xl border border-gray-100">
 
                 {/* Header */}
-                <div className="text-center">
-                    {/* Logo or Avatar placeholder can go here */}
-                    <div className="mx-auto h-20 w-20 bg-indigo-100 rounded-full flex items-center justify-center text-4xl mb-4">
-                        🏷️
+                <div className="text-center pt-2">
+                    {/* Logo/Avatar */}
+                    <div className="mx-auto h-24 w-24 bg-gradient-to-br from-indigo-50 to-slate-100 rounded-full flex items-center justify-center text-5xl mb-6 shadow-inner ring-4 ring-white">
+                        🌲
                     </div>
-                    <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                    <h1 className="text-2xl font-bold tracking-tight text-gray-900 leading-tight">
                         {card.title}
                     </h1>
                     {card.description && (
-                        <p className="mt-2 text-lg text-gray-500">
+                        <p className="mt-3 text-sm text-gray-500 whitespace-pre-wrap leading-relaxed">
                             {card.description}
                         </p>
                     )}
@@ -88,12 +88,12 @@ export default async function PublicCardPage({ params }: { params: { slug: strin
                                     href={url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="w-full flex items-center px-6 py-4 border border-gray-200 rounded-lg shadow-sm text-lg font-medium text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all group"
+                                    className="w-full flex items-center px-5 py-4 border border-gray-100 rounded-xl shadow-[0_2px_4px_rgba(0,0,0,0.02)] bg-white hover:bg-slate-50 hover:shadow-sm transition-all group"
                                 >
-                                    <Icon className={`h-6 w-6 mr-4 ${config.color}`} />
-                                    <span className="flex-1 capitalize">{config.label}</span>
+                                    <Icon className={`h-5 w-5 mr-3 ${config.color}`} />
+                                    <span className="flex-1 text-base font-medium text-gray-700 group-hover:text-gray-900 capitalize transition-colors">{config.label}</span>
                                     {platform !== 'phone' && platform !== 'email' && (
-                                        <span className="text-gray-400 group-hover:text-gray-500">↗</span>
+                                        <span className="text-gray-300 group-hover:text-gray-500 transition-colors">↗</span>
                                     )}
                                 </a>
                             )
@@ -101,8 +101,8 @@ export default async function PublicCardPage({ params }: { params: { slug: strin
 
                         if (item.type === 'text' && isTextContent(item.content)) {
                             return (
-                                <div key={item.id} className="bg-gray-50 rounded-lg p-4 text-center">
-                                    <p className="text-gray-700 whitespace-pre-wrap">{item.content.text}</p>
+                                <div key={item.id} className="bg-slate-50 rounded-xl p-5 text-center text-sm text-gray-600 leading-relaxed border border-slate-100">
+                                    <p className="whitespace-pre-wrap">{item.content.text}</p>
                                 </div>
                             )
                         }
