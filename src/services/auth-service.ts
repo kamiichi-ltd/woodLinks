@@ -53,28 +53,35 @@ export async function signup(formData: FormData) {
     }
 
     if (data.user) {
-        // Create profile
+        console.log('[Auth] SignUp successful, User ID:', data.user.id)
+
+        // Create or Update profile (upsert)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const profilePayload: any = {
             id: data.user.id,
             email: email,
             full_name: email.split('@')[0],
+            updated_at: new Date().toISOString(),
         }
+
+        console.log('[Auth] Attempting to create profile for:', data.user.id)
 
         const { error: profileError } = await supabase
             .from('profiles')
-            .insert(profilePayload)
-            .select() // Ensure it was created
+            .upsert(profilePayload)
+            .select()
 
         if (profileError) {
-            console.error('Error creating profile:', profileError)
-            // Continue even if profile creation fails? Ideally retry or fail. 
-            // For MVP, we log it. In prod, maybe throw or use a trigger.
+            console.error('[Auth] Error creating/updating profile:', profileError)
+            console.error('[Auth] Profile Payload:', profilePayload)
+            // Ideally we might want to throw here to alert the user, 
+            // but the auth user is already created. 
+            // We'll log it and proceed, as the user can try to fix profile later or we rely on triggers.
+        } else {
+            console.log('[Auth] Profile created successfully')
         }
-
-        // Also create a default card for the user? 
-        // Requirement said "profiles table", but cards are useful too. 
-        // Let's stick to profiles first as requested.
+    } else {
+        console.warn('[Auth] SignUp returned no user data')
     }
 
     revalidatePath('/', 'layout')
