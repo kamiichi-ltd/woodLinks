@@ -77,18 +77,18 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-                <div className="lg:col-span-7 space-y-8">
-                    <div>
-                        <h2 className="text-3xl font-serif font-bold text-[#2c3e50] tracking-tight">Content Editor</h2>
-                        <p className="mt-2 text-[#8c7b6c] font-medium">Manage your links and texts. / コンテンツの追加と編集</p>
+                <div className="lg:col-span-7 space-y-6">
+                    <div className="flex items-end gap-3 mb-2">
+                        <h2 className="text-2xl font-serif font-bold text-[#2c3e50] leading-none">Content Editor</h2>
+                        <span className="text-sm font-medium text-[#8c7b6c] mb-0.5">/ コンテンツ編集</span>
                     </div>
                     <ContentEditor cardId={card.id} initialContents={card.contents as unknown as ContentItem[]} />
                 </div>
 
-                <div className="lg:col-span-5 space-y-8 lg:sticky lg:top-8">
-                    <div>
-                        <h2 className="text-2xl font-serif font-bold text-[#2c3e50] tracking-tight">Settings</h2>
-                        <p className="mt-2 text-[#8c7b6c] font-medium">Card Configuration. / 設定</p>
+                <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-8">
+                    <div className="flex items-end gap-3 mb-2">
+                        <h2 className="text-2xl font-serif font-bold text-[#2c3e50] leading-none">Card Settings</h2>
+                        <span className="text-sm font-medium text-[#8c7b6c] mb-0.5">/ 名刺設定</span>
                     </div>
                     <CardSettingsForm
                         cardId={card.id}

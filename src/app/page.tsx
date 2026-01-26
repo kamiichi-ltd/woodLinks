@@ -24,8 +24,8 @@ export default async function Home() {
               デモを見る
             </Link>
             <Link
-              href="/dashboard"
-              className="text-sm font-semibold leading-6 text-[#fdfbf7] bg-[#3d3126] px-5 py-2.5 rounded-full hover:bg-[#2c221b] transition-all shadow-sm"
+              href="/login"
+              className="rounded-full bg-[#fdfbf7] text-[#3d3126] px-5 py-2.5 text-sm font-semibold hover:bg-[#eae0cf] transition-colors"
             >
               ログイン
             </Link>
@@ -54,7 +54,7 @@ export default async function Home() {
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
                 <Link
-                  href="/dashboard"
+                  href="/login"
                   className="w-full sm:w-auto rounded-full bg-[#2c3e50] px-10 py-4 text-lg font-bold text-white shadow-xl shadow-[#2c3e50]/20 hover:bg-[#1a252f] hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2"
                 >
                   Create Your Card <ArrowRight className="h-5 w-5" />

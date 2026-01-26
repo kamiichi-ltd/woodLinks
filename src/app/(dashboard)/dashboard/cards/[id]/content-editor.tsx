@@ -57,7 +57,7 @@ function SortableItem({ item, onDelete, isPending }: { item: ContentItem; onDele
     }
 
     return (
-        <li ref={setNodeRef} style={style} className="flex items-center justify-between gap-x-6 py-4 px-6 bg-white border border-[#e6e2d3] rounded-xl shadow-sm hover:shadow-md transition-all duration-200 group relative overflow-hidden">
+        <li ref={setNodeRef} style={style} className="flex items-center justify-between gap-x-4 sm:gap-x-6 py-4 px-4 sm:px-6 bg-white border border-[#e6e2d3] rounded-xl shadow-sm hover:shadow-md transition-all duration-200 group relative overflow-hidden">
             {/* Hover accent */}
             <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#d4c5ae] opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
@@ -182,7 +182,7 @@ export default function ContentEditor({ cardId, initialContents }: { cardId: str
 
     return (
         <div className="bg-white/90 backdrop-blur-md shadow-lg border border-[#e6e2d3] rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl">
-            <div className="p-6 sm:p-8">
+            <div className="p-5 sm:p-8">
                 {/* Add New Content Form */}
                 <div className="bg-[#fdfbf7] rounded-2xl p-6 mb-10 border border-[#e6e2d3] shadow-inner relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
