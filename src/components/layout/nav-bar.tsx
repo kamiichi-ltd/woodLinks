@@ -15,7 +15,7 @@ export default function NavBar() {
                     </nav>
                 </div>
                 <div className="flex items-center gap-x-4">
-                    <Link href="/dashboard/settings" className="text-stone-300 hover:text-white transition-colors group" title="Settings">
+                    <Link href="/dashboard/profile" className="text-stone-300 hover:text-white transition-colors group" title="Profile & Settings">
                         <div className="h-8 w-8 rounded-full bg-stone-700 flex items-center justify-center group-hover:bg-stone-600 transition-colors">
                             <User className="h-4 w-4" />
                         </div>

@@ -1,7 +1,7 @@
 import { getCard } from '@/services/card-service'
 import { notFound } from 'next/navigation'
 import ContentEditor, { ContentItem } from './content-editor'
-import CardSettingsForm from './card-settings-form'
+import CardSettingsForm from '@/components/forms/card-settings-form'
 import Link from 'next/link'
 import { ExternalLink, AlertTriangle } from 'lucide-react'
 
