@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import ContentEditor, { ContentItem } from './content-editor'
 import CardSettingsForm from './card-settings-form'
 import Link from 'next/link'
+import { ExternalLink, AlertTriangle } from 'lucide-react'
 
 export default async function CardEditPage({ params }: { params: { id: string } }) {
     // Await params in case it's a promise (Next.js future changes) though currently object in older versions, 
@@ -46,8 +47,38 @@ export default async function CardEditPage({ params }: { params: { id: string } 
                     <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${card.is_published ? 'bg-green-50 text-green-700 ring-green-600/20' : 'bg-yellow-50 text-yellow-800 ring-yellow-600/20'}`}>
                         {card.is_published ? 'Published' : 'Draft'}
                     </span>
+                    {card.slug && card.is_published && (
+                        <a
+                            href={`/p/${card.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-4 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                        >
+                            <ExternalLink className="h-4 w-4 mr-2 text-gray-500" />
+                            View Public Page
+                        </a>
+                    )}
                 </div>
             </div>
+
+            {/* Validation Alert */}
+            {(!card.is_published || !card.slug) && (
+                <div className="mb-6 rounded-md bg-yellow-50 p-4 border border-yellow-200">
+                    <div className="flex">
+                        <div className="flex-shrink-0">
+                            <AlertTriangle className="h-5 w-5 text-yellow-400" aria-hidden="true" />
+                        </div>
+                        <div className="ml-3">
+                            <h3 className="text-sm font-medium text-yellow-800">Card is not live</h3>
+                            <div className="mt-2 text-sm text-yellow-700">
+                                <p>
+                                    To make your digital business card accessible to others, please set a unique URL slug and publish it in the settings below.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <div>
