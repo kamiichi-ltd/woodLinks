@@ -1,4 +1,4 @@
-import { getCard } from '@/services/card-service'
+import { getPublicCardById } from '@/services/card-service'
 import { redirect } from 'next/navigation'
 import { AlertCircle, Clock, Construction } from 'lucide-react'
 
@@ -8,7 +8,7 @@ import { AlertCircle, Clock, Construction } from 'lucide-react'
 
 export default async function PhysicalCardEntryPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
-    const card = await getCard(id)
+    const card = await getPublicCardById(id)
 
     if (!card) {
         // Unknown card - could be an invalid ID or deleted card

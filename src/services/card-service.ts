@@ -359,7 +359,6 @@ export async function getPublicCardById(id: string) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .select('*' as any)
         .eq('id', id)
-        .eq('status', 'published')
         .single()
 
     if (cardError || !card) {
