@@ -2,6 +2,7 @@ import { getCardBySlug } from '@/services/card-service'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Database } from '@/database.types'
+import { UserPlus, Link as LinkIcon, Phone, Mail, Instagram, Twitter, Facebook, Github, Globe, LucideIcon } from 'lucide-react'
 
 type CardContent = Database['public']['Tables']['card_contents']['Row']
 
@@ -17,6 +18,16 @@ function isSnsContent(content: unknown): content is { platform: string; url: str
 
 function isTextContent(content: unknown): content is { text: string } {
     return typeof content === 'object' && content !== null && 'text' in content
+}
+
+const platformConfig: Record<string, { icon: LucideIcon, label: string, color: string }> = {
+    twitter: { icon: Twitter, label: 'X (Twitter)', color: 'text-black' },
+    instagram: { icon: Instagram, label: 'Instagram', color: 'text-pink-600' },
+    facebook: { icon: Facebook, label: 'Facebook', color: 'text-blue-600' },
+    github: { icon: Github, label: 'GitHub', color: 'text-gray-900' },
+    website: { icon: Globe, label: 'Website', color: 'text-gray-600' },
+    phone: { icon: Phone, label: 'Phone', color: 'text-green-600' },
+    email: { icon: Mail, label: 'Email', color: 'text-indigo-600' },
 }
 
 export default async function PublicCardPage({ params }: { params: { slug: string } }) {
@@ -50,8 +61,9 @@ export default async function PublicCardPage({ params }: { params: { slug: strin
                 <div className="mt-6">
                     <a
                         href={`/api/cards/${card.id}/vcard`}
-                        className="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                        className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
                     >
+                        <UserPlus className="h-4 w-4 mr-2" />
                         Add to Contacts
                     </a>
                 </div>
@@ -59,23 +71,30 @@ export default async function PublicCardPage({ params }: { params: { slug: strin
                 {/* Contents List */}
                 <div className="mt-8 space-y-4">
                     {card.contents.length === 0 && (
-                        <p className="text-center text-gray-400 text-sm">No details provided yet.</p>
+                        <div className="text-center py-10">
+                            <p className="text-gray-400 text-sm">表示できる情報がありません</p>
+                        </div>
                     )}
 
                     {card.contents.map((item: CardContent) => {
                         if (item.type === 'sns_link' && isSnsContent(item.content)) {
                             const { platform, url } = item.content
+                            const config = platformConfig[platform] || { icon: LinkIcon, label: platform, color: 'text-gray-600' }
+                            const Icon = config.icon
+
                             return (
                                 <a
                                     key={item.id}
                                     href={url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="w-full flex items-center justify-center px-6 py-4 border border-gray-200 rounded-lg shadow-sm text-lg font-medium text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all group"
+                                    className="w-full flex items-center px-6 py-4 border border-gray-200 rounded-lg shadow-sm text-lg font-medium text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all group"
                                 >
-                                    {/* Simple Logic to show platform name capitalized */}
-                                    <span className="capitalize">{platform}</span>
-                                    <span className="ml-2 text-gray-400 group-hover:text-gray-500">↗</span>
+                                    <Icon className={`h-6 w-6 mr-4 ${config.color}`} />
+                                    <span className="flex-1 capitalize">{config.label}</span>
+                                    {platform !== 'phone' && platform !== 'email' && (
+                                        <span className="text-gray-400 group-hover:text-gray-500">↗</span>
+                                    )}
                                 </a>
                             )
                         }

@@ -7,11 +7,30 @@ import { Database, Json } from '@/database.types'
 type Card = Database['public']['Tables']['cards']['Row']
 type CardContent = Database['public']['Tables']['card_contents']['Row']
 
-function generateSlug(title: string): string {
-    return title
+// Helper to generate unique slug
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function generateUniqueSlug(supabase: any, title: string): Promise<string> {
+    const baseSlug = title
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '') + '-' + Math.random().toString(36).substring(2, 7)
+        .replace(/(^-|-$)/g, '')
+
+    if (!baseSlug) {
+        return Math.random().toString(36).substring(2, 7)
+    }
+
+    // Check if baseSlug exists
+    const { count } = await supabase
+        .from('cards')
+        .select('*', { count: 'exact', head: true })
+        .eq('slug', baseSlug)
+
+    if (!count) {
+        return baseSlug
+    }
+
+    // Append random suffix if exists
+    return `${baseSlug}-${Math.random().toString(36).substring(2, 5)}`
 }
 
 export async function getCards(): Promise<Card[]> {
@@ -134,7 +153,7 @@ export async function createCard(formData: FormData) {
         throw new Error('Title is required')
     }
 
-    const slug = generateSlug(title)
+    const slug = await generateUniqueSlug(supabase, title)
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const insertPayload: any = {
@@ -178,7 +197,7 @@ export async function updateCard(id: string, updates: { title?: string; descript
         const { data: currentCard } = await supabase.from('cards').select('slug').eq('id', id).single()
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (currentCard && !(currentCard as any).slug) {
-            updatePayload.slug = generateSlug(updates.title)
+            updatePayload.slug = await generateUniqueSlug(supabase, updates.title)
         }
     }
 
