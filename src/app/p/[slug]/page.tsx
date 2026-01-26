@@ -25,11 +25,11 @@ function isTextContent(content: unknown): content is { text: string } {
 const platformConfig: Record<string, { icon: LucideIcon, label: string, color: string }> = {
     twitter: { icon: Twitter, label: 'X (Twitter)', color: 'text-black' },
     instagram: { icon: Instagram, label: 'Instagram', color: 'text-pink-600' },
-    facebook: { icon: Facebook, label: 'Facebook', color: 'text-blue-600' },
+    facebook: { icon: Facebook, label: 'Facebook', color: 'text-[#1877F2]' },
     github: { icon: Github, label: 'GitHub', color: 'text-gray-900' },
     website: { icon: Globe, label: 'Website', color: 'text-gray-600' },
     phone: { icon: Phone, label: 'Phone', color: 'text-green-600' },
-    email: { icon: Mail, label: 'Email', color: 'text-indigo-600' },
+    email: { icon: Mail, label: 'Email', color: 'text-stone-600' },
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -122,7 +122,7 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
                                     href={url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="w-full flex items-center px-5 py-4 border border-stone-100 rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] bg-white hover:bg-[#faf9f6 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] transition-all duration-300 group"
+                                    className="w-full flex items-center px-5 py-4 border border-stone-100 rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] bg-white hover:bg-[#faf9f6] hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] transition-all duration-300 group"
                                 >
                                     <Icon className={`h-5 w-5 mr-3 ${config.color}`} />
                                     <span className="flex-1 text-base font-medium text-stone-700 group-hover:text-stone-900 capitalize transition-colors">{config.label}</span>

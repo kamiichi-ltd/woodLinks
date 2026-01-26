@@ -75,7 +75,7 @@ export default function LoginPage() {
                                     type="email"
                                     autoComplete="email"
                                     required
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#2c3e50] sm:text-sm sm:leading-6"
                                 />
                             </div>
                         </div>
@@ -91,7 +91,7 @@ export default function LoginPage() {
                                     type="password"
                                     autoComplete={isLogin ? "current-password" : "new-password"}
                                     required
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#2c3e50] sm:text-sm sm:leading-6"
                                 />
                             </div>
                         </div>
@@ -129,7 +129,7 @@ export default function LoginPage() {
                                     setIsLogin(!isLogin)
                                     setError(null)
                                 }}
-                                className="text-sm font-medium text-indigo-600 hover:text-indigo-500 hover:underline"
+                                className="text-sm font-medium text-[#2c3e50] hover:text-[#1a252f] hover:underline"
                             >
                                 {isLogin
                                     ? 'アカウントをお持ちでない方はこちら (新規登録)'

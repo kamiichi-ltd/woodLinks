@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import { Leaf, Palette, UserCheck, ArrowRight, Smartphone, Zap } from 'lucide-react'
+import { Leaf, Palette, UserCheck, ArrowRight, Smartphone } from 'lucide-react'
 
 export default async function Home() {
   const supabase = await createClient()
@@ -33,7 +33,7 @@ export default async function Home() {
         </div>
       </header>
 
-      <main className="flex-1 pt-20">
+      <main className="flex-1 pt-24">
         {/* Hero Section */}
         <section className="relative py-24 sm:py-32 lg:pb-40 overflow-hidden">
           <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
@@ -42,223 +42,236 @@ export default async function Home() {
 
           <div className="max-w-7xl mx-auto px-6 text-center">
             <div className="mx-auto max-w-3xl">
-              <h2 className="text-5xl font-serif font-medium tracking-tight text-[#3d3126] sm:text-6xl mb-8 leading-tight">
+              <span className="inline-block py-1 px-3 rounded-full bg-[#f4f1ea] border border-[#e6e2d3] text-[#8c7b6c] text-xs font-bold tracking-widest uppercase mb-8">
+                The Original Wood Card
+              </span>
+              <h2 className="text-5xl font-serif font-medium tracking-tight text-[#3d3126] sm:text-7xl mb-8 leading-tight">
                 木に、デジタルという<br className="hidden sm:block" />命を宿す。
               </h2>
-              <p className="mt-6 text-lg leading-8 text-[#5a4d41] mb-10">
+              <p className="mt-8 text-xl leading-8 text-[#5a4d41] mb-12 font-light">
                 本物の木の温もりと、デジタル名刺の利便性を一つに。<br className="hidden sm:block" />
-                NFC技術を内蔵したウッドカードで、一期一会の出会いを、一生のつながりに変えましょう。
+                NFC技術を内蔵したウッドカードで、<br className="sm:hidden" />一期一会の出会いを、一生のつながりに。
               </p>
-              <div className="mt-10 flex items-center justify-center gap-x-6">
+              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
                 <Link
                   href="/dashboard"
-                  className="rounded-full bg-[#2c3e50] px-8 py-4 text-base font-semibold text-white shadow-lg hover:bg-[#1a252f] hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2"
+                  className="w-full sm:w-auto rounded-full bg-[#2c3e50] px-10 py-4 text-lg font-bold text-white shadow-xl shadow-[#2c3e50]/20 hover:bg-[#1a252f] hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2"
                 >
-                  今すぐ名刺を作成 <ArrowRight className="h-4 w-4" />
+                  Create Your Card <ArrowRight className="h-5 w-5" />
                 </Link>
-                <Link href="/p/demo" className="text-sm font-semibold leading-6 text-[#3d3126] hover:underline underline-offset-4 flex items-center gap-1">
-                  デモ体験 <Smartphone className="h-4 w-4" />
+                <Link href="/p/demo" className="text-sm font-bold tracking-wide text-[#3d3126] hover:text-[#8c7b6c] transition-colors flex items-center gap-2 border-b border-transparent hover:border-[#8c7b6c] pb-0.5">
+                  VIEW DEMO <Smartphone className="h-4 w-4" />
                 </Link>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Concept Section */}
-        <section className="py-24 bg-white">
+        {/* Wood Selection (Encyclopedia Style) */}
+        <section className="py-32 bg-[#f4f1ea] border-y border-[#e6e2d3]">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
-              <div>
-                <h3 className="text-3xl font-serif font-medium text-[#3d3126] mb-6">
-                  ただのデータではない、<br />触れられる記憶。
-                </h3>
-                <p className="text-[#5a4d41] leading-relaxed mb-6">
-                  通常の名刺交換は、数日経てば誰のものかわからなくなってしまいがちです。<br />
-                  WoodLinksは、手に触れた瞬間の木の質感と、スマホにかざすだけの魔法のような体験で、相手の記憶に深く刻まれます。
-                </p>
-                <ul className="space-y-4 mt-8">
-                  <li className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-[#f4f1ea] flex items-center justify-center text-[#3d3126]">
-                      <Leaf className="h-5 w-5" />
-                    </div>
-                    <span className="text-[#3d3126] font-medium">100% 天然木材を使用</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-[#f4f1ea] flex items-center justify-center text-[#3d3126]">
-                      <Zap className="h-5 w-5" />
-                    </div>
-                    <span className="text-[#3d3126] font-medium">アプリ不要、かざすだけで転送</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="mt-12 lg:mt-0 relative">
-                <div className="aspect-[4/3] bg-[#e6e2d3] rounded-2xl overflow-hidden shadow-2xl relative">
-                  {/* Placeholder for Card Image */}
-                  <div className="absolute inset-0 flex items-center justify-center text-[#a4998e] bg-stone-100">
-                    <span className="text-lg">Product Image Placeholder</span>
-                  </div>
-                  <div className="absolute -bottom-6 -left-6 bg-[#2c3e50] text-white p-6 rounded-lg shadow-xl max-w-xs">
-                    <p className="text-sm font-medium">&quot;この名刺、素敵ですね&quot;</p>
-                    <p className="text-xs text-gray-300 mt-1">そこから会話が始まる、新しいコミュニケーション。</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Wood Personality Section */}
-        <section className="py-24 bg-[#f4f1ea] border-y border-[#e6e2d3]">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-16">
-              <span className="text-[#8c7b6c] font-medium tracking-wider uppercase text-sm">Wood Personality</span>
-              <h3 className="mt-3 text-3xl font-serif font-medium text-[#3d3126]">
-                あなたに合う木を、選ぶ楽しみ
+            <div className="text-center mb-20">
+              <span className="text-[#8c7b6c] font-bold tracking-[0.2em] uppercase text-xs">Material Selection</span>
+              <h3 className="mt-4 text-4xl font-serif font-medium text-[#3d3126]">
+                あなたに呼応する、木の個性
               </h3>
-              <p className="mt-4 text-[#5a4d41]">
+              <p className="mt-6 text-[#5a4d41] max-w-2xl mx-auto">
                 木にはそれぞれ、生まれた土地や育った環境による「性格」があります。<br />
                 あなたのビジネススタイルに共鳴する一枚を見つけてください。
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
               {/* Cedar */}
-              <div className="group relative bg-[#fdfbf7] p-8 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border-t-4 border-[#d4a373]">
-                <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#d4a373] text-white px-4 py-1 rounded-full text-xs font-bold tracking-widest">CEDAR</div>
-                <h4 className="text-xl font-bold text-[#3d3126] text-center mt-4 mb-2">杉 (スギ)</h4>
-                <p className="text-center text-xs text-[#8c7b6c] mb-6">親しみやすさ / 直感 / スピード</p>
-                <p className="text-[#5a4d41] text-sm leading-relaxed text-center">
-                  真っ直ぐに伸びる木目は、嘘のない誠実さを表します。柔らかく温かみのある手触りは、初対面の相手にも安心感を与え、心の距離を縮めます。
-                </p>
+              <div className="group relative bg-[#fdfbf7] rounded-none sm:rounded-sm shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden">
+                <div className="h-2 bg-[#d4a373]"></div>
+                <div className="p-10">
+                  <span className="text-[#d4a373] text-xs font-bold tracking-widest mb-2 block">JAPANESE CEDAR</span>
+                  <h4 className="text-3xl font-serif font-bold text-[#3d3126] mb-6">杉 <span className="text-lg font-normal text-[#8c7b6c] ml-2">- Sugi</span></h4>
+                  <div className="w-12 h-0.5 bg-[#e6e2d3] mb-6 group-hover:w-full group-hover:bg-[#d4a373] transition-all duration-500"></div>
+                  <p className="text-[#5a4d41] leading-relaxed mb-8">
+                    真っ直ぐに伸びる木目は、嘘のない誠実さを表します。柔らかく温かみのある手触りは、初対面の相手にも安心感を与え、心の距離を縮めます。
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium">親しみやすさ</span>
+                    <span className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium">直感</span>
+                    <span className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium">スピード</span>
+                  </div>
+                </div>
               </div>
 
               {/* Cypress */}
-              <div className="group relative bg-[#fdfbf7] p-8 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border-t-4 border-[#e9d8a6]">
-                <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#e9d8a6] text-[#3d3126] px-4 py-1 rounded-full text-xs font-bold tracking-widest">CYPRESS</div>
-                <h4 className="text-xl font-bold text-[#3d3126] text-center mt-4 mb-2">桧 (ヒノキ)</h4>
-                <p className="text-center text-xs text-[#8c7b6c] mb-6">高貴 / 信頼 / 持続性</p>
-                <p className="text-[#5a4d41] text-sm leading-relaxed text-center">
-                  古来より寺社仏閣に使われてきた「木の王様」。その特有の香りと美しい白木の色合いは、揺るぎない信頼と品格を無言のうちに語ります。
-                </p>
+              <div className="group relative bg-[#fdfbf7] rounded-none sm:rounded-sm shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden transform lg:-translate-y-4">
+                <div className="h-2 bg-[#e9d8a6]"></div>
+                <div className="p-10">
+                  <span className="text-[#cbb89d] text-xs font-bold tracking-widest mb-2 block">JAPANESE CYPRESS</span>
+                  <h4 className="text-3xl font-serif font-bold text-[#3d3126] mb-6">桧 <span className="text-lg font-normal text-[#8c7b6c] ml-2">- Hinoki</span></h4>
+                  <div className="w-12 h-0.5 bg-[#e6e2d3] mb-6 group-hover:w-full group-hover:bg-[#e9d8a6] transition-all duration-500"></div>
+                  <p className="text-[#5a4d41] leading-relaxed mb-8">
+                    古来より寺社仏閣に使われてきた「木の王様」。その特有の香りと美しい白木の色合いは、揺るぎない信頼と品格を無言のうちに語ります。
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium">高貴</span>
+                    <span className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium">信頼</span>
+                    <span className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium">持続性</span>
+                  </div>
+                </div>
               </div>
 
               {/* Walnut */}
-              <div className="group relative bg-[#fdfbf7] p-8 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border-t-4 border-[#6b4c3e]">
-                <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#6b4c3e] text-white px-4 py-1 rounded-full text-xs font-bold tracking-widest">WALNUT</div>
-                <h4 className="text-xl font-bold text-[#3d3126] text-center mt-4 mb-2">ウォールナット</h4>
-                <p className="text-center text-xs text-[#8c7b6c] mb-6">知性 / 重厚 / モダン</p>
-                <p className="text-[#5a4d41] text-sm leading-relaxed text-center">
-                  深く濃い色合いと美しい縞模様は、成熟した大人の知性を演出します。使い込むほどに艶が増し、あなたのキャリアと共に深みを増していくでしょう。
-                </p>
+              <div className="group relative bg-[#fdfbf7] rounded-none sm:rounded-sm shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden">
+                <div className="h-2 bg-[#6b4c3e]"></div>
+                <div className="p-10">
+                  <span className="text-[#8c7b6c] text-xs font-bold tracking-widest mb-2 block">BLACK WALNUT</span>
+                  <h4 className="text-3xl font-serif font-bold text-[#3d3126] mb-6">胡桃 <span className="text-lg font-normal text-[#8c7b6c] ml-2">- Walnut</span></h4>
+                  <div className="w-12 h-0.5 bg-[#e6e2d3] mb-6 group-hover:w-full group-hover:bg-[#6b4c3e] transition-all duration-500"></div>
+                  <p className="text-[#5a4d41] leading-relaxed mb-8">
+                    深く濃い色合いと美しい縞模様は、成熟した大人の知性を演出します。使い込むほどに艶が増し、あなたのキャリアと共に深みを増していくでしょう。
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium">知性</span>
+                    <span className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium">重厚</span>
+                    <span className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium">モダン</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Aging Story Section */}
-        <section className="py-24 bg-white overflow-hidden">
+        {/* Aging Story Section (Revised Timeline) */}
+        <section className="py-32 bg-white overflow-hidden">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
-              <div className="order-2 lg:order-1 relative mt-12 lg:mt-0">
-                {/* Visual Representation of Aging using CSS shapes/gradients as abstraction */}
-                <div className="relative h-80 w-full bg-[#fdfbf7] rounded-2xl overflow-hidden shadow-inner border border-[#e6e2d3] flex items-center justify-center">
-                  <div className="absolute w-3/4 h-3/4 bg-[#d4c5ae] opacity-20 rounded-full blur-3xl"></div>
-                  <div className="space-y-8 relative z-10 w-full px-8">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-[#e6e2d3] flex items-center justify-center text-xs font-bold text-[#3d3126]">New</div>
-                      <div className="h-2 flex-1 bg-gradient-to-r from-[#e6e2d3] to-[#cbb89d] rounded-full"></div>
+            <div className="lg:grid lg:grid-cols-2 lg:gap-24 items-center">
+              <div className="order-2 lg:order-1 relative mt-16 lg:mt-0">
+                {/* Abstract visualization of 0-3 years againg */}
+                <div className="relative">
+                  <div className="absolute top-0 bottom-0 left-8 w-0.5 bg-[#e6e2d3]"></div>
+
+                  {/* Year 0 */}
+                  <div className="relative flex items-center gap-8 mb-12">
+                    <div className="w-16 h-16 rounded-full bg-[#fdfbf7] border-2 border-[#e6e2d3] flex items-center justify-center relative z-10 font-serif font-bold text-[#8c7b6c]">0</div>
+                    <div className="flex-1 bg-[#fdfbf7] p-6 rounded-xl border border-[#e6e2d3] shadow-sm">
+                      <h5 className="font-bold text-[#3d3126] mb-1">Brand New</h5>
+                      <p className="text-xs text-[#8c7b6c]">まだ若々しい、フレッシュな表情。</p>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-[#cbb89d] flex items-center justify-center text-xs font-bold text-[#3d3126] shadow-sm">1 Year</div>
-                      <div className="h-2 flex-1 bg-gradient-to-r from-[#cbb89d] to-[#8c7b6c] rounded-full"></div>
+                  </div>
+
+                  {/* Year 1 */}
+                  <div className="relative flex items-center gap-8 mb-12">
+                    <div className="w-16 h-16 rounded-full bg-[#f4f1ea] border-2 border-[#d4c5ae] flex items-center justify-center relative z-10 font-serif font-bold text-[#5a4d41]">1</div>
+                    <div className="flex-1 bg-[#f4f1ea] p-6 rounded-xl border border-[#d4c5ae] shadow-sm">
+                      <h5 className="font-bold text-[#3d3126] mb-1">1 Year Later</h5>
+                      <p className="text-xs text-[#5a4d41]">手の油分が馴染み、艶が生まれます。</p>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-[#8c7b6c] flex items-center justify-center text-xs font-bold text-white shadow-md">10 Years</div>
-                      <div className="h-2 flex-1 bg-gradient-to-r from-[#8c7b6c] to-[#3d3126] rounded-full"></div>
+                  </div>
+
+                  {/* Year 3 */}
+                  <div className="relative flex items-center gap-8">
+                    <div className="w-16 h-16 rounded-full bg-[#d4c5ae] border-2 border-[#8c7b6c] flex items-center justify-center relative z-10 font-serif font-bold text-[#3d3126]">3</div>
+                    <div className="flex-1 bg-[#eae0cf] p-6 rounded-xl border border-[#8c7b6c] shadow-md">
+                      <h5 className="font-bold text-[#3d3126] mb-1">3 Years Later</h5>
+                      <p className="text-xs text-[#3d3126]">角が取れ、あなただけの色＝「飴色」へ。</p>
                     </div>
                   </div>
                 </div>
               </div>
+
               <div className="order-1 lg:order-2">
-                <span className="text-[#8c7b6c] font-medium tracking-wider uppercase text-sm">Aging Story</span>
-                <h3 className="mt-3 text-3xl font-serif font-medium text-[#3d3126] mb-6">
+                <span className="text-[#8c7b6c] font-bold tracking-[0.2em] uppercase text-xs">Aging Process</span>
+                <h3 className="mt-4 text-4xl font-serif font-medium text-[#3d3126] mb-8">
                   「劣化」ではなく、「熟成」。
                 </h3>
-                <p className="text-[#5a4d41] leading-relaxed mb-6">
+                <p className="text-[#5a4d41] leading-relaxed mb-6 text-lg">
                   プラスチックの名刺は傷つけば「劣化」しますが、木の名刺は傷さえも「味」になります。<br />
+                </p>
+                <p className="text-[#5a4d41] leading-relaxed mb-8">
                   手動でコーヒーを挽く時間を愛でるように、名刺が飴色に変わり、角が取れて手に馴染んでいく過程そのものを楽しんでください。
+                  それは、あなたのビジネスが時間をかけて信頼を積み重ねていく姿と重なります。
                 </p>
-                <p className="text-[#5a4d41] leading-relaxed font-medium">
-                  それは、あなたのビジネスが時間をかけて信頼を積み重ねていく姿と重なります。<br />
-                  世界に一つだけの、あなたと共に育つ名刺です。
-                </p>
+                <div className="inline-block p-4 border-l-2 border-[#d4c5ae] bg-[#fdfbf7]">
+                  <p className="text-sm text-[#8c7b6c] italic font-serif">
+                    &quot;世界に一つだけの、あなたと共に育つ名刺です。&quot;
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Our Roots Section */}
-        <section className="py-24 bg-[#3d3126] text-[#d4c5ae] relative overflow-hidden">
-          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-[#2c221b] rounded-full opacity-50 blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 bg-[#4e3d30] rounded-full opacity-50 blur-3xl"></div>
+        {/* Our Roots Section (Kamiichi Lumber) */}
+        <section className="py-32 bg-[#2c3e50] text-[#d4c5ae] relative overflow-hidden">
+          {/* Decorative shapes */}
+          <div className="absolute top-0 right-0 -mr-40 -mt-40 w-[30rem] h-[30rem] bg-[#3e5266] rounded-full opacity-30 blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 -ml-40 -mb-40 w-[30rem] h-[30rem] bg-[#1a252f] rounded-full opacity-50 blur-3xl"></div>
 
           <div className="max-w-7xl mx-auto px-6 relative z-10">
             <div className="max-w-3xl mx-auto text-center">
-              <span className="text-[#8c7b6c] font-medium tracking-wider uppercase text-sm">Our Roots</span>
-              <h3 className="mt-3 text-3xl font-serif font-medium text-white mb-8">
+              <span className="text-[#8c7b6c] font-bold tracking-[0.2em] uppercase text-xs">Our Authenticity</span>
+              <h3 className="mt-4 text-4xl font-serif font-medium text-white mb-10">
                 大阪・北摂、上一木材の誇り。
               </h3>
-              <p className="text-lg leading-8 text-[#d4c5ae]/90 mb-10">
-                私たちはIT企業ではありません。大阪・北摂（吹田）の地で代々続く、材木屋から生まれました。<br />
+              <p className="text-lg leading-8 text-[#d4c5ae]/90 mb-12 font-light">
+                私たちはIT企業ではありません。<br />
+                大阪・北摂（吹田）の地で代々続く、<span className="text-white font-medium border-b border-[#d4c5ae]/30 pb-0.5">材木屋</span>から生まれました。<br />
                 デジタル全盛の今だからこそ、「本物の木の力」を届けたい。
               </p>
-              <div className="bg-[#2c221b]/50 p-8 rounded-2xl border border-[#4e3d30] backdrop-blur-sm">
-                <p className="italic text-white/80">
-                  &quot;職人が一枚ずつ木目を読み、ICチップを埋め込む。その0.1ミリの精度にこだわるのは、<br className="hidden sm:block" />
-                  それが単なるガジェットではなく、お客様の「顔」になるものだからです。&quot;
-                </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+                <div className="p-8 rounded-2xl bg-[#3e5266]/30 border border-[#3e5266] backdrop-blur-sm">
+                  <h5 className="text-white font-serif text-lg mb-3">0.1ミリの職人技</h5>
+                  <p className="text-sm text-[#d4c5ae]/80 leading-relaxed">
+                    職人が一枚ずつ木目を読み、ICチップを埋め込む。その妥協なき精度は、単なるガジェットではなく、工芸品としての品格を宿します。
+                  </p>
+                </div>
+                <div className="p-8 rounded-2xl bg-[#3e5266]/30 border border-[#3e5266] backdrop-blur-sm">
+                  <h5 className="text-white font-serif text-lg mb-3">サステナブルな循環</h5>
+                  <p className="text-sm text-[#d4c5ae]/80 leading-relaxed">
+                    使用する木材は、適切な管理下にある国産材を中心に使用。木を使うことで森を守る、美しい循環の一部を担っています。
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Use Cases */}
-        <section className="py-24 bg-[#fdfbf7]">
+        {/* Use Cases Grid */}
+        <section className="py-32 bg-[#fdfbf7]">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-16">
-              <h3 className="text-2xl font-serif font-bold text-[#3d3126]">
+            <div className="text-center mb-20">
+              <h3 className="text-3xl font-serif font-bold text-[#3d3126]">
                 あらゆるシーンで、<br className="sm:hidden" />あなたらしさを表現
               </h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Business */}
-              <div className="bg-white p-8 rounded-2xl shadow-sm border border-[#e6e2d3] hover:shadow-md transition-shadow">
-                <div className="h-12 w-12 bg-[#2c3e50] rounded-xl flex items-center justify-center text-white mb-6">
-                  <UserCheck className="h-6 w-6" />
+              <div className="bg-white p-10 rounded-3xl shadow-sm border border-[#e6e2d3] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div className="h-14 w-14 bg-[#2c3e50] rounded-2xl flex items-center justify-center text-white mb-8 group-hover:scale-110 transition-transform">
+                  <UserCheck className="h-7 w-7" />
                 </div>
-                <h4 className="text-xl font-bold text-[#3d3126] mb-3">ビジネスの第一線で</h4>
+                <h4 className="text-xl font-bold text-[#2c3e50] mb-4 font-serif">Business</h4>
                 <p className="text-[#5a4d41] text-sm leading-relaxed">
                   商談や交流会で、信頼感を伝える唯一無二のツールとして。環境への配慮もアピールでき、企業のブランドイメージを高めます。
                 </p>
               </div>
 
               {/* Creator */}
-              <div className="bg-white p-8 rounded-2xl shadow-sm border border-[#e6e2d3] hover:shadow-md transition-shadow">
-                <div className="h-12 w-12 bg-[#a4b494] rounded-xl flex items-center justify-center text-white mb-6">
-                  <Palette className="h-6 w-6" />
+              <div className="bg-white p-10 rounded-3xl shadow-sm border border-[#e6e2d3] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div className="h-14 w-14 bg-[#a4b494] rounded-2xl flex items-center justify-center text-white mb-8 group-hover:scale-110 transition-transform">
+                  <Palette className="h-7 w-7" />
                 </div>
-                <h4 className="text-xl font-bold text-[#3d3126] mb-3">クリエイターのポートフォリオに</h4>
+                <h4 className="text-xl font-bold text-[#2c3e50] mb-4 font-serif">Creator</h4>
                 <p className="text-[#5a4d41] text-sm leading-relaxed">
                   作品への想いを、一枚の木に込めて。ポートフォリオサイトやSNSへのリンクをまとめ、あなたの世界観を余すことなく伝えます。
                 </p>
               </div>
 
               {/* Personal */}
-              <div className="bg-white p-8 rounded-2xl shadow-sm border border-[#e6e2d3] hover:shadow-md transition-shadow">
-                <div className="h-12 w-12 bg-[#d4c5ae] rounded-xl flex items-center justify-center text-white mb-6">
-                  <Leaf className="h-6 w-6" />
+              <div className="bg-white p-10 rounded-3xl shadow-sm border border-[#e6e2d3] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div className="h-14 w-14 bg-[#d4c5ae] rounded-2xl flex items-center justify-center text-white mb-8 group-hover:scale-110 transition-transform">
+                  <Leaf className="h-7 w-7" />
                 </div>
-                <h4 className="text-xl font-bold text-[#3d3126] mb-3">個人の特別な紹介に</h4>
+                <h4 className="text-xl font-bold text-[#2c3e50] mb-4 font-serif">Personal</h4>
                 <p className="text-[#5a4d41] text-sm leading-relaxed">
                   趣味やSNSを、自然な形で共有。無機質なQRコードではなく、温かみのある木の名刺で、より親密なつながりを築きましょう。
                 </p>

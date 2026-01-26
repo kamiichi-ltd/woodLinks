@@ -74,7 +74,7 @@ function SortableItem({ item, onDelete, isPending }: { item: ContentItem; onDele
 
                 <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-x-3 mb-1">
-                        <span className={`inline-flex items-center rounded-md px-2 py-1 text-[10px] uppercase font-bold tracking-wider ring-1 ring-inset ${item.type === 'sns_link' ? 'bg-blue-50 text-blue-700 ring-blue-600/20' : 'bg-emerald-50 text-emerald-700 ring-emerald-600/20'}`}>
+                        <span className={`inline-flex items-center rounded-md px-2 py-1 text-[10px] uppercase font-bold tracking-wider ring-1 ring-inset ${item.type === 'sns_link' ? 'bg-[#2c3e50]/5 text-[#2c3e50] ring-[#2c3e50]/20' : 'bg-emerald-50 text-emerald-800 ring-emerald-600/20'}`}>
                             {item.type === 'sns_link' ? 'LINK' : 'TEXT'}
                         </span>
                         <p className="text-sm font-bold text-[#2c3e50] truncate">
