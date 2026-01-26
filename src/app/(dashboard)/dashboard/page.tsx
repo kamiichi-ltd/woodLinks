@@ -62,7 +62,7 @@ export default async function DashboardPage() {
                                                     ? 'bg-[#2c3e50] text-[#fdfbf7] shadow-sm'
                                                     : 'bg-[#e6e2d3] text-[#8c7b6c]'}
                                             `}>
-                                                {card.status === 'published' ? 'LIVE' : card.status.toUpperCase()}
+                                                {card.status === 'published' ? 'LIVE' : (card.status || 'DRAFT').toUpperCase()}
                                             </span>
                                             {card.status === 'published' && (
                                                 <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)] animate-pulse"></div>

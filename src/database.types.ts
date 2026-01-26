@@ -41,7 +41,6 @@ export interface Database {
           created_at: string
           updated_at: string
           slug: string | null
-          is_published: boolean
           view_count: number
           material_type: 'sugi' | 'hinoki' | 'walnut'
           status: 'draft' | 'published' | 'lost_reissued' | 'disabled' | 'transferred'
@@ -54,7 +53,6 @@ export interface Database {
           created_at?: string
           updated_at?: string
           slug?: string | null
-          is_published?: boolean
           view_count?: number
           material_type?: 'sugi' | 'hinoki' | 'walnut'
           status?: 'draft' | 'published' | 'lost_reissued' | 'disabled' | 'transferred'
@@ -67,7 +65,6 @@ export interface Database {
           created_at?: string
           updated_at?: string
           slug?: string | null
-          is_published?: boolean
           view_count?: number
           material_type?: 'sugi' | 'hinoki' | 'walnut'
           status?: 'draft' | 'published' | 'lost_reissued' | 'disabled' | 'transferred'
@@ -129,7 +126,7 @@ export interface Database {
     Functions: {
       increment_view_count: {
         Args: {
-          card_slug: string
+          card_id: string
         }
         Returns: void
       }
