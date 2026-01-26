@@ -57,13 +57,13 @@ function SortableItem({ item, onDelete, isPending }: { item: ContentItem; onDele
     }
 
     return (
-        <li ref={setNodeRef} style={style} className="flex items-center justify-between gap-x-6 py-5 px-4 bg-white border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
+        <li ref={setNodeRef} style={style} className="flex items-center justify-between gap-x-6 py-4 px-4 bg-[#fdfbf7] border-b border-[#e6e2d3] last:border-0 hover:bg-[#faf9f6] transition-colors group">
             <div className="flex items-center w-full min-w-0 gap-x-4">
                 {/* Drag Handle */}
                 <button
                     {...attributes}
                     {...listeners}
-                    className="touch-none cursor-move text-gray-400 hover:text-gray-600 focus:outline-none"
+                    className="touch-none cursor-move text-[#a4998e] hover:text-[#3d3126] focus:outline-none p-1 rounded hover:bg-[#e6e2d3]/50 transition-colors"
                     aria-label="Drag to reorder"
                 >
                     <GripVertical className="h-5 w-5" />
@@ -71,20 +71,20 @@ function SortableItem({ item, onDelete, isPending }: { item: ContentItem; onDele
 
                 <div className="min-w-0 flex-1">
                     <div className="flex items-start gap-x-3">
-                        <p className="text-sm font-semibold leading-6 text-gray-900">
-                            {item.type === 'sns_link' && isSnsContent(item.content) ? item.content.platform : 'テキスト'}
+                        <p className="text-sm font-bold leading-6 text-[#3d3126]">
+                            {item.type === 'sns_link' && isSnsContent(item.content) ? item.content.platform : 'Free Text'}
                         </p>
-                        <p className={`rounded-md whitespace-nowrap mt-0.5 px-1.5 py-0.5 text-xs font-medium ring-1 ring-inset ${item.type === 'sns_link' ? 'bg-blue-50 text-blue-700 ring-blue-600/20' : 'bg-green-50 text-green-700 ring-green-600/20'}`}>
-                            {item.type === 'sns_link' ? 'リンク' : 'テキスト'}
+                        <p className={`rounded-full whitespace-nowrap mt-0.5 px-2 py-0.5 text-[10px] uppercase tracking-wider font-bold border ${item.type === 'sns_link' ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-stone-100 text-[#5a4d41] border-[#d4c5ae]'}`}>
+                            {item.type === 'sns_link' ? 'LINK' : 'TEXT'}
                         </p>
                     </div>
-                    <div className="mt-1 flex items-center gap-x-2 text-xs leading-5 text-gray-500">
+                    <div className="mt-1 flex items-center gap-x-2 text-xs leading-5 text-[#8c7b6c]">
                         {item.type === 'sns_link' && isSnsContent(item.content) ? (
-                            <a href={item.content.url} target="_blank" rel="noopener noreferrer" className="hover:underline truncate">
+                            <a href={item.content.url} target="_blank" rel="noopener noreferrer" className="hover:text-[#3d3126] hover:underline truncate">
                                 {item.content.url}
                             </a>
                         ) : item.type === 'text' && isTextContent(item.content) ? (
-                            <p className="whitespace-pre-wrap line-clamp-2">{item.content.text}</p>
+                            <p className="whitespace-pre-wrap line-clamp-2 text-[#5a4d41]">{item.content.text}</p>
                         ) : null}
                     </div>
                 </div>
@@ -94,10 +94,10 @@ function SortableItem({ item, onDelete, isPending }: { item: ContentItem; onDele
                 <button
                     onClick={() => onDelete(item.id)}
                     disabled={isPending}
-                    className="rounded-md p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+                    className="rounded-md p-2 text-[#a4998e] hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50 opacity-0 group-hover:opacity-100 focus:opacity-100"
                     title="Delete"
                 >
-                    <Trash2 className="h-5 w-5" />
+                    <Trash2 className="h-4 w-4" />
                 </button>
             </div>
         </li>
@@ -175,35 +175,36 @@ export default function ContentEditor({ cardId, initialContents }: { cardId: str
     }
 
     return (
-        <div className="bg-white shadow sm:rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-                <h3 className="text-lg font-semibold leading-6 text-gray-900 mb-6">内容の管理</h3>
-
+        <div className="bg-white/80 backdrop-blur-sm shadow-sm border border-[#e6e2d3] sm:rounded-xl overflow-hidden">
+            <div className="px-4 py-6 sm:p-8">
                 {/* Add New Content Form */}
-                <div className="bg-gray-50 rounded-lg p-5 mb-8 border border-gray-100">
-                    <h4 className="text-sm font-medium text-gray-900 mb-4">新しいブロックを追加</h4>
+                <div className="bg-[#fdfbf7] rounded-xl p-6 mb-8 border border-[#e6e2d3] shadow-inner">
+                    <h4 className="text-sm font-bold text-[#3d3126] mb-4 flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#d4a373]"></span>
+                        Add New Block / ブロックを追加
+                    </h4>
                     <form onSubmit={handleAdd} className="space-y-4">
                         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                             <div className="sm:col-span-1">
-                                <label className="block text-xs font-medium text-gray-700 mb-1">種類</label>
+                                <label className="block text-xs font-bold text-[#8c7b6c] mb-1">Type / 種類</label>
                                 <select
                                     value={contentType}
                                     onChange={(e) => setContentType(e.target.value as 'sns_link' | 'text')}
-                                    className="block w-full rounded-md border-0 py-1.5 pl-3 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    className="block w-full rounded-lg border-0 py-2 pl-3 pr-8 text-[#3d3126] ring-1 ring-inset ring-[#d4c5ae] focus:ring-2 focus:ring-[#2c3e50] sm:text-sm sm:leading-6 bg-white"
                                 >
-                                    <option value="sns_link">SNSリンク</option>
-                                    <option value="text">自由入力テキスト</option>
+                                    <option value="sns_link">Link / リンク</option>
+                                    <option value="text">Text / 自由入力</option>
                                 </select>
                             </div>
 
                             {contentType === 'sns_link' ? (
                                 <>
                                     <div className="sm:col-span-1">
-                                        <label className="block text-xs font-medium text-gray-700 mb-1">プラットフォーム</label>
+                                        <label className="block text-xs font-bold text-[#8c7b6c] mb-1">Platform</label>
                                         <select
                                             value={platform}
                                             onChange={(e) => setPlatform(e.target.value)}
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                            className="block w-full rounded-lg border-0 py-2 text-[#3d3126] ring-1 ring-inset ring-[#d4c5ae] focus:ring-2 focus:ring-[#2c3e50] sm:text-sm sm:leading-6 bg-white"
                                         >
                                             <option value="twitter">X (Twitter)</option>
                                             <option value="instagram">Instagram</option>
@@ -215,27 +216,27 @@ export default function ContentEditor({ cardId, initialContents }: { cardId: str
                                         </select>
                                     </div>
                                     <div className="sm:col-span-2">
-                                        <label className="block text-xs font-medium text-gray-700 mb-1">URLまたは連絡先</label>
+                                        <label className="block text-xs font-bold text-[#8c7b6c] mb-1">URL / Contact</label>
                                         <input
                                             type="text"
                                             required
                                             value={url}
                                             onChange={(e) => setUrl(e.target.value)}
                                             placeholder="https://..."
-                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                            className="block w-full rounded-lg border-0 py-2 text-[#3d3126] ring-1 ring-inset ring-[#d4c5ae] placeholder:text-[#a4998e] focus:ring-2 focus:ring-[#2c3e50] sm:text-sm sm:leading-6 bg-white"
                                         />
                                     </div>
                                 </>
                             ) : (
                                 <div className="sm:col-span-3">
-                                    <label className="block text-xs font-medium text-gray-700 mb-1">テキスト内容</label>
+                                    <label className="block text-xs font-bold text-[#8c7b6c] mb-1">Text Content</label>
                                     <input
                                         type="text"
                                         required
                                         value={text}
                                         onChange={(e) => setText(e.target.value)}
-                                        placeholder="メッセージを入力..."
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        placeholder="Enter your message... / メッセージを入力"
+                                        className="block w-full rounded-lg border-0 py-2 text-[#3d3126] ring-1 ring-inset ring-[#d4c5ae] placeholder:text-[#a4998e] focus:ring-2 focus:ring-[#2c3e50] sm:text-sm sm:leading-6 bg-white"
                                     />
                                 </div>
                             )}
@@ -245,9 +246,9 @@ export default function ContentEditor({ cardId, initialContents }: { cardId: str
                             <button
                                 type="submit"
                                 disabled={isPending}
-                                className="inline-flex justify-center rounded-md bg-stone-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-600 disabled:opacity-50 transition-colors"
+                                className="inline-flex justify-center rounded-lg bg-[#2c3e50] px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-[#1a252f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2c3e50] disabled:opacity-50 transition-all"
                             >
-                                {isPending ? '追加中...' : '内容を追加'}
+                                {isPending ? 'Adding...' : 'Add Block / 追加'}
                             </button>
                         </div>
                     </form>
@@ -256,8 +257,10 @@ export default function ContentEditor({ cardId, initialContents }: { cardId: str
                 {/* Sortable List */}
                 <div className="mt-8">
                     <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-sm font-medium text-gray-900">現在のコンテンツ一覧</h4>
-                        <span className="text-xs text-gray-500">ドラッグして順序を入れ替え</span>
+                        <h4 className="text-sm font-bold text-[#3d3126]">Current Blocks / 現在のブロック</h4>
+                        <span className="text-xs text-[#8c7b6c] font-medium flex items-center gap-1">
+                            <GripVertical className="h-3 w-3" /> Drag to reorder
+                        </span>
                     </div>
 
                     <DndContext
@@ -269,10 +272,11 @@ export default function ContentEditor({ cardId, initialContents }: { cardId: str
                             items={items.map(i => i.id)}
                             strategy={verticalListSortingStrategy}
                         >
-                            <ul role="list" className="divide-y divide-gray-100 rounded-lg border border-gray-200 overflow-hidden bg-white shadow-sm">
+                            <ul role="list" className="divide-y divide-[#e6e2d3] rounded-xl border border-[#e6e2d3] overflow-hidden bg-white shadow-sm">
                                 {items.length === 0 && (
-                                    <li className="p-8 text-center text-gray-500 text-sm italic bg-gray-50">
-                                        コンテンツがありません。上記から追加してください。
+                                    <li className="p-12 text-center text-[#8c7b6c] text-sm bg-[#faf9f6] flex flex-col items-center justify-center dashed-border">
+                                        <span className="block mb-2 text-2xl">📭</span>
+                                        No contents yet. <br />Add your first block above.
                                     </li>
                                 )}
                                 {items.map((item) => (

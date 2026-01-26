@@ -9,33 +9,98 @@ export default async function DashboardPage() {
 
     return (
         <div>
-            <CreateCardForm />
-
-            <div className="mt-8">
-                <h2 className="text-lg font-medium text-gray-900">作成した名刺一覧</h2>
-                <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                    {cards.map((card) => (
-                        <Link href={`/dashboard/cards/${card.id}`} key={card.id} className="block group">
-                            <div className="bg-white overflow-hidden shadow rounded-lg px-4 py-5 sm:p-6 group-hover:shadow-md transition-shadow">
-                                <h3 className="text-lg font-medium leading-6 text-gray-900 group-hover:text-indigo-600">{card.title}</h3>
-                                <p className="mt-1 text-sm text-gray-500 truncate pb-4">
-                                    {card.description || '説明文なし'}
-                                </p>
-                                <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${card.is_published ? 'bg-green-50 text-green-700 ring-green-600/20' : 'bg-yellow-50 text-yellow-800 ring-yellow-600/20'}`}>
-                                    {card.is_published ? '公開中' : '下書き'}
-                                </span>
-                                {card.is_published && (
-                                    <span className="ml-2 inline-flex items-center text-xs text-gray-500">
-                                        {card.view_count || 0} 閲覧
-                                    </span>
-                                )}
-                            </div>
-                        </Link>
-                    ))}
-                    {cards.length === 0 && (
-                        <p className="text-gray-500">名刺がまだありません。上記から作成してください。</p>
-                    )}
+            {/* Header Area */}
+            <div className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-[#e6e2d3] pb-6">
+                <div>
+                    <h2 className="text-2xl font-serif font-bold text-[#3d3126]">Dashboard</h2>
+                    <p className="mt-1 text-sm text-[#8c7b6c]">作成した名刺の管理・分析</p>
                 </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                {/* Left Column: Create Form */}
+                <div className="lg:col-span-2 xl:col-span-1">
+                    <CreateCardForm />
+                </div>
+
+                {/* Right Column: Card List (or Full width if needed, but grid usually better) */}
+                {/* Actually, let's keep the Create Form above or to the side? The request implies a list of cards. 
+                    Let's put Create Form at the top or separately.  Existing layout had CreateForm then List.
+                    Let's keep the vertical flow but style it better.
+                 */}
+            </div>
+
+            <div className="space-y-12">
+                {/* Create Area */}
+                <section>
+                    <CreateCardForm />
+                </section>
+
+                {/* List Area */}
+                <section>
+                    <div className="flex items-center gap-2 mb-6">
+                        <h3 className="text-xl font-bold text-[#3d3126]">Your Cards</h3>
+                        <span className="text-sm text-[#8c7b6c] font-medium">/ 作成した名刺一覧</span>
+                    </div>
+
+                    <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                        {cards.map((card) => (
+                            <Link href={`/dashboard/cards/${card.id}`} key={card.id} className="block group relative">
+                                {/* Card Body simulating Wood */}
+                                <div className={`
+                                    relative h-56 rounded-xl border-2 transition-all duration-300 overflow-hidden
+                                    ${card.is_published
+                                        ? 'bg-[#f4f0e6] border-[#d4c5ae] shadow-lg group-hover:shadow-xl group-hover:scale-[1.02] group-hover:border-[#cbb89d]'
+                                        : 'bg-[#faf9f6] border-dashed border-[#e6e2d3] opacity-90 hover:opacity-100'}
+                                `}>
+                                    {/* Wood Grain Pattern (CSS Opacity) */}
+                                    {card.is_published && (
+                                        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] pointer-events-none"></div>
+                                    )}
+
+                                    <div className="absolute px-6 py-6 inset-0 flex flex-col justify-between">
+                                        <div>
+                                            <div className="flex justify-between items-start">
+                                                <h3 className="text-xl font-serif font-bold text-[#3d3126] group-hover:text-[#2c3e50] line-clamp-1">
+                                                    {card.title}
+                                                </h3>
+                                                <span className={`
+                                                    inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium tracking-wide border
+                                                    ${card.is_published
+                                                        ? 'bg-green-50 text-green-700 border-green-200'
+                                                        : 'bg-gray-50 text-gray-500 border-gray-200'}
+                                                `}>
+                                                    {card.is_published ? 'LIVE' : 'DRAFT'}
+                                                </span>
+                                            </div>
+                                            <p className="mt-2 text-sm text-[#8c7b6c] line-clamp-2">
+                                                {card.description || 'No description / 説明文なし'}
+                                            </p>
+                                        </div>
+
+                                        <div className="flex items-end justify-between border-t border-[#d4c5ae]/40 pt-4 mt-auto">
+                                            <div className="flex flex-col">
+                                                <span className="text-[10px] uppercase tracking-wider text-[#8c7b6c]">Total Views</span>
+                                                <span className="text-2xl font-bold text-[#3d3126] font-mono">
+                                                    {card.view_count || 0}
+                                                </span>
+                                            </div>
+                                            <span className="text-xs text-[#2c3e50] font-medium group-hover:underline underline-offset-2">
+                                                Edit / 編集 &rarr;
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+
+                        {cards.length === 0 && (
+                            <div className="col-span-full py-12 text-center border-2 border-dashed border-[#e6e2d3] rounded-xl bg-[#faf9f6]">
+                                <p className="text-[#8c7b6c]">No cards yet. / 名刺がまだありません。</p>
+                            </div>
+                        )}
+                    </div>
+                </section>
             </div>
         </div>
     )
