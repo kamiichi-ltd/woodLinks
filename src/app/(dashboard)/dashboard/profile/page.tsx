@@ -39,8 +39,10 @@ export default async function SettingsPage() {
                     {primaryCard ? (
                         <CardSettingsForm
                             cardId={primaryCard.id}
+                            initialTitle={primaryCard.title || ''}
                             initialSlug={primaryCard.slug || ''}
                             initialDescription={primaryCard.description}
+                            initialIsPublished={primaryCard.is_published}
                         />
                     ) : (
                         <div className="rounded-md bg-yellow-50 p-4">

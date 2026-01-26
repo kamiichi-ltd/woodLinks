@@ -6,13 +6,17 @@ import { useRouter } from 'next/navigation'
 
 interface CardSettingsFormProps {
     cardId: string
+    initialTitle: string
     initialSlug: string
     initialDescription: string | null
+    initialIsPublished: boolean
 }
 
-export default function CardSettingsForm({ cardId, initialSlug, initialDescription }: CardSettingsFormProps) {
+export default function CardSettingsForm({ cardId, initialTitle, initialSlug, initialDescription, initialIsPublished }: CardSettingsFormProps) {
+    const [title, setTitle] = useState(initialTitle)
     const [slug, setSlug] = useState(initialSlug)
     const [description, setDescription] = useState(initialDescription || '')
+    const [isPublished, setIsPublished] = useState(initialIsPublished)
     const [isLoading, setIsLoading] = useState(false)
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
     const router = useRouter()
@@ -24,8 +28,10 @@ export default function CardSettingsForm({ cardId, initialSlug, initialDescripti
 
         try {
             await updateCard(cardId, {
+                title,
                 slug,
                 description,
+                is_published: isPublished,
             })
             setMessage({ type: 'success', text: 'Settings updated successfully' })
             router.refresh()
@@ -46,6 +52,23 @@ export default function CardSettingsForm({ cardId, initialSlug, initialDescripti
                     {message.text}
                 </div>
             )}
+
+            <div>
+                <label htmlFor="title" className="block text-sm font-medium leading-6 text-gray-900">
+                    Card Title
+                </label>
+                <div className="mt-2">
+                    <input
+                        type="text"
+                        name="title"
+                        id="title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        required
+                    />
+                </div>
+            </div>
 
             <div>
                 <label htmlFor="slug" className="block text-sm font-medium leading-6 text-gray-900">
@@ -84,7 +107,20 @@ export default function CardSettingsForm({ cardId, initialSlug, initialDescripti
                         placeholder="Job Title, Company, or Brief Bio"
                     />
                 </div>
-                <p className="mt-3 text-sm text-gray-600">Write a few sentences about yourself or your company.</p>
+            </div>
+
+            <div className="flex items-center gap-x-3 bg-gray-50 p-4 rounded-md border border-gray-200">
+                <input
+                    id="is_published"
+                    name="is_published"
+                    type="checkbox"
+                    checked={isPublished}
+                    onChange={(e) => setIsPublished(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 cursor-pointer"
+                />
+                <label htmlFor="is_published" className="block text-sm font-medium leading-6 text-gray-900 cursor-pointer select-none">
+                    Publish this card (Make it live)
+                </label>
             </div>
 
             <div>

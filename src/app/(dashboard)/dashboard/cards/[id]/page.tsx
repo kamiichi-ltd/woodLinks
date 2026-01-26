@@ -91,8 +91,10 @@ export default async function CardEditPage({ params }: { params: { id: string } 
                     {/* Settings Form */}
                     <CardSettingsForm
                         cardId={card.id}
+                        initialTitle={card.title || ''}
                         initialSlug={card.slug || ''}
                         initialDescription={card.description}
+                        initialIsPublished={card.is_published}
                     />
                 </div>
             </div>
