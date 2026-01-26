@@ -15,7 +15,7 @@ export default async function DashboardPage() {
                 <h2 className="text-lg font-medium text-gray-900">Your Cards</h2>
                 <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                     {cards.map((card) => (
-                        <Link href={`/cards/${card.id}`} key={card.id} className="block group">
+                        <Link href={`/dashboard/cards/${card.id}`} key={card.id} className="block group">
                             <div className="bg-white overflow-hidden shadow rounded-lg px-4 py-5 sm:p-6 group-hover:shadow-md transition-shadow">
                                 <h3 className="text-lg font-medium leading-6 text-gray-900 group-hover:text-indigo-600">{card.title}</h3>
                                 <p className="mt-1 text-sm text-gray-500 truncate pb-4">
