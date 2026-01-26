@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { User } from 'lucide-react'
+import { User, LogOut } from 'lucide-react'
+import { logout } from '@/services/auth-service'
 
 export default function NavBar() {
     return (
@@ -20,6 +21,15 @@ export default function NavBar() {
                             <User className="h-4 w-4" />
                         </div>
                     </Link>
+                    <form action={logout}>
+                        <button
+                            type="submit"
+                            className="text-stone-300 hover:text-white transition-colors flex items-center justify-center p-2 rounded-full hover:bg-stone-700"
+                            title="Sign Out"
+                        >
+                            <LogOut className="h-4 w-4" />
+                        </button>
+                    </form>
                 </div>
             </div>
         </header>
