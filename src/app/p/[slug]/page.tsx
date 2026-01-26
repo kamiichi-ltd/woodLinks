@@ -30,8 +30,25 @@ const platformConfig: Record<string, { icon: LucideIcon, label: string, color: s
     email: { icon: Mail, label: 'Email', color: 'text-indigo-600' },
 }
 
-export default async function PublicCardPage({ params }: { params: { slug: string } }) {
-    const card = await getCardBySlug(params.slug)
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params
+    const card = await getCardBySlug(slug)
+
+    if (!card) {
+        return {
+            title: 'Card Not Found',
+        }
+    }
+
+    return {
+        title: `${card.title} | WoodLinks`,
+        description: card.description || 'Digital Business Card',
+    }
+}
+
+export default async function PublicCardPage({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params
+    const card = await getCardBySlug(slug)
 
     if (!card) {
         notFound()

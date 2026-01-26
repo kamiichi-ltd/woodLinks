@@ -1,20 +1,11 @@
--- Insert a test user (profile) - assumes auth.users link is loose or ignored for manual seed, 
--- or you might need to insert into auth.users first if foreign key constraints are strict. 
--- For Supabase local dev, usually we insert into public.profiles directly if trigger handles it, 
--- or we just insert into cards/contents skipping profile strictness if possible, but cards.user_id usually references auth.users.
--- Since we cannot easily seed auth.users with a known UUID without knowing the internal auth schema or using Supabase functions,
--- wE WILL ASSUME the user already exists or we use a placeholder UUID that matches your current login.
+-- Insert a test user (profile) - assumes auth.users link is loose or ignored for manual seed
 -- **REPLACE 'YOUR_USER_ID' WITH YOUR ACTUAL SUPABASE USER ID FROM AUTH TAB**
-
--- Example using a placeholder UUID (You MUST Update this before running if FK exists)
--- If you just want to see the UI and your table allows arbitrary UUIDs or you are testing:
--- SET session_replication_role = 'replica'; -- Only works if you are superuser to bypass FK triggers tentatively
 
 -- 1. Insert Card
 INSERT INTO public.cards (id, user_id, title, description, slug, is_published, created_at, updated_at)
 VALUES (
     '11111111-1111-1111-1111-111111111111', 
-    '00000000-0000-0000-0000-000000000000', -- REPLACE WITH YOUR USER ID
+    '00000000-0000-0000-0000-000000000000', -- REPLACE WITH YOUR USER ID of the currently logged in user
     '山田 太郎 (Yusuke Otani)', 
     '代表取締役 / CEO
 株式会社 木材リンクス', 
