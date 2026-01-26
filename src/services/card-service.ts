@@ -79,6 +79,45 @@ export async function getCard(id: string) {
     }
 }
 
+export async function getCardBySlug(slug: string) {
+    const supabase = await createClient()
+
+    // No auth check needed for public access, RLS should handle 'is_published' check or we do it explicitly
+    // Explicit check is safer given we are in a server action/component context where RLS might depend on role
+    // But for public access using anon key, RLS for 'select' on 'cards' should allow if is_published is true.
+    // However, since we are using the service role or anon key server-side, it's best to be explicit in the query too.
+
+    const { data: card, error: cardError } = await supabase
+        .from('cards')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .select('*' as any)
+        .eq('slug', slug)
+        .eq('is_published', true)
+        .single()
+
+    if (cardError || !card) {
+        if (cardError) console.error('Error fetching public card:', cardError)
+        return null
+    }
+
+    const { data: contents, error: contentError } = await supabase
+        .from('card_contents')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .select('*' as any)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .eq('card_id', (card as any).id)
+        .order('order_index', { ascending: true })
+
+    if (contentError) {
+        console.error('Error fetching public card contents:', contentError)
+    }
+
+    return {
+        ...(card as unknown as Card),
+        contents: (contents as unknown as CardContent[]) || []
+    }
+}
+
 export async function createCard(formData: FormData) {
     const supabase = await createClient()
     const {
