@@ -1,10 +1,11 @@
 import { getCardBySlug } from '@/services/card-service'
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
 import { Database } from '@/database.types'
 import { UserPlus, Link as LinkIcon, Phone, Mail, Instagram, Twitter, Facebook, Github, Globe, LucideIcon } from 'lucide-react'
+import { createClient } from '@/utils/supabase/server'
 
 import { ViewCounter } from '@/components/analytics/view-counter'
+import PublicNavigation from '@/components/public/public-navigation'
 
 type CardContent = Database['public']['Tables']['card_contents']['Row']
 
@@ -90,11 +91,19 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
         notFound()
     }
 
+    // Check ownership
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const isOwner = user?.id === card.user_id
+
     const material = card.material_type || 'sugi'
     const theme = themes[material]
 
     return (
         <div className={`min-h-screen ${theme.bg} flex flex-col items-center py-12 sm:px-6 lg:px-8 font-sans ${theme.text} relative overflow-hidden transition-colors duration-500`}>
+            {/* Navigation & Actions */}
+            <PublicNavigation isOwner={isOwner} cardId={card.id} />
+
             {/* Background Texture */}
             <div className={`absolute inset-0 ${theme.pattern} pointer-events-none mix-blend-multiply`}></div>
 
@@ -136,7 +145,7 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
                         className={`w-full flex justify-center items-center py-4 px-4 rounded-xl shadow-md text-sm font-bold tracking-wide transform transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] ${theme.button}`}
                     >
                         <UserPlus className="h-4 w-4 mr-2" />
-                        Add to Contacts
+                        Add to Contacts / 連絡先に追加
                     </a>
                 </div>
 

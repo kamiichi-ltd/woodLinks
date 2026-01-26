@@ -55,10 +55,10 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                 </div>
             )}
 
-            <div className="space-y-6">
+            <div className="space-y-8">
                 <div>
-                    <label htmlFor="title" className="block text-sm font-bold leading-6 text-[#2c3e50] uppercase tracking-wider">
-                        Card Title <span className="text-xs font-normal text-[#8c7b6c] ml-1 normal-case">/ 名刺のタイトル（お名前など）</span>
+                    <label htmlFor="title" className="block text-sm font-bold leading-6 text-[#2c3e50]">
+                        名刺のタイトル（お名前など） <span className="text-xs font-normal text-[#8c7b6c] ml-1">/ Title</span>
                     </label>
                     <div className="mt-2">
                         <input
@@ -74,8 +74,8 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                 </div>
 
                 <div>
-                    <label htmlFor="slug" className="block text-sm font-bold leading-6 text-[#2c3e50] uppercase tracking-wider">
-                        Public URL Slug <span className="text-xs font-normal text-[#8c7b6c] ml-1 normal-case">/ 公開URLスラッグ</span>
+                    <label htmlFor="slug" className="block text-sm font-bold leading-6 text-[#2c3e50]">
+                        公開URLスラッグ <span className="text-xs font-normal text-[#8c7b6c] ml-1">/ Slug</span>
                     </label>
                     <div className="mt-2 flex rounded-xl shadow-sm ring-1 ring-inset ring-[#d4c5ae] focus-within:ring-2 focus-within:ring-inset focus-within:ring-[#2c3e50] bg-[#fcfbf9] overflow-hidden">
                         <span className="flex select-none items-center pl-4 pr-1 bg-[#f4f1ea] text-[#8c7b6c] sm:text-sm font-mono border-r border-[#e6e2d3]">woodlinks.app/p/</span>
@@ -88,19 +88,19 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                             className="block flex-1 border-0 bg-transparent py-3 pl-3 text-[#2c3e50] placeholder:text-[#a4998e] focus:ring-0 sm:text-sm sm:leading-6 font-mono"
                             placeholder="your-custom-url"
                             pattern="^[a-z0-9-]+$"
-                            title="Only lowercase alphanumeric characters and hyphens are allowed"
+                            title="半角英数字とハイフンのみ使用可能です"
                             required
                         />
                     </div>
                     <p className="mt-2 text-xs text-[#8c7b6c] flex items-center gap-1">
                         <span className="inline-block w-1 h-1 rounded-full bg-[#d4c5ae]"></span>
-                        Lowercase alphanumeric & hyphens only.
+                        半角英数字とハイフンのみ使用可能です (Lowercase alphanumeric & hyphens)
                     </p>
                 </div>
 
                 <div>
-                    <label htmlFor="description" className="block text-sm font-bold leading-6 text-[#2c3e50] uppercase tracking-wider">
-                        Description / Bio <span className="text-xs font-normal text-[#8c7b6c] ml-1 normal-case">/ 自己紹介・プロフィール文</span>
+                    <label htmlFor="description" className="block text-sm font-bold leading-6 text-[#2c3e50]">
+                        自己紹介・プロフィール文 <span className="text-xs font-normal text-[#8c7b6c] ml-1">/ Description</span>
                     </label>
                     <div className="mt-2">
                         <textarea
@@ -110,19 +110,19 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             className="block w-full rounded-xl border-0 py-3 text-[#2c3e50] shadow-sm ring-1 ring-inset ring-[#d4c5ae] placeholder:text-[#a4998e] focus:ring-2 focus:ring-inset focus:ring-[#2c3e50] sm:text-sm sm:leading-6 bg-[#fcfbf9]"
-                            placeholder="Brief bio, title, or tagline..."
+                            placeholder="経歴、役職、一言メッセージなどを入力..."
                         />
                     </div>
                 </div>
 
                 <div>
-                    <label className="block text-sm font-bold leading-6 text-[#2c3e50] uppercase tracking-wider mb-3">
-                        Material Selection <span className="text-xs font-normal text-[#8c7b6c] ml-1 normal-case">/ 名刺の素材（テーマ）</span>
+                    <label className="block text-sm font-bold leading-6 text-[#2c3e50] mb-3">
+                        名刺の素材（テーマ） <span className="text-xs font-normal text-[#8c7b6c] ml-1">/ Material</span>
                     </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-3 gap-3">
                         {/* Sugi */}
                         <label className={`
-                            relative flex flex-col items-center p-4 rounded-xl cursor-pointer border-2 transition-all duration-200
+                            relative flex flex-col items-center p-3 rounded-xl cursor-pointer border-2 transition-all duration-200
                             ${materialType === 'sugi'
                                 ? 'border-[#d4a373] bg-[#fdfbf7] ring-1 ring-[#d4a373]'
                                 : 'border-[#e6e2d3] bg-white hover:border-[#d4c5ae]'}
@@ -135,18 +135,18 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                                 onChange={(e) => setMaterialType(e.target.value as 'sugi' | 'hinoki' | 'walnut')}
                                 className="sr-only"
                             />
-                            <div className="w-full h-24 rounded-lg bg-[#fdfbf7] mb-3 relative overflow-hidden border border-[#e6e2d3]">
+                            <div className="w-full h-20 rounded-lg bg-[#fdfbf7] mb-2 relative overflow-hidden border border-[#e6e2d3]">
                                 <div className="absolute inset-x-0 top-0 h-1 bg-[#d4a373]"></div>
                                 <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] mix-blend-multiply"></div>
-                                <div className="absolute inset-0 flex items-center justify-center text-3xl">🌲</div>
+                                <div className="absolute inset-0 flex items-center justify-center text-2xl">🌲</div>
                             </div>
-                            <span className="font-bold text-[#3d3126]">杉 (Sugi)</span>
-                            <span className="text-xs text-[#8c7b6c] mt-1 text-center">親しみやすさ・直感<br />Light & Friendly</span>
+                            <span className="font-bold text-sm text-[#3d3126]">杉 (Sugi)</span>
+                            <span className="text-[10px] text-[#8c7b6c] mt-0.5 text-center leading-tight">親しみやすさ<br />Friendly</span>
                         </label>
 
                         {/* Hinoki */}
                         <label className={`
-                            relative flex flex-col items-center p-4 rounded-xl cursor-pointer border-2 transition-all duration-200
+                            relative flex flex-col items-center p-3 rounded-xl cursor-pointer border-2 transition-all duration-200
                             ${materialType === 'hinoki'
                                 ? 'border-[#e9d8a6] bg-[#fdfbf7] ring-1 ring-[#e9d8a6]'
                                 : 'border-[#e6e2d3] bg-white hover:border-[#d4c5ae]'}
@@ -159,18 +159,18 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                                 onChange={(e) => setMaterialType(e.target.value as 'sugi' | 'hinoki' | 'walnut')}
                                 className="sr-only"
                             />
-                            <div className="w-full h-24 rounded-lg bg-[#fdfbf7] mb-3 relative overflow-hidden border border-[#e6e2d3]">
+                            <div className="w-full h-20 rounded-lg bg-[#fdfbf7] mb-2 relative overflow-hidden border border-[#e6e2d3]">
                                 <div className="absolute inset-x-0 top-0 h-1 bg-[#e9d8a6]"></div>
                                 <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] mix-blend-multiply"></div>
-                                <div className="absolute inset-0 flex items-center justify-center text-3xl">🪵</div>
+                                <div className="absolute inset-0 flex items-center justify-center text-2xl">🪵</div>
                             </div>
-                            <span className="font-bold text-[#3d3126]">桧 (Hinoki)</span>
-                            <span className="text-xs text-[#8c7b6c] mt-1 text-center">信頼・高貴・清潔感<br />Trust & Dignity</span>
+                            <span className="font-bold text-sm text-[#3d3126]">桧 (Hinoki)</span>
+                            <span className="text-[10px] text-[#8c7b6c] mt-0.5 text-center leading-tight">高貴・清潔<br />Noble</span>
                         </label>
 
                         {/* Walnut */}
                         <label className={`
-                            relative flex flex-col items-center p-4 rounded-xl cursor-pointer border-2 transition-all duration-200
+                            relative flex flex-col items-center p-3 rounded-xl cursor-pointer border-2 transition-all duration-200
                             ${materialType === 'walnut'
                                 ? 'border-[#6b4c3e] bg-[#fdfbf7] ring-1 ring-[#6b4c3e]'
                                 : 'border-[#e6e2d3] bg-white hover:border-[#d4c5ae]'}
@@ -183,13 +183,13 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                                 onChange={(e) => setMaterialType(e.target.value as 'sugi' | 'hinoki' | 'walnut')}
                                 className="sr-only"
                             />
-                            <div className="w-full h-24 rounded-lg bg-[#2c1810] mb-3 relative overflow-hidden border border-[#6b4c3e]">
+                            <div className="w-full h-20 rounded-lg bg-[#2c1810] mb-2 relative overflow-hidden border border-[#6b4c3e]">
                                 <div className="absolute inset-x-0 top-0 h-1 bg-[#6b4c3e]"></div>
                                 <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] mix-blend-overlay"></div>
-                                <div className="absolute inset-0 flex items-center justify-center text-3xl text-white">🕰️</div>
+                                <div className="absolute inset-0 flex items-center justify-center text-2xl text-white">🕰️</div>
                             </div>
-                            <span className="font-bold text-[#3d3126]">胡桃 (Walnut)</span>
-                            <span className="text-xs text-[#8c7b6c] mt-1 text-center">知性・モダン・重厚<br />Intellect & Modern</span>
+                            <span className="font-bold text-sm text-[#3d3126]">胡桃 (Walnut)</span>
+                            <span className="text-[10px] text-[#8c7b6c] mt-0.5 text-center leading-tight">重厚・モダン<br />Modern</span>
                         </label>
                     </div>
                 </div>
@@ -208,14 +208,14 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                     </div>
                     <div className="text-sm leading-6">
                         <label htmlFor="status" className="font-bold text-[#2c3e50] cursor-pointer select-none">
-                            Publish Card <span className="font-normal text-[#8c7b6c]">/ 名刺を公開する</span>
+                            名刺を公開する <span className="font-normal text-[#8c7b6c]">/ Publish</span>
                         </label>
                         <p className="text-[#8c7b6c] text-xs">
-                            {status === 'published' ? 'Your card is visible to the world.' : 'Your card is currently private (Draft).'}
+                            {status === 'published' ? '現在、あなたの名刺は世界中に公開されています。' : '現在、この名刺は非公開（下書き）です。'}
                         </p>
                         {['lost_reissued', 'disabled', 'transferred'].includes(status) && (
                             <p className="text-red-600 text-xs font-bold mt-1">
-                                Status: {status.toUpperCase()} (Cannot be changed here)
+                                Status: {status.toUpperCase()} (変更不可)
                             </p>
                         )}
                     </div>

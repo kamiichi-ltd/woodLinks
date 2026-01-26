@@ -4,10 +4,24 @@ import ContentEditor, { ContentItem } from './content-editor'
 import CardSettingsForm from '@/components/forms/card-settings-form'
 import Link from 'next/link'
 import { ExternalLink, AlertTriangle } from 'lucide-react'
+import CardQRCode from '@/components/cards/card-qr-code'
+import { createClient } from '@/utils/supabase/server'
+import { OrderSection } from '@/components/orders/order-section'
+import { Database } from '@/database.types'
+
+type Order = Database['public']['Tables']['orders']['Row']
+
 
 export default async function CardEditPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = await params
     const card = await getCard(resolvedParams.id)
+
+    const supabase = await createClient()
+    const { data: orders } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('card_id', resolvedParams.id)
+        .order('created_at', { ascending: false })
 
     if (!card) {
         notFound()
@@ -64,11 +78,10 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
                             <AlertTriangle className="h-5 w-5 text-[#d4a373]" aria-hidden="true" />
                         </div>
                         <div className="ml-3">
-                            <h3 className="text-sm font-bold text-[#3d3126]">Setup Required / 設定が必要です</h3>
+                            <h3 className="text-sm font-bold text-[#3d3126]">公開設定が必要です</h3>
                             <div className="mt-1 text-sm text-[#5a4d41]">
                                 <p>
-                                    To publish your card, please set a unique URL slug and enable &quot;Public&quot; mode in the settings below.<br />
-                                    <span className="text-xs text-[#8c7b6c]">公開するには「Settings / 名刺の基本設定」でスラッグを設定し、公開モードをONにしてください。</span>
+                                    名刺を公開するには、以下の設定でスラッグを決め、公開モードをONにしてください。
                                 </p>
                             </div>
                         </div>
@@ -76,8 +89,8 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
                 </div>
             )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-                <div className="lg:col-span-7 space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+                <div className="lg:col-span-7 xl:col-span-8 space-y-6">
                     <div className="flex items-end gap-3 mb-2">
                         <h2 className="text-2xl font-serif font-bold text-[#2c3e50] leading-none">Content Editor</h2>
                         <span className="text-sm font-medium text-[#8c7b6c] mb-0.5">/ コンテンツ編集</span>
@@ -85,7 +98,30 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
                     <ContentEditor cardId={card.id} initialContents={card.contents as unknown as ContentItem[]} />
                 </div>
 
-                <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-8">
+                <div className="lg:col-span-5 xl:col-span-4 space-y-6 lg:sticky lg:top-8">
+                    {/* Order Section */}
+                    <OrderSection cardId={card.id} initialOrders={(orders as Order[]) || []} />
+
+                    {/* QR Code Section */}
+                    <div>
+                        <div className="flex items-end gap-3 mb-2">
+                            <h2 className="text-2xl font-serif font-bold text-[#2c3e50] leading-none">QR Code</h2>
+                            <span className="text-sm font-medium text-[#8c7b6c] mb-0.5">/ 繋がり</span>
+                        </div>
+                        <div className="bg-white/90 backdrop-blur-md shadow-lg border border-[#e6e2d3] rounded-3xl p-6 sm:p-8 transition-all hover:shadow-xl">
+                            <div className="flex flex-col sm:flex-row items-center gap-6">
+                                <CardQRCode cardId={card.id} size={120} className="flex-shrink-0" />
+                                <div className="text-center sm:text-left">
+                                    <h3 className="text-lg font-bold text-[#3d3126] mb-1">物理カード用リンク</h3>
+                                    <p className="text-xs text-[#8c7b6c] mb-3 leading-relaxed">QRコードまたはNFCには<br />この不変リンクを使用してください。</p>
+                                    <div className="inline-flex items-center px-3 py-1.5 bg-stone-100 rounded-lg text-xs font-mono text-stone-600 select-all">
+                                        /c/{card.id.substring(0, 8)}...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="flex items-end gap-3 mb-2">
                         <h2 className="text-2xl font-serif font-bold text-[#2c3e50] leading-none">Card Settings</h2>
                         <span className="text-sm font-medium text-[#8c7b6c] mb-0.5">/ 名刺設定</span>
@@ -100,6 +136,8 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
                     />
                 </div>
             </div>
+
         </div>
+
     )
 }
