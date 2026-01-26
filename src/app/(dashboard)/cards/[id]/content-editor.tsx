@@ -97,6 +97,8 @@ export default function ContentEditor({ cardId, initialContents }: { cardId: str
                                         <option value="facebook">Facebook</option>
                                         <option value="github">GitHub</option>
                                         <option value="website">Website</option>
+                                        <option value="phone">Phone</option>
+                                        <option value="email">Email</option>
                                     </select>
                                 </div>
                                 <div className="sm:col-span-3">

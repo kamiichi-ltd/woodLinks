@@ -306,3 +306,37 @@ export async function deleteCardContent(contentId: string, cardId: string) {
 
     revalidatePath(`/dashboard/cards/${cardId}`)
 }
+
+export async function getPublicCardById(id: string) {
+    const supabase = await createClient()
+
+    const { data: card, error: cardError } = await supabase
+        .from('cards')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .select('*' as any)
+        .eq('id', id)
+        .eq('is_published', true)
+        .single()
+
+    if (cardError || !card) {
+        if (cardError) console.error('Error fetching public card by ID:', cardError)
+        return null
+    }
+
+    const { data: contents, error: contentError } = await supabase
+        .from('card_contents')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .select('*' as any)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .eq('card_id', (card as any).id)
+        .order('order_index', { ascending: true })
+
+    if (contentError) {
+        console.error('Error fetching public card contents:', contentError)
+    }
+
+    return {
+        ...(card as unknown as Card),
+        contents: (contents as unknown as CardContent[]) || []
+    }
+}
