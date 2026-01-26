@@ -178,7 +178,7 @@ export async function createCard(formData: FormData) {
     return data
 }
 
-export async function updateCard(id: string, updates: { title?: string; description?: string; is_published?: boolean }) {
+export async function updateCard(id: string, updates: { title?: string; description?: string; is_published?: boolean; slug?: string }) {
     const supabase = await createClient()
     const {
         data: { user },
@@ -193,10 +193,23 @@ export async function updateCard(id: string, updates: { title?: string; descript
     // Logic to ensure slug exists if not already, or if title changes and slug is empty (though slug is usually persistent)
     // For now, if we are updating title, let's check if we want to regenerate slug? 
     // Requirement says: "cards table slug is empty, auto generate from title at create or update"
+    if (updates.slug) {
+        if (!/^[a-z0-9-]+$/.test(updates.slug)) {
+            throw new Error('Invalid slug format. use only lowercase alphanumeric characters and hyphens.')
+        }
+
+        // Check uniqueness if slug changed
+        const { count } = await supabase.from('cards').select('*', { count: 'exact', head: true }).eq('slug', updates.slug).neq('id', id)
+        if (count) {
+            throw new Error('Slug already exists')
+        }
+    }
+
+    // Auto-generate if title changed and no slug exists (fallback logic)
     if (updates.title) {
         const { data: currentCard } = await supabase.from('cards').select('slug').eq('id', id).single()
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if (currentCard && !(currentCard as any).slug) {
+        if (currentCard && !(currentCard as any).slug && !updates.slug) {
             updatePayload.slug = await generateUniqueSlug(supabase, updates.title)
         }
     }
@@ -354,8 +367,19 @@ export async function getPublicCardById(id: string) {
         console.error('Error fetching public card contents:', contentError)
     }
 
+    // Fetch profile avatar
+    // Ensure we access user_id safely. card is typed as any in select but we know it matches Card structure partially.
+    const userId = (card as unknown as Card).user_id
+
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', userId)
+        .single() as { data: { avatar_url: string | null } | null, error: unknown }
+
     return {
         ...(card as unknown as Card),
-        contents: (contents as unknown as CardContent[]) || []
+        contents: (contents as unknown as CardContent[]) || [],
+        avatar_url: profile?.avatar_url || null
     }
 }

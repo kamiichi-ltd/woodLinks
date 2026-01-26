@@ -61,8 +61,20 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
                 {/* Header */}
                 <div className="text-center pt-2">
                     {/* Logo/Avatar */}
-                    <div className="mx-auto h-24 w-24 bg-gradient-to-br from-stone-100 to-stone-50 rounded-full flex items-center justify-center text-5xl mb-6 shadow-inner ring-4 ring-white">
-                        🌲
+                    <div className="mx-auto h-24 w-24 bg-gradient-to-br from-stone-100 to-stone-50 rounded-full flex items-center justify-center text-5xl mb-6 shadow-md ring-4 ring-white overflow-hidden relative">
+                        {/* 
+                            We cast card to include avatar_url which is joined in service.
+                        */}
+                        {(card as { avatar_url?: string | null } & typeof card).avatar_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                                src={(card as { avatar_url?: string | null } & typeof card).avatar_url!}
+                                alt={card.title || 'Avatar'}
+                                className="h-full w-full object-cover"
+                            />
+                        ) : (
+                            <span>🌲</span>
+                        )}
                     </div>
                     <h1 className="text-2xl font-bold tracking-tight text-stone-900 leading-tight">
                         {card.title}

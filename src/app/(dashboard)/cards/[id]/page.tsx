@@ -1,6 +1,7 @@
 import { getCard } from '@/services/card-service'
 import { notFound } from 'next/navigation'
 import ContentEditor, { ContentItem } from './content-editor'
+import CardSettingsForm from './card-settings-form'
 import Link from 'next/link'
 
 export default async function CardEditPage({ params }: { params: { id: string } }) {
@@ -56,19 +57,12 @@ export default async function CardEditPage({ params }: { params: { id: string } 
 
                 <div>
                     {/* Preview or other details can go here */}
-                    <div className="bg-white shadow sm:rounded-lg p-6">
-                        <h3 className="text-base font-semibold leading-6 text-gray-900">Card Details</h3>
-                        <dl className="mt-4 divide-y divide-gray-100">
-                            <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                                <dt className="text-sm font-medium leading-6 text-gray-900">Slug</dt>
-                                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{card.slug || 'Not generated'}</dd>
-                            </div>
-                            <div className="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                                <dt className="text-sm font-medium leading-6 text-gray-900">Description</dt>
-                                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">{card.description || 'No description'}</dd>
-                            </div>
-                        </dl>
-                    </div>
+                    {/* Settings Form */}
+                    <CardSettingsForm
+                        cardId={card.id}
+                        initialSlug={card.slug || ''}
+                        initialDescription={card.description}
+                    />
                 </div>
             </div>
         </div>
