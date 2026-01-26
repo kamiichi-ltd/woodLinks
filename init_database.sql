@@ -39,13 +39,18 @@ ALTER TABLE public.card_contents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Public cards are viewable by everyone
+-- This allows anon role to SELECT published cards
+DROP POLICY IF EXISTS "Public cards are viewable by everyone" ON public.cards;
 CREATE POLICY "Public cards are viewable by everyone" 
 ON public.cards FOR SELECT 
+TO public, anon, authenticated
 USING (is_published = true);
 
 -- Policy: Card contents are viewable if the parent card is published
+DROP POLICY IF EXISTS "Public card contents are viewable by everyone" ON public.card_contents;
 CREATE POLICY "Public card contents are viewable by everyone" 
 ON public.card_contents FOR SELECT 
+TO public, anon, authenticated
 USING (
   EXISTS (
     SELECT 1 FROM public.cards 
@@ -55,10 +60,12 @@ USING (
 );
 
 -- (Optional) Policy: Owners can view/edit their own data
+DROP POLICY IF EXISTS "Users can manage their own cards" ON public.cards;
 CREATE POLICY "Users can manage their own cards" 
 ON public.cards FOR ALL 
 USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can manage their own card contents" ON public.card_contents;
 CREATE POLICY "Users can manage their own card contents" 
 ON public.card_contents FOR ALL 
 USING (
@@ -71,14 +78,30 @@ USING (
 
 -- 3. Test Data Seeding
 
--- Note: This requires a valid user_id. 
--- If you are running this in Supabase SQL Editor, you can use a placeholder or your actual UID.
--- Here we use a placeholder UUID.
+-- Create a dummy user in auth.users to satisfy Foreign Key constraints
+-- Note: Modifying auth.users directly is generally reserved for seeding/testing.
+INSERT INTO auth.users (id, aud, role, email, email_confirmed_at)
+VALUES (
+  '00000000-0000-0000-0000-000000000000',
+  'authenticated',
+  'authenticated',
+  'test_user@example.com',
+  now()
+) ON CONFLICT (id) DO NOTHING;
 
+-- Create associated profile
+INSERT INTO public.profiles (id, full_name, email)
+VALUES (
+  '00000000-0000-0000-0000-000000000000',
+  'Test User',
+  'test_user@example.com'
+) ON CONFLICT (id) DO NOTHING;
+
+-- Insert Test Card linked to dummy user
 INSERT INTO public.cards (id, user_id, title, description, slug, is_published)
 VALUES (
     '11111111-1111-1111-1111-111111111111', 
-    '00000000-0000-0000-0000-000000000000', -- REPLACE THIS WITH YOUR AUTH.UID()
+    '00000000-0000-0000-0000-000000000000',
     '山田 太郎 (Yusuke Otani)', 
     '代表取締役 / CEO
 株式会社 木材リンクス', 
@@ -86,6 +109,7 @@ VALUES (
     true
 ) ON CONFLICT (id) DO NOTHING;
 
+-- Insert Contents linked to Test Card
 INSERT INTO public.card_contents (card_id, type, content, order_index)
 VALUES 
 (

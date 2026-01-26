@@ -55,20 +55,20 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col items-center py-12 sm:px-6 lg:px-8 font-sans text-gray-800">
-            <div className="w-full max-w-sm space-y-6 bg-white p-6 shadow-xl rounded-2xl border border-gray-100">
+        <div className="min-h-screen bg-[#fdfbf7] flex flex-col items-center py-12 sm:px-6 lg:px-8 font-sans text-stone-800">
+            <div className="w-full max-w-sm space-y-6 bg-white p-6 shadow-xl shadow-stone-200/50 rounded-2xl border border-stone-100">
 
                 {/* Header */}
                 <div className="text-center pt-2">
                     {/* Logo/Avatar */}
-                    <div className="mx-auto h-24 w-24 bg-gradient-to-br from-indigo-50 to-slate-100 rounded-full flex items-center justify-center text-5xl mb-6 shadow-inner ring-4 ring-white">
+                    <div className="mx-auto h-24 w-24 bg-gradient-to-br from-stone-100 to-stone-50 rounded-full flex items-center justify-center text-5xl mb-6 shadow-inner ring-4 ring-white">
                         🌲
                     </div>
-                    <h1 className="text-2xl font-bold tracking-tight text-gray-900 leading-tight">
+                    <h1 className="text-2xl font-bold tracking-tight text-stone-900 leading-tight">
                         {card.title}
                     </h1>
                     {card.description && (
-                        <p className="mt-3 text-sm text-gray-500 whitespace-pre-wrap leading-relaxed">
+                        <p className="mt-3 text-sm text-stone-500 whitespace-pre-wrap leading-relaxed">
                             {card.description}
                         </p>
                     )}
@@ -78,7 +78,7 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
                 <div className="mt-6">
                     <a
                         href={`/api/cards/${card.id}/vcard`}
-                        className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                        className="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-semibold text-white bg-stone-800 hover:bg-stone-700 active:scale-[0.98] transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500"
                     >
                         <UserPlus className="h-4 w-4 mr-2" />
                         Add to Contacts
@@ -89,7 +89,7 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
                 <div className="mt-8 space-y-4">
                     {card.contents.length === 0 && (
                         <div className="text-center py-10">
-                            <p className="text-gray-400 text-sm">表示できる情報がありません</p>
+                            <p className="text-stone-400 text-sm">表示できる情報がありません</p>
                         </div>
                     )}
 
@@ -105,12 +105,12 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
                                     href={url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="w-full flex items-center px-5 py-4 border border-gray-100 rounded-xl shadow-[0_2px_4px_rgba(0,0,0,0.02)] bg-white hover:bg-slate-50 hover:shadow-sm transition-all group"
+                                    className="w-full flex items-center px-5 py-4 border border-stone-100 rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] bg-white hover:bg-[#faf9f6 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] transition-all duration-300 group"
                                 >
                                     <Icon className={`h-5 w-5 mr-3 ${config.color}`} />
-                                    <span className="flex-1 text-base font-medium text-gray-700 group-hover:text-gray-900 capitalize transition-colors">{config.label}</span>
+                                    <span className="flex-1 text-base font-medium text-stone-700 group-hover:text-stone-900 capitalize transition-colors">{config.label}</span>
                                     {platform !== 'phone' && platform !== 'email' && (
-                                        <span className="text-gray-300 group-hover:text-gray-500 transition-colors">↗</span>
+                                        <span className="text-stone-300 group-hover:text-stone-500 transition-colors">↗</span>
                                     )}
                                 </a>
                             )
@@ -118,7 +118,7 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
 
                         if (item.type === 'text' && isTextContent(item.content)) {
                             return (
-                                <div key={item.id} className="bg-slate-50 rounded-xl p-5 text-center text-sm text-gray-600 leading-relaxed border border-slate-100">
+                                <div key={item.id} className="bg-[#faf9f6] rounded-xl p-5 text-center text-sm text-stone-600 leading-relaxed border border-stone-100">
                                     <p className="whitespace-pre-wrap">{item.content.text}</p>
                                 </div>
                             )
@@ -129,8 +129,8 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
                 </div>
 
                 {/* Footer */}
-                <div className="mt-10 text-center text-xs text-gray-400">
-                    Powered by <Link href="/" className="hover:text-indigo-500">WoodLinks</Link>
+                <div className="mt-10 text-center text-xs text-stone-400">
+                    Powered by <Link href="/" className="hover:text-stone-600 transition-colors">WoodLinks</Link>
                 </div>
 
             </div>
