@@ -395,3 +395,46 @@ export async function getPublicCardById(id: string) {
         avatar_url: profile?.avatar_url || null
     }
 }
+
+export async function incrementViewCount(slug: string) {
+    const supabase = await createClient()
+    const { error } = await supabase.rpc('increment_view_count', { card_slug: slug })
+    if (error) {
+        console.error('Error incrementing view count:', error)
+    }
+}
+
+export async function reorderCardContents(cardId: string, items: { id: string; order_index: number }[]) {
+    const supabase = await createClient()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+        throw new Error('Unauthorized')
+    }
+
+    // Verify ownership
+    const { count } = await supabase.from('cards').select('*', { count: 'exact', head: true }).eq('id', cardId).eq('user_id', user.id)
+    if (!count) {
+        throw new Error('Card not found or access denied')
+    }
+
+    const { error } = await supabase
+        .from('card_contents')
+        .upsert(
+            items.map((item) => ({
+                id: item.id,
+                card_id: cardId, // Required for composite key or constraint if any, though ID alone usually enough? Supabase usually needs all PKs or valid update columns
+                order_index: item.order_index,
+            })) as any
+        )
+        .select()
+
+    if (error) {
+        console.error('Error reordering contents:', error)
+        throw new Error('Failed to reorder contents')
+    }
+
+    revalidatePath(`/dashboard/cards/${cardId}`)
+}

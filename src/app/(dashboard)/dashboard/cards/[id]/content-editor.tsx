@@ -1,7 +1,25 @@
 'use client'
 
-import { addCardContent, deleteCardContent } from '@/services/card-service'
-import { useState, useTransition } from 'react'
+import { addCardContent, deleteCardContent, reorderCardContents } from '@/services/card-service'
+import { useState, useTransition, useEffect } from 'react'
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent,
+} from '@dnd-kit/core'
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+    useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import { GripVertical, Trash2 } from 'lucide-react'
 
 export type ContentItem = {
     id: string
@@ -24,12 +42,70 @@ function isTextContent(content: unknown): content is { text: string } {
     return typeof content === 'object' && content !== null && 'text' in content
 }
 
-export default function ContentEditor({ cardId, initialContents }: { cardId: string; initialContents: ContentItem[] }) {
-    // We'll trust revalidatePath to update the props, but for immediate feedback we might want local state.
-    // However, normally revalidatePath is fast enough. Let's rely on props update via parent re-render?
-    // Actually, in client components receiving props from RSC, we usually don't need local state for the list if we use revalidatePath.
-    // BUT the parent is an RSC... updates via Server Action + revalidatePath will cause RSC to re-render and send new props.
+function SortableItem({ item, onDelete, isPending }: { item: ContentItem; onDelete: (id: string) => void; isPending: boolean }) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+    } = useSortable({ id: item.id })
 
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    }
+
+    return (
+        <li ref={setNodeRef} style={style} className="flex items-center justify-between gap-x-6 py-5 px-4 bg-white border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
+            <div className="flex items-center w-full min-w-0 gap-x-4">
+                {/* Drag Handle */}
+                <button
+                    {...attributes}
+                    {...listeners}
+                    className="touch-none cursor-move text-gray-400 hover:text-gray-600 focus:outline-none"
+                    aria-label="Drag to reorder"
+                >
+                    <GripVertical className="h-5 w-5" />
+                </button>
+
+                <div className="min-w-0 flex-1">
+                    <div className="flex items-start gap-x-3">
+                        <p className="text-sm font-semibold leading-6 text-gray-900">
+                            {item.type === 'sns_link' && isSnsContent(item.content) ? item.content.platform : 'テキスト'}
+                        </p>
+                        <p className={`rounded-md whitespace-nowrap mt-0.5 px-1.5 py-0.5 text-xs font-medium ring-1 ring-inset ${item.type === 'sns_link' ? 'bg-blue-50 text-blue-700 ring-blue-600/20' : 'bg-green-50 text-green-700 ring-green-600/20'}`}>
+                            {item.type === 'sns_link' ? 'リンク' : 'テキスト'}
+                        </p>
+                    </div>
+                    <div className="mt-1 flex items-center gap-x-2 text-xs leading-5 text-gray-500">
+                        {item.type === 'sns_link' && isSnsContent(item.content) ? (
+                            <a href={item.content.url} target="_blank" rel="noopener noreferrer" className="hover:underline truncate">
+                                {item.content.url}
+                            </a>
+                        ) : item.type === 'text' && isTextContent(item.content) ? (
+                            <p className="whitespace-pre-wrap line-clamp-2">{item.content.text}</p>
+                        ) : null}
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex flex-none items-center gap-x-4">
+                <button
+                    onClick={() => onDelete(item.id)}
+                    disabled={isPending}
+                    className="rounded-md p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+                    title="Delete"
+                >
+                    <Trash2 className="h-5 w-5" />
+                </button>
+            </div>
+        </li>
+    )
+}
+
+export default function ContentEditor({ cardId, initialContents }: { cardId: string; initialContents: ContentItem[] }) {
+    const [items, setItems] = useState(initialContents)
     const [isPending, startTransition] = useTransition()
     const [contentType, setContentType] = useState<'sns_link' | 'text'>('sns_link')
 
@@ -37,6 +113,42 @@ export default function ContentEditor({ cardId, initialContents }: { cardId: str
     const [platform, setPlatform] = useState('twitter')
     const [url, setUrl] = useState('')
     const [text, setText] = useState('')
+
+    // Sync items with props when they change (e.g. after refresh or add/delete)
+    useEffect(() => {
+        setItems(initialContents)
+    }, [initialContents])
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    )
+
+    const handleDragEnd = async (event: DragEndEvent) => {
+        const { active, over } = event
+
+        if (over && active.id !== over.id) {
+            setItems((items) => {
+                const oldIndex = items.findIndex((item) => item.id === active.id)
+                const newIndex = items.findIndex((item) => item.id === over.id)
+
+                const newItems = arrayMove(items, oldIndex, newIndex)
+
+                // Trigger server update with new order indices
+                startTransition(async () => {
+                    const reorderedItems = newItems.map((item, index) => ({
+                        id: item.id,
+                        order_index: index
+                    }))
+                    await reorderCardContents(cardId, reorderedItems)
+                })
+
+                return newItems
+            })
+        }
+    }
 
     const handleAdd = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -56,7 +168,7 @@ export default function ContentEditor({ cardId, initialContents }: { cardId: str
     }
 
     const handleDelete = async (contentId: string) => {
-        if (!confirm('Are you sure?')) return
+        if (!confirm('本当に削除しますか？')) return
         startTransition(async () => {
             await deleteCardContent(contentId, cardId)
         })
@@ -65,118 +177,110 @@ export default function ContentEditor({ cardId, initialContents }: { cardId: str
     return (
         <div className="bg-white shadow sm:rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-                <h3 className="text-base font-semibold leading-6 text-gray-900">Manage Content</h3>
+                <h3 className="text-lg font-semibold leading-6 text-gray-900 mb-6">内容の管理</h3>
 
                 {/* Add New Content Form */}
-                <div className="mt-6 border-t border-gray-100 pt-6">
-                    <h4 className="text-sm font-medium text-gray-900">Add New Block</h4>
-                    <form onSubmit={handleAdd} className="mt-4 space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium leading-6 text-gray-900">Type</label>
-                            <select
-                                value={contentType}
-                                onChange={(e) => setContentType(e.target.value as 'sns_link' | 'text')}
-                                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                            >
-                                <option value="sns_link">SNS Link</option>
-                                <option value="text">Free Text</option>
-                            </select>
-                        </div>
+                <div className="bg-gray-50 rounded-lg p-5 mb-8 border border-gray-100">
+                    <h4 className="text-sm font-medium text-gray-900 mb-4">新しいブロックを追加</h4>
+                    <form onSubmit={handleAdd} className="space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                            <div className="sm:col-span-1">
+                                <label className="block text-xs font-medium text-gray-700 mb-1">種類</label>
+                                <select
+                                    value={contentType}
+                                    onChange={(e) => setContentType(e.target.value as 'sns_link' | 'text')}
+                                    className="block w-full rounded-md border-0 py-1.5 pl-3 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                >
+                                    <option value="sns_link">SNSリンク</option>
+                                    <option value="text">自由入力テキスト</option>
+                                </select>
+                            </div>
 
-                        {contentType === 'sns_link' && (
-                            <div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
+                            {contentType === 'sns_link' ? (
+                                <>
+                                    <div className="sm:col-span-1">
+                                        <label className="block text-xs font-medium text-gray-700 mb-1">プラットフォーム</label>
+                                        <select
+                                            value={platform}
+                                            onChange={(e) => setPlatform(e.target.value)}
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        >
+                                            <option value="twitter">X (Twitter)</option>
+                                            <option value="instagram">Instagram</option>
+                                            <option value="facebook">Facebook</option>
+                                            <option value="github">GitHub</option>
+                                            <option value="website">Website</option>
+                                            <option value="phone">Phone</option>
+                                            <option value="email">Email</option>
+                                        </select>
+                                    </div>
+                                    <div className="sm:col-span-2">
+                                        <label className="block text-xs font-medium text-gray-700 mb-1">URLまたは連絡先</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={url}
+                                            onChange={(e) => setUrl(e.target.value)}
+                                            placeholder="https://..."
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        />
+                                    </div>
+                                </>
+                            ) : (
                                 <div className="sm:col-span-3">
-                                    <label className="block text-sm font-medium leading-6 text-gray-900">Platform</label>
-                                    <select
-                                        value={platform}
-                                        onChange={(e) => setPlatform(e.target.value)}
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                    >
-                                        <option value="twitter">X (Twitter)</option>
-                                        <option value="instagram">Instagram</option>
-                                        <option value="facebook">Facebook</option>
-                                        <option value="github">GitHub</option>
-                                        <option value="website">Website</option>
-                                        <option value="phone">Phone</option>
-                                        <option value="email">Email</option>
-                                    </select>
-                                </div>
-                                <div className="sm:col-span-3">
-                                    <label className="block text-sm font-medium leading-6 text-gray-900">URL</label>
+                                    <label className="block text-xs font-medium text-gray-700 mb-1">テキスト内容</label>
                                     <input
-                                        type="url"
+                                        type="text"
                                         required
-                                        value={url}
-                                        onChange={(e) => setUrl(e.target.value)}
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        value={text}
+                                        onChange={(e) => setText(e.target.value)}
+                                        placeholder="メッセージを入力..."
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                     />
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
 
-                        {contentType === 'text' && (
-                            <div>
-                                <label className="block text-sm font-medium leading-6 text-gray-900">Text Content</label>
-                                <textarea
-                                    required
-                                    rows={3}
-                                    value={text}
-                                    onChange={(e) => setText(e.target.value)}
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                />
-                            </div>
-                        )}
-
-                        <button
-                            type="submit"
-                            disabled={isPending}
-                            className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50"
-                        >
-                            {isPending ? 'Adding...' : 'Add Content'}
-                        </button>
+                        <div className="flex justify-end">
+                            <button
+                                type="submit"
+                                disabled={isPending}
+                                className="inline-flex justify-center rounded-md bg-stone-800 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-stone-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-600 disabled:opacity-50 transition-colors"
+                            >
+                                {isPending ? '追加中...' : '内容を追加'}
+                            </button>
+                        </div>
                     </form>
                 </div>
 
-                {/* Existing Contents List */}
+                {/* Sortable List */}
                 <div className="mt-8">
-                    <h4 className="text-sm font-medium text-gray-900 mb-4">Current Blocks</h4>
-                    <ul role="list" className="divide-y divide-gray-100 rounded-md border border-gray-200">
-                        {initialContents.length === 0 && (
-                            <li className="p-4 text-center text-gray-500 text-sm">No content yet.</li>
-                        )}
-                        {initialContents.map((item) => (
-                            <li key={item.id} className="flex items-center justify-between gap-x-6 py-5 px-4">
-                                <div className="min-w-0">
-                                    <div className="flex items-start gap-x-3">
-                                        <p className="text-sm font-semibold leading-6 text-gray-900">
-                                            {item.type === 'sns_link' && isSnsContent(item.content) ? item.content.platform : 'Text Block'}
-                                        </p>
-                                        <p className={`rounded-md whitespace-nowrap mt-0.5 px-1.5 py-0.5 text-xs font-medium ring-1 ring-inset ${item.type === 'sns_link' ? 'bg-blue-50 text-blue-700 ring-blue-600/20' : 'bg-green-50 text-green-700 ring-green-600/20'}`}>
-                                            {item.type === 'sns_link' ? 'Link' : 'Text'}
-                                        </p>
-                                    </div>
-                                    <div className="mt-1 flex items-center gap-x-2 text-xs leading-5 text-gray-500">
-                                        {item.type === 'sns_link' && isSnsContent(item.content) ? (
-                                            <a href={item.content.url} target="_blank" rel="noopener noreferrer" className="hover:underline truncate">
-                                                {item.content.url}
-                                            </a>
-                                        ) : item.type === 'text' && isTextContent(item.content) ? (
-                                            <p className="whitespace-pre-wrap line-clamp-2">{item.content.text}</p>
-                                        ) : null}
-                                    </div>
-                                </div>
-                                <div className="flex flex-none items-center gap-x-4">
-                                    <button
-                                        onClick={() => handleDelete(item.id)}
-                                        disabled={isPending}
-                                        className="hidden rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:block disabled:opacity-50"
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
+                    <div className="flex items-center justify-between mb-4">
+                        <h4 className="text-sm font-medium text-gray-900">現在のコンテンツ一覧</h4>
+                        <span className="text-xs text-gray-500">ドラッグして順序を入れ替え</span>
+                    </div>
+
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                    >
+                        <SortableContext
+                            items={items.map(i => i.id)}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            <ul role="list" className="divide-y divide-gray-100 rounded-lg border border-gray-200 overflow-hidden bg-white shadow-sm">
+                                {items.length === 0 && (
+                                    <li className="p-8 text-center text-gray-500 text-sm italic bg-gray-50">
+                                        コンテンツがありません。上記から追加してください。
+                                    </li>
+                                )}
+                                {items.map((item) => (
+                                    <SortableItem key={item.id} item={item} onDelete={handleDelete} isPending={isPending} />
+                                ))}
+                            </ul>
+                        </SortableContext>
+                    </DndContext>
                 </div>
             </div>
         </div>

@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { Database } from '@/database.types'
 import { UserPlus, Link as LinkIcon, Phone, Mail, Instagram, Twitter, Facebook, Github, Globe, LucideIcon } from 'lucide-react'
 
+import { ViewCounter } from '@/components/analytics/view-counter'
+
 type CardContent = Database['public']['Tables']['card_contents']['Row']
 
 // Helper guard
@@ -56,6 +58,7 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
 
     return (
         <div className="min-h-screen bg-[#fdfbf7] flex flex-col items-center py-12 sm:px-6 lg:px-8 font-sans text-stone-800">
+            <ViewCounter slug={slug} />
             <div className="w-full max-w-sm space-y-6 bg-white p-6 shadow-xl shadow-stone-200/50 rounded-2xl border border-stone-100">
 
                 {/* Header */}

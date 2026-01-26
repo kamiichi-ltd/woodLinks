@@ -33,10 +33,10 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                 description,
                 is_published: isPublished,
             })
-            setMessage({ type: 'success', text: 'Settings updated successfully' })
+            setMessage({ type: 'success', text: '設定を更新しました' })
             router.refresh()
         } catch (error) {
-            setMessage({ type: 'error', text: 'Failed to update settings. Slug might be taken.' })
+            setMessage({ type: 'error', text: '設定の更新に失敗しました。スラッグが既に使用されている可能性があります。' })
             console.error(error)
         } finally {
             setIsLoading(false)
@@ -45,7 +45,7 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
 
     return (
         <form onSubmit={handleSubmit} className="bg-white shadow sm:rounded-lg p-6 space-y-6">
-            <h3 className="text-base font-semibold leading-6 text-gray-900">Card Settings</h3>
+            <h3 className="text-base font-semibold leading-6 text-gray-900">名刺の基本設定</h3>
 
             {message && (
                 <div className={`p-4 rounded-md ${message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
@@ -55,7 +55,7 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
 
             <div>
                 <label htmlFor="title" className="block text-sm font-medium leading-6 text-gray-900">
-                    Card Title
+                    名刺のタイトル（お名前など）
                 </label>
                 <div className="mt-2">
                     <input
@@ -72,7 +72,7 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
 
             <div>
                 <label htmlFor="slug" className="block text-sm font-medium leading-6 text-gray-900">
-                    Public URL Slug
+                    公開URLのスラッグ（英数字）
                 </label>
                 <div className="mt-2 flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
                     <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm">/p/</span>
@@ -89,12 +89,12 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                         required
                     />
                 </div>
-                <p className="mt-1 text-xs text-gray-500">Only lowercase alphanumeric characters and hyphens.</p>
+                <p className="mt-1 text-xs text-gray-500">半角英数字とハイフンのみ使用できます。</p>
             </div>
 
             <div>
                 <label htmlFor="description" className="block text-sm font-medium leading-6 text-gray-900">
-                    Description / Bio
+                    自己紹介・プロフィール文
                 </label>
                 <div className="mt-2">
                     <textarea
@@ -104,7 +104,7 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        placeholder="Job Title, Company, or Brief Bio"
+                        placeholder="役職、会社名、簡単な経歴など"
                     />
                 </div>
             </div>
@@ -119,7 +119,7 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                     className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 cursor-pointer"
                 />
                 <label htmlFor="is_published" className="block text-sm font-medium leading-6 text-gray-900 cursor-pointer select-none">
-                    Publish this card (Make it live)
+                    名刺を公開する
                 </label>
             </div>
 
@@ -129,7 +129,7 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                     disabled={isLoading}
                     className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {isLoading ? 'Saving...' : 'Save Settings'}
+                    {isLoading ? '保存中...' : '設定を保存する'}
                 </button>
             </div>
         </form>

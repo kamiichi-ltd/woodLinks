@@ -5,12 +5,9 @@ import CardSettingsForm from '@/components/forms/card-settings-form'
 import Link from 'next/link'
 import { ExternalLink, AlertTriangle } from 'lucide-react'
 
-export default async function CardEditPage({ params }: { params: { id: string } }) {
-    // Await params in case it's a promise (Next.js future changes) though currently object in older versions, 
-    // but safest is to treat validly. In standard Next.js 13/14 app router params is prop.
-    // Actually params is just an object. 
-
-    const card = await getCard(params.id)
+export default async function CardEditPage({ params }: { params: Promise<{ id: string }> }) {
+    const resolvedParams = await params
+    const card = await getCard(resolvedParams.id)
 
     if (!card) {
         notFound()
@@ -22,14 +19,14 @@ export default async function CardEditPage({ params }: { params: { id: string } 
                 <div>
                     <nav className="sm:hidden" aria-label="Back">
                         <Link href="/dashboard" className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
-                            Back to Dashboard
+                            ダッシュボードに戻る
                         </Link>
                     </nav>
                     <nav className="hidden sm:flex" aria-label="Breadcrumb">
                         <ol role="list" className="flex items-center space-x-4">
                             <li>
                                 <div className="flex">
-                                    <Link href="/dashboard" className="text-sm font-medium text-gray-500 hover:text-gray-700">Dashboard</Link>
+                                    <Link href="/dashboard" className="text-sm font-medium text-gray-500 hover:text-gray-700">ダッシュボード</Link>
                                 </div>
                             </li>
                             <li>
@@ -45,7 +42,7 @@ export default async function CardEditPage({ params }: { params: { id: string } 
                 </div>
                 <div className="mt-2 flex md:ml-4 md:mt-0">
                     <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${card.is_published ? 'bg-green-50 text-green-700 ring-green-600/20' : 'bg-yellow-50 text-yellow-800 ring-yellow-600/20'}`}>
-                        {card.is_published ? 'Published' : 'Draft'}
+                        {card.is_published ? '公開中' : '下書き'}
                     </span>
                     {card.slug && card.is_published && (
                         <a
@@ -55,7 +52,7 @@ export default async function CardEditPage({ params }: { params: { id: string } 
                             className="ml-4 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                         >
                             <ExternalLink className="h-4 w-4 mr-2 text-gray-500" />
-                            View Public Page
+                            公開ページを見る
                         </a>
                     )}
                 </div>
@@ -69,10 +66,10 @@ export default async function CardEditPage({ params }: { params: { id: string } 
                             <AlertTriangle className="h-5 w-5 text-yellow-400" aria-hidden="true" />
                         </div>
                         <div className="ml-3">
-                            <h3 className="text-sm font-medium text-yellow-800">Card is not live</h3>
+                            <h3 className="text-sm font-medium text-yellow-800">名刺は公開されていません</h3>
                             <div className="mt-2 text-sm text-yellow-700">
                                 <p>
-                                    To make your digital business card accessible to others, please set a unique URL slug and publish it in the settings below.
+                                    他の人がアクセスできるようにするには、以下の設定で独自のURLスラッグを設定し、公開してください。
                                 </p>
                             </div>
                         </div>
@@ -82,7 +79,7 @@ export default async function CardEditPage({ params }: { params: { id: string } 
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <div>
-                    <h2 className="text-lg font-medium text-gray-900 mb-4">Content Editor</h2>
+                    <h2 className="text-lg font-medium text-gray-900 mb-4">コンテンツ編集</h2>
                     <ContentEditor cardId={card.id} initialContents={card.contents as unknown as ContentItem[]} />
                 </div>
 

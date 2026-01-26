@@ -42,6 +42,7 @@ export interface Database {
           updated_at: string
           slug: string | null
           is_published: boolean
+          view_count: number
         }
         Insert: {
           id?: string
@@ -52,6 +53,7 @@ export interface Database {
           updated_at?: string
           slug?: string | null
           is_published?: boolean
+          view_count?: number
         }
         Update: {
           id?: string
@@ -62,6 +64,7 @@ export interface Database {
           updated_at?: string
           slug?: string | null
           is_published?: boolean
+          view_count?: number
         }
       }
       card_contents: {
@@ -89,6 +92,14 @@ export interface Database {
           order_index?: number
           created_at?: string
         }
+      }
+    }
+    Functions: {
+      increment_view_count: {
+        Args: {
+          card_slug: string
+        }
+        Returns: void
       }
     }
   }
