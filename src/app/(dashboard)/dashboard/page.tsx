@@ -24,6 +24,11 @@ export default async function DashboardPage() {
                                 <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${card.is_published ? 'bg-green-50 text-green-700 ring-green-600/20' : 'bg-yellow-50 text-yellow-800 ring-yellow-600/20'}`}>
                                     {card.is_published ? '公開中' : '下書き'}
                                 </span>
+                                {card.is_published && (
+                                    <span className="ml-2 inline-flex items-center text-xs text-gray-500">
+                                        {card.view_count || 0} 閲覧
+                                    </span>
+                                )}
                             </div>
                         </Link>
                     ))}

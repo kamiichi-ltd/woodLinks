@@ -11,7 +11,7 @@ export default function NavBar() {
                         <span>🌲</span> WoodLinks
                     </h1>
                     <nav className="hidden md:flex gap-x-6">
-                        <Link href="/dashboard" className="text-stone-300 hover:text-white transition-colors text-sm font-medium">Dashboard</Link>
+                        <Link href="/dashboard" className="text-stone-300 hover:text-white transition-colors text-sm font-medium">ダッシュボード</Link>
                         {/* <Link href="/dashboard/templates" className="text-stone-300 hover:text-white transition-colors text-sm font-medium">Templates</Link> */}
                     </nav>
                 </div>

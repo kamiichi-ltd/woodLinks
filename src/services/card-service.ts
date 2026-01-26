@@ -398,7 +398,8 @@ export async function getPublicCardById(id: string) {
 
 export async function incrementViewCount(slug: string) {
     const supabase = await createClient()
-    const { error } = await supabase.rpc('increment_view_count', { card_slug: slug })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await supabase.rpc('increment_view_count', { card_slug: slug } as any)
     if (error) {
         console.error('Error incrementing view count:', error)
     }
@@ -427,6 +428,7 @@ export async function reorderCardContents(cardId: string, items: { id: string; o
                 id: item.id,
                 card_id: cardId, // Required for composite key or constraint if any, though ID alone usually enough? Supabase usually needs all PKs or valid update columns
                 order_index: item.order_index,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
             })) as any
         )
         .select()
