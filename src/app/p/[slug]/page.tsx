@@ -73,7 +73,9 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
                                 className="h-full w-full object-cover"
                             />
                         ) : (
-                            <span>🌲</span>
+                            <span className="text-3xl font-bold text-stone-300">
+                                {card.title ? card.title.charAt(0).toUpperCase() : '🌲'}
+                            </span>
                         )}
                     </div>
                     <h1 className="text-2xl font-bold tracking-tight text-stone-900 leading-tight">

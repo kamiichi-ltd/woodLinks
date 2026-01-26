@@ -205,8 +205,9 @@ export async function updateCard(id: string, updates: { title?: string; descript
     // For now, if we are updating title, let's check if we want to regenerate slug? 
     // Requirement says: "cards table slug is empty, auto generate from title at create or update"
     if (updates.slug) {
-        if (!/^[a-z0-9-]+$/.test(updates.slug)) {
-            throw new Error('Invalid slug format. use only lowercase alphanumeric characters and hyphens.')
+        // Regex: Alphanumeric, can contain hyphens but not at start/end, no consecutive hyphens
+        if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(updates.slug)) {
+            throw new Error('Invalid slug format. Use lowercase alphanumeric characters and hyphens (not at start/end).')
         }
 
         // Check uniqueness if slug changed
