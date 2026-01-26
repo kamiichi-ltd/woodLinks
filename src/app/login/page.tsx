@@ -32,8 +32,8 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen bg-[#fdfbf7] flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans text-[#2c3e50]">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="flex justify-center text-5xl mb-4">
-                    <span>🌲</span>
+                <div className="flex justify-center mb-4">
+                    <img src="/logo.png" alt="WoodLinks Logo" className="h-20 w-20 object-contain" />
                 </div>
                 <h2 className="mt-6 text-center text-3xl font-serif font-bold tracking-tight text-[#3d3126]">
                     WoodLinks

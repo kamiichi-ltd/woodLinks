@@ -8,7 +8,8 @@ export default function NavBar() {
             <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
                 <div className="flex items-center gap-x-8">
                     <h1 className="text-xl font-serif font-bold tracking-tight text-[#fdfbf7] flex items-center gap-2">
-                        <span>🌲</span> WoodLinks
+                        <img src="/logo.png" alt="WoodLinks Logo" className="h-8 w-8 object-contain" />
+                        <span>WoodLinks</span>
                     </h1>
                     <nav className="hidden md:flex gap-x-6">
                         <Link href="/dashboard" className="text-[#aabdc1] hover:text-white transition-colors text-sm font-medium">Dashboard / ダッシュボード</Link>

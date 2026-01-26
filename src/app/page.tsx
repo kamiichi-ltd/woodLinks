@@ -17,7 +17,8 @@ export default async function Home() {
       <header className="fixed w-full z-50 bg-[#fdfbf7]/80 backdrop-blur-md border-b border-[#e6e2d3]">
         <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
           <h1 className="text-2xl font-bold tracking-tight text-[#3d3126] flex items-center gap-2">
-            <span className="text-3xl">🌲</span> <span className="font-serif">WoodLinks</span>
+            <img src="/logo.png" alt="WoodLinks Logo" className="h-10 w-10 object-contain" />
+            <span className="font-serif">WoodLinks</span>
           </h1>
           <nav className="flex items-center gap-4">
             <Link href="/p/demo" className="text-sm font-medium text-[#5a4d41] hover:text-[#3d3126] transition-colors hidden sm:block">
@@ -284,7 +285,7 @@ export default async function Home() {
       <footer className="bg-[#3d3126] py-12 px-6 text-[#d4c5ae]">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
-            <span className="text-2xl">🌲</span>
+            <img src="/logo.png" alt="WoodLinks Logo" className="h-8 w-8 object-contain" />
             <span className="font-serif text-xl font-bold text-white">WoodLinks</span>
           </div>
           <p className="text-sm opacity-60">
