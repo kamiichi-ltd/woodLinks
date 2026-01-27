@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/client';
 import { Database } from '@/database.types';
-
+import { createStripeCheckoutSession } from '@/app/actions/checkout';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type OrderStatus = Database['public']['Tables']['orders']['Row']['status'];
 
 export interface CreateOrderParams {
@@ -30,7 +31,7 @@ export async function createOrder(params: CreateOrderParams) {
         p_shipping_address1: params.shipping_address1,
         p_shipping_address2: params.shipping_address2 || '',
         p_shipping_phone: params.shipping_phone,
-    });
+    } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
     if (error) {
         console.error('Error creating order:', error);
@@ -43,18 +44,11 @@ export async function createOrder(params: CreateOrderParams) {
 /**
  * startCheckout
  * Calls the `start_checkout` RPC to initiate payment flow.
+ * Calls the Server Action `createStripeCheckoutSession` to initiate payment flow.
  */
 export async function startCheckout(orderId: string) {
-    const { data, error } = await supabase.rpc('start_checkout', {
-        p_order_id: orderId,
-    });
-
-    if (error) {
-        console.error('Error starting checkout:', error);
-        throw new Error(error.message);
-    }
-
-    return data; // Returns the Checkout URL
+    const url = await createStripeCheckoutSession(orderId);
+    return url;
 }
 
 /**

@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Database } from '@/database.types';
 import { OrderForm } from './order-form';
 import { OrderStatusView } from './order-status-view';
+import { CheckCircle2, XCircle } from 'lucide-react';
 
 type Order = Database['public']['Tables']['orders']['Row'];
 
@@ -15,6 +16,8 @@ interface OrderSectionProps {
 
 export function OrderSection({ cardId, initialOrders }: OrderSectionProps) {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const status = searchParams.get('status');
     // For now, simpler handling: just take the most recent order if exists.
     // Ideally, if a previous order is 'delivered' / 'cancelled', we might allow re-ordering.
     // But for this version, let's just show the latest order if it exists and is active.
@@ -47,6 +50,30 @@ export function OrderSection({ cardId, initialOrders }: OrderSectionProps) {
                 <h2 className="text-2xl font-serif font-bold text-[#2c3e50] leading-none">Order Physical Card</h2>
                 <span className="text-sm font-medium text-[#8c7b6c] mb-0.5">/ 木の名刺を注文</span>
             </div>
+
+            {status === 'success' && (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
+                    <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5" />
+                    <div>
+                        <h3 className="font-bold text-green-800">お支払いが完了しました</h3>
+                        <p className="text-sm text-green-700 mt-1">
+                            ご注文ありがとうございます。製作を開始いたします。詳細は下記ステータスをご確認ください。
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {status === 'cancel' && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
+                    <XCircle className="h-5 w-5 text-red-600 mt-0.5" />
+                    <div>
+                        <h3 className="font-bold text-red-800">決済がキャンセルされました</h3>
+                        <p className="text-sm text-red-700 mt-1">
+                            お支払いは完了していません。再度お試しください。
+                        </p>
+                    </div>
+                </div>
+            )}
 
             {!activeOrder ? (
                 <OrderForm cardId={cardId} onOrderCreated={handleOrderCreated} />
