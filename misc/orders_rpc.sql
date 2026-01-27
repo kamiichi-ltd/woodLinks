@@ -106,7 +106,6 @@ BEGIN
 END;
 $$;
 
-
 -- RPC: admin_update_order_status
 -- Description: 管理者が注文ステータスを更新する（発送処理など）
 -- Service Role Only (Supabase Dashboardや管理画面からのみ実行可)
@@ -124,14 +123,6 @@ AS $$
 DECLARE
     v_current_status public.order_status;
 BEGIN
-    -- 管理者権限チェックの方法はプロジェクトによるが、
-    -- Supabaseの特権ユーザー(Service Role)経由で呼ばれることを想定するか、
-    -- ユーザーテーブルにis_adminフラグを持たせてチェックする。
-    -- ここでは単純化のため、別途RLSや呼び出し元の権限管理に委ねるが、
-    -- 安全のため「auth.uid()」チェックを入れるべき。
-    -- 今回は簡易的に「この関数はService Roleからしか呼ばない」前提で実装するか、
-    -- あるいは特定のAdmin UIDリストとの照合を入れるなどが考えられる。
-    
     -- NOTE: 本番では auth.jwt() -> role = 'service_role' のチェックなどを推奨。
     
     UPDATE public.orders
@@ -139,6 +130,7 @@ BEGIN
         status = p_new_status,
         tracking_number = COALESCE(p_tracking_number, tracking_number),
         shipped_at = COALESCE(p_shipped_at, shipped_at),
+        paid_at = CASE WHEN p_new_status = 'paid' AND paid_at IS NULL THEN now() ELSE paid_at END,
         updated_at = now()
     WHERE id = p_order_id;
     
@@ -146,6 +138,13 @@ BEGIN
     IF p_new_status = 'shipped' THEN
         INSERT INTO public.card_lifecycle_logs (card_id, event_type, meta)
         SELECT card_id, 'shipped', jsonb_build_object('order_id', p_order_id)
+        FROM public.orders WHERE id = p_order_id;
+    END IF;
+    
+    -- ログ記録（支払い時）
+    IF p_new_status = 'paid' THEN
+        INSERT INTO public.card_lifecycle_logs (card_id, event_type, meta)
+        SELECT card_id, 'payment_received', jsonb_build_object('order_id', p_order_id)
         FROM public.orders WHERE id = p_order_id;
     END IF;
 END;
