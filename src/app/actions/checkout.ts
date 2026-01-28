@@ -112,7 +112,7 @@ export async function createStripeCheckoutSession(orderId: string) {
     // 6. Update Order with Session ID
     const { error: updateError } = await supabase
         .from('orders')
-        // @ts-expect-error
+        // @ts-expect-error: checkout_session_id column exists in DB but might be missing in types
         .update({ checkout_session_id: session.id })
         .eq('id', orderData.id)
 

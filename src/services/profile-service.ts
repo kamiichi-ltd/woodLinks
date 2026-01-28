@@ -15,7 +15,6 @@ export async function updateProfile(avatarUrl: string) {
 
     const { error } = await supabase
         .from('profiles')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .upsert({
             id: user.id,
             avatar_url: avatarUrl,

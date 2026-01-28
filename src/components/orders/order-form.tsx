@@ -39,8 +39,10 @@ export function OrderForm({ cardId, onOrderCreated }: OrderFormProps) {
                 shipping_phone: shippingPhone,
             });
             onOrderCreated();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
-            setError(err.message || '注文の作成に失敗しました。');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            setError((err as any).message || '注文の作成に失敗しました。');
         } finally {
             setLoading(false);
         }
@@ -62,6 +64,7 @@ export function OrderForm({ cardId, onOrderCreated }: OrderFormProps) {
                     <label className="block text-sm font-medium text-stone-700 mb-1">材質</label>
                     <select
                         value={material}
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         onChange={(e) => setMaterial(e.target.value as any)}
                         className="w-full border border-stone-300 rounded px-3 py-2 focus:ring-2 focus:ring-stone-500 focus:outline-none"
                     >
