@@ -51,12 +51,12 @@ export async function POST(req: Request) {
 
             // Perform direct update using Service Role to ensure reliability
             // Using direct update instead of RPC to avoid signature issues and simplify debugging
-            const { error } = await supabase
+            const { error } = await (supabase as any)
                 .from('orders')
                 .update({
                     status: 'paid',
                     // Optionally set paid_at if your schema supports it
-                    // paid_at: new Date().toISOString() 
+                    paid_at: new Date().toISOString()
                 })
                 .eq('id', orderId)
 
