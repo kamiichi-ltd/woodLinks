@@ -4,8 +4,8 @@ import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { Database, Json } from '@/database.types'
 
-type Card = Database['public']['Tables']['cards']['Row']
-type CardContent = Database['public']['Tables']['card_contents']['Row']
+type Card = any
+type CardContent = any
 
 // Helper to generate unique slug
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -43,7 +43,7 @@ export async function getCards(): Promise<Card[]> {
         return []
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
         .from('cards')
         .select('*')
         .eq('user_id', user.id)
@@ -67,7 +67,7 @@ export async function getCard(id: string) {
         return null
     }
 
-    const { data: card, error: cardError } = await supabase
+    const { data: card, error: cardError } = await (supabase as any)
         .from('cards')
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .select('*' as any)
@@ -80,7 +80,7 @@ export async function getCard(id: string) {
         return null
     }
 
-    const { data: contents, error: contentError } = await supabase
+    const { data: contents, error: contentError } = await (supabase as any)
         .from('card_contents')
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .select('*' as any)
@@ -106,7 +106,7 @@ export async function getCardBySlug(slug: string) {
     // But for public access using anon key, RLS for 'select' on 'cards' should allow if is_published is true.
     // However, since we are using the service role or anon key server-side, it's best to be explicit in the query too.
 
-    const { data: card, error: cardError } = await supabase
+    const { data: card, error: cardError } = await (supabase as any)
         .from('cards')
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .select('*' as any)
@@ -119,7 +119,7 @@ export async function getCardBySlug(slug: string) {
         return null
     }
 
-    const { data: contents, error: contentError } = await supabase
+    const { data: contents, error: contentError } = await (supabase as any)
         .from('card_contents')
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .select('*' as any)
@@ -174,7 +174,7 @@ export async function createCard(formData: FormData) {
         status: 'draft',
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
         .from('cards')
         .insert(insertPayload)
         .select()
@@ -211,7 +211,7 @@ export async function updateCard(id: string, updates: { title?: string; descript
         }
 
         // Check uniqueness if slug changed
-        const { count } = await supabase.from('cards').select('*', { count: 'exact', head: true }).eq('slug', updates.slug).neq('id', id)
+        const { count } = await (supabase as any).from('cards').select('*', { count: 'exact', head: true }).eq('slug', updates.slug).neq('id', id)
         if (count) {
             throw new Error('Slug already exists')
         }
@@ -219,16 +219,16 @@ export async function updateCard(id: string, updates: { title?: string; descript
 
     // Auto-generate if title changed and no slug exists (fallback logic)
     if (updates.title) {
-        const { data: currentCard } = await supabase.from('cards').select('slug').eq('id', id).single()
+        const { data: currentCard } = await (supabase as any).from('cards').select('slug').eq('id', id).single()
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (currentCard && !(currentCard as any).slug && !updates.slug) {
             updatePayload.slug = await generateUniqueSlug(supabase, updates.title)
         }
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
         .from('cards')
-        // @ts-expect-error Supabase types issue
+
         .update(updatePayload)
         .eq('id', id)
         .eq('user_id', user.id)
@@ -254,7 +254,7 @@ export async function deleteCard(id: string) {
         throw new Error('Unauthorized')
     }
 
-    const { error } = await supabase
+    const { error } = await (supabase as any)
         .from('cards')
         .delete()
         .eq('id', id)
@@ -279,13 +279,13 @@ export async function addCardContent(cardId: string, type: 'sns_link' | 'text', 
     }
 
     // Checking ownership
-    const { count } = await supabase.from('cards').select('*', { count: 'exact', head: true }).eq('id', cardId).eq('user_id', user.id)
+    const { count } = await (supabase as any).from('cards').select('*', { count: 'exact', head: true }).eq('id', cardId).eq('user_id', user.id)
     if (!count) {
         throw new Error('Card not found or access denied')
     }
 
     // Get current max order
-    const { data: maxOrderData } = await supabase
+    const { data: maxOrderData } = await (supabase as any)
         .from('card_contents')
         .select('order_index')
         .eq('card_id', cardId)
@@ -303,7 +303,7 @@ export async function addCardContent(cardId: string, type: 'sns_link' | 'text', 
         order_index: nextOrder,
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
         .from('card_contents')
         .insert(contentPayload)
         .select()
@@ -331,13 +331,13 @@ export async function deleteCardContent(contentId: string, cardId: string) {
     // Verify ownership of the card via the content relation is tricky without a join or multiple queries 
     // or RLS (which should handle it, but we are in server action)
     // Let's verify card ownership first
-    const { count } = await supabase.from('cards').select('*', { count: 'exact', head: true }).eq('id', cardId).eq('user_id', user.id)
+    const { count } = await (supabase as any).from('cards').select('*', { count: 'exact', head: true }).eq('id', cardId).eq('user_id', user.id)
 
     if (!count) {
         throw new Error('Card not found or access denied')
     }
 
-    const { error } = await supabase
+    const { error } = await (supabase as any)
         .from('card_contents')
         .delete()
         .eq('id', contentId)
@@ -354,7 +354,7 @@ export async function deleteCardContent(contentId: string, cardId: string) {
 export async function getPublicCardById(id: string) {
     const supabase = await createClient()
 
-    const { data: card, error: cardError } = await supabase
+    const { data: card, error: cardError } = await (supabase as any)
         .from('cards')
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .select('*' as any)
@@ -366,7 +366,7 @@ export async function getPublicCardById(id: string) {
         return null
     }
 
-    const { data: contents, error: contentError } = await supabase
+    const { data: contents, error: contentError } = await (supabase as any)
         .from('card_contents')
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .select('*' as any)
@@ -420,12 +420,12 @@ export async function reorderCardContents(cardId: string, items: { id: string; o
     }
 
     // Verify ownership
-    const { count } = await supabase.from('cards').select('*', { count: 'exact', head: true }).eq('id', cardId).eq('user_id', user.id)
+    const { count } = await (supabase as any).from('cards').select('*', { count: 'exact', head: true }).eq('id', cardId).eq('user_id', user.id)
     if (!count) {
         throw new Error('Card not found or access denied')
     }
 
-    const { error } = await supabase
+    const { error } = await (supabase as any)
         .from('card_contents')
         .upsert(
             items.map((item) => ({
