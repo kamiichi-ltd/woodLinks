@@ -48,14 +48,14 @@ export async function getAdminOrders() {
     await verifyAdmin();
 
     // Debug: Check total count without joins first
-    const { count, error: countError } = await adminDbClient
+    const { count, error: countError } = await (adminDbClient as any)
         .from('orders')
         .select('*', { count: 'exact', head: true });
 
     console.log('[Admin] 注文総数 (Raw Count):', count);
     if (countError) console.error('[Admin] カウント取得エラー:', countError);
 
-    const { data, error } = await adminDbClient
+    const { data, error } = await (adminDbClient as any)
         .from('orders')
         .select(`
             *,
@@ -111,7 +111,7 @@ export async function updateOrderStatus(
     }
 
     // Explicitly cast to any to bypass strict type checks if needed
-    const { error } = await adminDbClient
+    const { error } = await (adminDbClient as any)
         .from('orders')
         .update(updateData as any)
         .eq('id', orderId)
@@ -129,7 +129,7 @@ export async function updateOrderStatus(
 export async function getAdminStats() {
     await verifyAdmin();
 
-    const { data: orders, error } = await adminDbClient
+    const { data: orders, error } = await (adminDbClient as any)
         .from('orders')
         .select('*')
         .in('status', ['paid', 'in_production', 'shipped', 'delivered']);
@@ -172,7 +172,6 @@ export async function getAdminStats() {
         // Revenue (Current Month only)
         const orderDate = new Date(order.created_at);
         if (orderDate >= startOfMonth) {
-            // @ts-expect-error: amount might be missing
             const amount = order.amount || MATERIAL_PRICES_MAP[order.material] || 0;
             totalRevenue += amount;
         }
@@ -194,7 +193,7 @@ export async function getAdminCustomers() {
     await verifyAdmin();
 
     // Fetch all profiles with their orders
-    const { data: profiles, error } = await adminDbClient
+    const { data: profiles, error } = await (adminDbClient as any)
         .from('profiles')
         .select(`
             *,
@@ -221,7 +220,6 @@ export async function getAdminCustomers() {
         );
 
         const totalSpend = paidOrders.reduce((sum: number, o: any) => {
-            // @ts-expect-error: amount might be missing
             return sum + (o.amount || MATERIAL_PRICES_MAP[o.material] || 0);
         }, 0);
 
