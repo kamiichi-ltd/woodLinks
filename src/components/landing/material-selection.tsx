@@ -1,10 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { cn } from '@/utils/cn' // Assuming cn exists, if not I'll use template literals logic or check if utils/cn exists. 
-// Checking previous files, I don't see explicit cn usage but I should verify. 
-// I'll stick to standard template literals for safety or check first.
-// Actually standard template literals is safer if I don't know about `cn`.
+import { cn } from '@/lib/utils'
+
 
 const materials = [
     {
