@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Database } from '@/database.types';
 import { OrderForm } from './order-form';
 import { OrderStatusView } from './order-status-view';
+import { OrderTimeline } from './order-timeline';
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 
 type Order = Database['public']['Tables']['orders']['Row'];
@@ -99,7 +100,10 @@ export function OrderSection({ cardId, initialOrders }: OrderSectionProps) {
                             </p>
                         </div>
                     ) : (
-                        <OrderStatusView order={activeOrder} />
+                        <div className="space-y-6">
+                            <OrderTimeline status={activeOrder.status} />
+                            <OrderStatusView order={activeOrder} />
+                        </div>
                     )}
 
                     {/* Allow re-order if cancelled or delivered (optional for now) 
