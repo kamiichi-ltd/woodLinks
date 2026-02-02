@@ -85,8 +85,8 @@ export async function getDashboardAnalytics(userId: string): Promise<DashboardAn
     }
 
     // 3. Process Data
-    const totalViews = analytics.filter(a => a.event_type === 'view').length
-    const totalSaves = analytics.filter(a => a.event_type === 'contact_save').length
+    const totalViews = analytics.filter((a: any) => a.event_type === 'view').length
+    const totalSaves = analytics.filter((a: any) => a.event_type === 'contact_save').length
 
     // Group views by date
     const viewsMap = new Map<string, number>()
@@ -99,7 +99,7 @@ export async function getDashboardAnalytics(userId: string): Promise<DashboardAn
         viewsMap.set(dateStr, 0)
     }
 
-    analytics.forEach(record => {
+    analytics.forEach((record: any) => {
         if (record.event_type === 'view') {
             const dateStr = new Date(record.created_at).toISOString().split('T')[0]
             if (viewsMap.has(dateStr)) {
