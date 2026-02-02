@@ -5,7 +5,8 @@ import Stripe from 'stripe'
 import { Database } from '@/database.types'
 
 type OrderWithCard = Database['public']['Tables']['orders']['Row'] & {
-    cards: Pick<Database['public']['Tables']['cards']['Row'], 'id' | 'title' | 'user_id'>
+    // cardsテーブルは廃止され、ordersテーブルに統合されました
+    cards: Pick<Database['public']['Tables']['orders']['Row'], 'id' | 'title' | 'user_id'>
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
