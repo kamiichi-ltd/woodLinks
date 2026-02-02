@@ -42,11 +42,11 @@ export async function deleteOrder(orderId: string) {
         throw new Error('Order not found');
     }
 
-    if (order.user_id !== user.id) {
+    if ((order as any).user_id !== user.id) {
         throw new Error('Unauthorized');
     }
 
-    if (order.status !== 'pending_payment') {
+    if ((order as any).status !== 'pending_payment') {
         throw new Error('Only pending orders can be deleted');
     }
 
@@ -61,6 +61,6 @@ export async function deleteOrder(orderId: string) {
         throw new Error('Failed to delete order');
     }
 
-    revalidatePath(`/dashboard/cards/${order.card_id}`);
+    revalidatePath(`/dashboard/cards/${(order as any).card_id}`);
     return { success: true };
 }
