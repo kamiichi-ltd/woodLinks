@@ -23,7 +23,8 @@ const ALL_STATUSES: OrderStatus[] = [
     'refunded',
 ]
 
-const STATUS_LABELS: Record<OrderStatus, string> = {
+// OrderStatusにはnullが含まれる可能性があるため、string型で許容する
+const STATUS_LABELS: Record<string, string> = {
     pending_payment: '支払い待ち',
     paid: '支払い完了',
     in_production: '製作中',
@@ -80,12 +81,12 @@ export function StatusUpdateDialog({ orderId, currentStatus, onUpdate }: StatusU
                     <div className="space-y-1">
                         <label className="text-xs font-bold text-stone-500 uppercase">Status</label>
                         <select
-                            value={newStatus}
+                            value={newStatus || ''}
                             onChange={(e) => setNewStatus(e.target.value as OrderStatus)}
                             className="w-full p-2 rounded-lg border border-stone-300 bg-stone-50 text-sm focus:ring-2 focus:ring-stone-400 focus:outline-none"
                         >
                             {ALL_STATUSES.map(s => (
-                                <option key={s} value={s}>{STATUS_LABELS[s] || s}</option>
+                                <option key={s || 'unknown'} value={s || ''}>{STATUS_LABELS[s as string] || s}</option>
                             ))}
                         </select>
                     </div>
