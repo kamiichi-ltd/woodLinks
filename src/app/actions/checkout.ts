@@ -86,6 +86,11 @@ export async function createStripeCheckoutSession(orderIdInput: string | { id: s
     }
 
     const unitPricePer100 = PRICES[material]
+
+    if (orderData.quantity <= 0) {
+        throw new Error('Invalid quantity')
+    }
+
     // quantity is total cards. 
     // Stripe expects amount in smallest currency unit (JPY is 1 unit = 1 JPY, no decimals)
     // Math.ceil just in case

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>メールアドレスの確認</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; line-height: 1.6; color: #3d3126; background-color: #f4f1ea; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .header { background-color: #2c3e50; padding: 30px; text-align: center; }
+    .header h1 { color: #ffffff; margin: 0; font-size: 24px; letter-spacing: 0.05em; font-family: "Times New Roman", serif; }
+    .content { padding: 40px 30px; }
+    .button-container { text-align: center; margin: 30px 0; }
+    .button { display: inline-block; background-color: #d4a373; color: #ffffff; font-weight: bold; text-decoration: none; padding: 12px 30px; border-radius: 50px; font-size: 16px; transition: background-color 0.3s; }
+    .button:hover { background-color: #c59262; }
+    .footer { background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 12px; color: #888888; border-top: 1px solid #eeeeee; }
+    a.link { color: #d4a373; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>WoodLinks</h1>
+    </div>
+    <div class="content">
+      <p>こんにちは。</p>
+      <p>この度は <strong>WoodLinks</strong> にご登録いただき、誠にありがとうございます。<br>
+      ご利用を開始するには、以下のボタンをクリックしてメールアドレスを認証してください。</p>
+      
+      <div class="button-container">
+        <a href="{{ .ConfirmationURL }}" class="button">メールアドレスを認証する</a>
+      </div>
+      
+      <p style="font-size: 14px; color: #666;">
+        ※ 心当たりがない場合は、このメールを破棄してください。<br>
+        ※ ボタンが機能しない場合は、以下のURLをブラウザにコピーしてアクセスしてください。<br>
+        <span style="word-break: break-all; color: #d4a373;">{{ .ConfirmationURL }}</span>
+      </p>
+    </div>
+    <div class="footer">
+      &copy; {{ .CurrentYear }} WoodLinks. All rights reserved.<br>
+      大阪府吹田市
+    </div>
+  </div>
+</body>
+</html>

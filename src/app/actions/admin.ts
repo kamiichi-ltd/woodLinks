@@ -80,12 +80,31 @@ export async function updateOrderStatus(
     await verifyAdmin() // Security Guard
     console.log(`[Admin] Updating order ${orderId} to ${newStatus}`)
 
-    const { error } = await adminDbClient.rpc('admin_update_order_status', {
-        p_order_id: orderId,
-        p_new_status: newStatus,
-        p_tracking_number: trackingNumber || undefined,
-        p_shipped_at: newStatus === 'shipped' ? new Date().toISOString() : undefined
-    } as any) // eslint-disable-line @typescript-eslint/no-explicit-any
+    // Direct Update via Service Role (Bypassing RLS)
+    const updateData: Database['public']['Tables']['orders']['Update'] = {
+        status: newStatus,
+        updated_at: new Date().toISOString()
+    }
+
+    if (trackingNumber !== undefined) {
+        updateData.tracking_number = trackingNumber
+    }
+
+    if (newStatus === 'shipped') {
+        updateData.shipped_at = new Date().toISOString()
+    }
+
+    // Auto-fill paid_at if manual status change to paid
+    if (newStatus === 'paid') {
+        // Keep existing paid_at if possible? For simplicity, we just update it.
+        // If stricter logic needed, we'd fetch first.
+        updateData.paid_at = new Date().toISOString()
+    }
+
+    const { error } = await adminDbClient
+        .from('orders')
+        .update(updateData)
+        .eq('id', orderId)
 
     if (error) {
         console.error('[Admin] Update failed:', error)
