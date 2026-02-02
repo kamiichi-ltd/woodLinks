@@ -2,6 +2,17 @@
 
 import { Database } from '@/database.types'
 import { StatusUpdateDialog } from './status-update-dialog'
+
+const STATUS_MAP: Record<string, string> = {
+    pending_payment: '支払い待ち',
+    paid: '支払い完了',
+    in_production: '製作中',
+    shipped: '発送済み',
+    delivered: '到着済み',
+    cancelled: 'キャンセル',
+    refunded: '返金済み',
+}
+
 // If date-fns not available, use simple formatter
 // Checking package.json... I will stick to standard Intl for zero dependency risk
 
@@ -21,12 +32,12 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
             <table className="min-w-full divide-y divide-stone-200 text-sm">
                 <thead className="bg-stone-50 text-stone-500 font-medium">
                     <tr>
-                        <th className="px-6 py-3 text-left">Order ID / Date</th>
-                        <th className="px-6 py-3 text-left">User</th>
-                        <th className="px-6 py-3 text-left">Details</th>
-                        <th className="px-6 py-3 text-left">Shipping</th>
-                        <th className="px-6 py-3 text-left">Status</th>
-                        <th className="px-6 py-3 text-right">Actions</th>
+                        <th className="px-6 py-3 text-left">注文ID / 受注日時</th>
+                        <th className="px-6 py-3 text-left">顧客名</th>
+                        <th className="px-6 py-3 text-left">注文内容</th>
+                        <th className="px-6 py-3 text-left">配送先住所</th>
+                        <th className="px-6 py-3 text-left">状態</th>
+                        <th className="px-6 py-3 text-right">ステータス更新</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
@@ -58,9 +69,9 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                                             order.material === 'hinoki' ? 'bg-[#fdfbf7] text-[#2c3e50] border border-[#e9d8a6]' :
                                                 'bg-[#faf9f6] text-[#5e5045] border border-[#d4a373]'}
                                     `}>
-                                        {order.material}
+                                        {order.material === 'walnut' ? 'ウォールナット' : order.material === 'hinoki' ? '檜 (Hinoki)' : '杉 (Sugi)'}
                                     </span>
-                                    <span className="text-stone-600 font-medium">x {order.quantity}</span>
+                                    <span className="text-stone-600 font-medium">x {order.quantity}枚</span>
                                     <span className="text-stone-400 text-xs">Card: {order.cards?.title}</span>
                                 </div>
                             </td>
@@ -72,14 +83,11 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                                 <div className="text-xs text-stone-400 mt-1">📞 {order.shipping_phone}</div>
                             </td>
                             <td className="px-6 py-4 align-top">
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                    ${order.status === 'paid' ? 'bg-green-100 text-green-800' :
-                                        order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                                            order.status === 'pending_payment' ? 'bg-yellow-100 text-yellow-800' :
-                                                order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                                                    'bg-gray-100 text-gray-800'}
-                                `}>
-                                    {order.status}
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${order.status === 'paid' ? 'bg-green-100 text-green-800' :
+                                    order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                                        'bg-gray-100 text-gray-800'
+                                    }`}>
+                                    {STATUS_MAP[order.status] || order.status}
                                 </span>
                                 {order.tracking_number && (
                                     <div className="text-xs text-stone-500 mt-1 font-mono">

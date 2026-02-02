@@ -1,4 +1,5 @@
 import { headers } from 'next/headers'
+import { revalidatePath } from 'next/cache'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 import { Database } from '@/database.types'
@@ -56,6 +57,10 @@ export async function POST(req: Request) {
             }
 
             console.log('[Stripe Webhook] Successfully updated order status to paid')
+
+            // Purge Admin Dashboard cache to ensure immediate update
+            revalidatePath('/admin/orders')
+            revalidatePath('/dashboard') // User dashboard as well
         }
     }
 

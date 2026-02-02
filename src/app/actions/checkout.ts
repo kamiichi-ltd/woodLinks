@@ -47,6 +47,9 @@ export async function createStripeCheckoutSession(orderId: string) {
     const orderData = order as unknown as OrderWithCard
 
     if (error || !orderData) {
+        console.error('[Checkout] Order not found or error:', error)
+        console.error('[Checkout] Requested Order ID:', orderId)
+        console.error('[Checkout] Authenticated User ID:', user.id)
         throw new Error('Order not found')
     }
 

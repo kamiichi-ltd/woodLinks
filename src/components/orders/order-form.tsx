@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { createOrder } from '@/services/order-service';
+import { createOrder, startCheckout } from '@/services/order-service';
 import { Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface OrderFormProps {
     cardId: string;
@@ -12,6 +13,7 @@ interface OrderFormProps {
 export function OrderForm({ cardId, onOrderCreated }: OrderFormProps) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
 
     // Form States
     const [material, setMaterial] = useState<'sugi' | 'hinoki' | 'walnut'>('sugi');
@@ -24,11 +26,14 @@ export function OrderForm({ cardId, onOrderCreated }: OrderFormProps) {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        console.log('[OrderForm] Submitting order...');
         setLoading(true);
         setError(null);
 
         try {
-            await createOrder({
+            // 1. Create Order
+            console.log('[OrderForm] Calling createOrder...');
+            const orderId = await createOrder({
                 card_id: cardId,
                 material,
                 quantity,
@@ -38,13 +43,31 @@ export function OrderForm({ cardId, onOrderCreated }: OrderFormProps) {
                 shipping_address2: shippingAddress2,
                 shipping_phone: shippingPhone,
             });
-            onOrderCreated();
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            console.log('[OrderForm] Order created. ID:', orderId);
+
+            if (!orderId) {
+                throw new Error('Order creation returned no ID');
+            }
+
+            // 2. Initiate Checkout (Server Action)
+            console.log('[OrderForm] Starting checkout flow...');
+            const checkoutUrl = await startCheckout(orderId);
+            console.log('[OrderForm] Checkout URL received:', checkoutUrl);
+
+            if (checkoutUrl) {
+                // 3. Redirect to Stripe
+                console.log('[OrderForm] Redirecting to Stripe...');
+                window.location.href = checkoutUrl;
+            } else {
+                throw new Error('Failed to retrieve checkout URL');
+            }
+
+            onOrderCreated(); // Optional: Refresh parent state (background)
         } catch (err: any) {
+            console.error('[OrderForm] Error:', err);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             setError((err as any).message || '注文の作成に失敗しました。');
-        } finally {
-            setLoading(false);
+            setLoading(false); // Only stop loading on error. On success, we redirect.
         }
     };
 

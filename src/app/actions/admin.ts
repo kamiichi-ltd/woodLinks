@@ -3,48 +3,64 @@
 import { createClient } from '@supabase/supabase-js'
 import { Database } from '@/database.types'
 import { revalidatePath } from 'next/cache'
+import { createClient as createServerClient } from '@/utils/supabase/server'
 
 // Use Service Role Key for Admin Actions to bypass RLS
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const adminEmail = process.env.ADMIN_EMAIL
 
-if (!supabaseServiceKey) {
-    console.error('SUPABASE_SERVICE_ROLE_KEY is not set')
+if (!supabaseServiceKey || !adminEmail) {
+    console.error('Admin Environment Variables are missing')
 }
 
-// Admin Client
-const adminClient = createClient<Database>(supabaseUrl, supabaseServiceKey)
+// Admin Service Role Client (for data access)
+const adminDbClient = createClient<Database>(supabaseUrl, supabaseServiceKey)
+
+async function verifyAdmin() {
+    const supabase = await createServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const adminEmail = process.env.ADMIN_EMAIL
+
+    // 🔍 ターミナル（ブラウザではなく、VS Code側）に表示されます
+    console.log("=== Admin Security Check ===");
+    console.log("ログイン中のメール:", user?.email);
+    console.log("設定された管理者メール:", adminEmail);
+    console.log("一致判定:", user?.email === adminEmail);
+    console.log("===========================");
+    if (!user || user.email !== adminEmail) {
+        throw new Error('Unauthorized: Admin access required')
+    }
+}
+
+// src/app/actions/admin.ts
 
 export async function getAdminOrders() {
-    console.log('[Admin] Fetching all orders...')
+    await verifyAdmin();
 
-    // Join with Profiles to get user email/name if not in shipping info
-    // However, shipping info is in `orders`.
-    // We mainly want `card` info and maybe `user` email for reference.
-    // Supabase Join syntax:
-    const { data, error } = await adminClient
+    const { data, error } = await adminDbClient
         .from('orders')
         .select(`
             *,
-            cards (
-                title,
-                slug,
-                view_count
+            profiles:user_id ( 
+                id, 
+                full_name, 
+                email 
             ),
-            profiles:user_id (
-                email,
-                full_name,
-                avatar_url
+            cards:card_id ( 
+                id, 
+                title, 
+                slug 
             )
         `)
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false });
 
     if (error) {
-        console.error('[Admin] Error fetching orders:', error)
-        throw new Error(error.message)
+        console.error('[Admin] Join Failed:', error.message);
+        throw new Error(`Join Failed: ${error.message}`);
     }
 
-    return data
+    return data;
 }
 
 export async function updateOrderStatus(
@@ -52,9 +68,10 @@ export async function updateOrderStatus(
     newStatus: Database['public']['Tables']['orders']['Row']['status'],
     trackingNumber?: string | null
 ) {
+    await verifyAdmin() // Security Guard
     console.log(`[Admin] Updating order ${orderId} to ${newStatus}`)
 
-    const { error } = await adminClient.rpc('admin_update_order_status', {
+    const { error } = await adminDbClient.rpc('admin_update_order_status', {
         p_order_id: orderId,
         p_new_status: newStatus,
         p_tracking_number: trackingNumber || undefined,
