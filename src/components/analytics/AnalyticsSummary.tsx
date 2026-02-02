@@ -16,10 +16,11 @@ export default function AnalyticsSummary({ totalViews, totalSaves }: { totalView
                     <div className="p-2 bg-[#f4f1ea] rounded-full text-[#3d3126]">
                         <Eye className="h-4 w-4" />
                     </div>
-                    <span className="text-xs font-bold text-[#8c7b6c] tracking-widest uppercase">30 Days Views</span>
+                    <span className="text-xs font-bold text-[#8c7b6c] tracking-widest uppercase">直近30日の閲覧数</span>
                 </div>
-                <div className="relative z-10">
+                <div className="relative z-10 flex items-baseline gap-1">
                     <span className="text-3xl font-serif font-bold text-[#2c3e50]">{totalViews}</span>
+                    <span className="text-sm font-bold text-[#8c7b6c]">回</span>
                 </div>
                 <div className="absolute -right-4 -bottom-4 opacity-5">
                     <Eye className="h-24 w-24 text-[#2c3e50]" />
@@ -36,10 +37,11 @@ export default function AnalyticsSummary({ totalViews, totalSaves }: { totalView
                     <div className="p-2 bg-[#ecf4ff] rounded-full text-[#4a90e2]">
                         <UserCheck className="h-4 w-4" />
                     </div>
-                    <span className="text-xs font-bold text-[#8c7b6c] tracking-widest uppercase">Contacts Saved</span>
+                    <span className="text-xs font-bold text-[#8c7b6c] tracking-widest uppercase">連絡先の保存回数</span>
                 </div>
-                <div className="relative z-10">
+                <div className="relative z-10 flex items-baseline gap-1">
                     <span className="text-3xl font-serif font-bold text-[#2c3e50]">{totalSaves}</span>
+                    <span className="text-sm font-bold text-[#8c7b6c]">回</span>
                 </div>
                 <div className="absolute -right-4 -bottom-4 opacity-5">
                     <UserCheck className="h-24 w-24 text-[#4a90e2]" />

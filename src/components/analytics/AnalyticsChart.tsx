@@ -6,18 +6,13 @@ import { DailyViews } from '@/services/analytics-service'
 
 export default function AnalyticsChart({ data }: { data: DailyViews[] }) {
     return (
-        <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="h-full w-full min-h-[250px] bg-white rounded-3xl p-6 border border-[#e6e2d3] shadow-sm flex flex-col"
-        >
-            <div className="mb-6 flex justify-between items-center">
-                <h4 className="font-bold text-[#3d3126] font-serif text-lg">Trend Check</h4>
-                <div className="text-[10px] bg-[#f4f1ea] px-2 py-1 rounded-full text-[#8c7b6c]">Last 30 Days</div>
+        <div className="w-full h-full flex flex-col">
+            <div className="mb-2 flex justify-between items-center">
+                <h4 className="font-bold text-[#8c7b6c] text-xs tracking-widest uppercase">閲覧数の推移</h4>
+                <div className="text-[10px] bg-[#f4f1ea] px-2 py-1 rounded-full text-[#8c7b6c]">過去30日間</div>
             </div>
 
-            <div className="flex-1 w-full relative">
+            <div className="flex-1 w-full relative min-h-[100px]">
                 <ResponsiveContainer width="100%" height="100%">
                     <AreaChart
                         data={data}
@@ -49,6 +44,7 @@ export default function AnalyticsChart({ data }: { data: DailyViews[] }) {
                             allowDecimals={false}
                         />
                         <Tooltip
+                            formatter={(value: number) => [value, '閲覧数']}
                             contentStyle={{
                                 backgroundColor: '#2c3e50',
                                 border: 'none',
@@ -72,6 +68,6 @@ export default function AnalyticsChart({ data }: { data: DailyViews[] }) {
                     </AreaChart>
                 </ResponsiveContainer>
             </div>
-        </motion.div>
+        </div>
     )
 }
