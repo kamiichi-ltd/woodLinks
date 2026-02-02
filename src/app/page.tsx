@@ -38,7 +38,7 @@ import {
 import MaterialSelection from '@/components/landing/material-selection'
 
 // --- Animation Variants ---
-const fadeIn = {
+const fadeIn: any = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
