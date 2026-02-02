@@ -14,9 +14,17 @@ if (!supabaseServiceKey || !adminEmail) {
     console.error('Admin Environment Variables are missing')
 }
 
-// Admin Service Role Client (for data access)
-// Inject Database type to ensure orders table is recognized
-const adminDbClient = createClient<Database>(supabaseUrl, supabaseServiceKey)
+// 修正後: 型定義 <Database> を明示的に渡す
+const adminDbClient = createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+        auth: {
+            autoRefreshToken: false,
+            persistSession: false
+        }
+    }
+)
 
 async function verifyAdmin() {
     const supabase = await createServerClient()
@@ -102,9 +110,10 @@ export async function updateOrderStatus(
         updateData.paid_at = new Date().toISOString()
     }
 
+    // Explicitly cast to any to bypass strict type checks if needed
     const { error } = await adminDbClient
         .from('orders')
-        .update(updateData)
+        .update(updateData as any)
         .eq('id', orderId)
 
     if (error) {
