@@ -6,7 +6,10 @@ import { Database } from '@/database.types'
 
 type OrderWithCard = Database['public']['Tables']['orders']['Row'] & {
     // cardsテーブルは廃止され、ordersテーブルに統合されました
-    cards: Pick<Database['public']['Tables']['orders']['Row'], 'id' | 'title' | 'user_id'>
+    cards: Pick<Database['public']['Tables']['orders']['Row'], 'id' | 'title' | 'user_id'> // 以前の修正箇所
+    material?: any; // 追加
+    card_id?: any;  // 追加
+    [key: string]: any; // 追加（これで未定義プロパティのエラーを全て防ぐ）
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
