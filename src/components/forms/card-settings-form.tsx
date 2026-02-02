@@ -58,7 +58,7 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
             <div className="space-y-8">
                 <div>
                     <label htmlFor="title" className="block text-sm font-bold leading-6 text-[#2c3e50]">
-                        名刺のタイトル（お名前など） <span className="text-xs font-normal text-[#8c7b6c] ml-1">/ Title</span>
+                        名刺のタイトル（お名前など）
                     </label>
                     <div className="mt-2">
                         <input
@@ -75,7 +75,7 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
 
                 <div>
                     <label htmlFor="slug" className="block text-sm font-bold leading-6 text-[#2c3e50]">
-                        公開URLスラッグ <span className="text-xs font-normal text-[#8c7b6c] ml-1">/ Slug</span>
+                        公開URLスラッグ
                     </label>
                     <div className="mt-2 flex rounded-xl shadow-sm ring-1 ring-inset ring-[#d4c5ae] focus-within:ring-2 focus-within:ring-inset focus-within:ring-[#2c3e50] bg-[#fcfbf9] overflow-hidden">
                         <span className="flex select-none items-center pl-4 pr-1 bg-[#f4f1ea] text-[#8c7b6c] sm:text-sm font-mono border-r border-[#e6e2d3]">woodlinks.app/p/</span>
@@ -94,13 +94,13 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                     </div>
                     <p className="mt-2 text-xs text-[#8c7b6c] flex items-center gap-1">
                         <span className="inline-block w-1 h-1 rounded-full bg-[#d4c5ae]"></span>
-                        半角英数字とハイフンのみ使用可能です (Lowercase alphanumeric & hyphens)
+                        半角英数字とハイフンのみ使用可能です
                     </p>
                 </div>
 
                 <div>
                     <label htmlFor="description" className="block text-sm font-bold leading-6 text-[#2c3e50]">
-                        自己紹介・プロフィール文 <span className="text-xs font-normal text-[#8c7b6c] ml-1">/ Description</span>
+                        自己紹介・プロフィール文
                     </label>
                     <div className="mt-2">
                         <textarea
@@ -117,7 +117,7 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
 
                 <div>
                     <label className="block text-sm font-bold leading-6 text-[#2c3e50] mb-3">
-                        名刺の素材（テーマ） <span className="text-xs font-normal text-[#8c7b6c] ml-1">/ Material</span>
+                        名刺の素材（テーマ）
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-3 gap-3">
                         {/* Sugi */}
@@ -141,7 +141,7 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                                 <div className="absolute inset-0 flex items-center justify-center text-2xl">🌲</div>
                             </div>
                             <span className="font-bold text-sm text-[#3d3126]">杉 (Sugi)</span>
-                            <span className="text-[10px] text-[#8c7b6c] mt-0.5 text-center leading-tight">親しみやすさ<br />Friendly</span>
+                            <span className="text-[10px] text-[#8c7b6c] mt-0.5 text-center leading-tight">親しみやすさ</span>
                         </label>
 
                         {/* Hinoki */}
@@ -165,7 +165,7 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                                 <div className="absolute inset-0 flex items-center justify-center text-2xl">🪵</div>
                             </div>
                             <span className="font-bold text-sm text-[#3d3126]">桧 (Hinoki)</span>
-                            <span className="text-[10px] text-[#8c7b6c] mt-0.5 text-center leading-tight">高貴・清潔<br />Noble</span>
+                            <span className="text-[10px] text-[#8c7b6c] mt-0.5 text-center leading-tight">高貴・清潔</span>
                         </label>
 
                         {/* Walnut */}
@@ -189,7 +189,7 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                                 <div className="absolute inset-0 flex items-center justify-center text-2xl text-white">🕰️</div>
                             </div>
                             <span className="font-bold text-sm text-[#3d3126]">胡桃 (Walnut)</span>
-                            <span className="text-[10px] text-[#8c7b6c] mt-0.5 text-center leading-tight">重厚・モダン<br />Modern</span>
+                            <span className="text-[10px] text-[#8c7b6c] mt-0.5 text-center leading-tight">重厚・モダン</span>
                         </label>
                     </div>
                 </div>
@@ -208,7 +208,7 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                     </div>
                     <div className="text-sm leading-6">
                         <label htmlFor="status" className="font-bold text-[#2c3e50] cursor-pointer select-none">
-                            名刺を公開する <span className="font-normal text-[#8c7b6c]">/ Publish</span>
+                            名刺を公開する
                         </label>
                         <p className="text-[#8c7b6c] text-xs">
                             {status === 'published' ? '現在、あなたの名刺は世界中に公開されています。' : '現在、この名刺は非公開（下書き）です。'}
@@ -228,7 +228,7 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                     disabled={isLoading}
                     className="flex w-full justify-center rounded-xl bg-[#2c3e50] px-4 py-3.5 text-sm font-bold leading-6 text-white shadow-lg shadow-[#2c3e50]/10 hover:bg-[#1a252f] hover:shadow-xl hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2c3e50] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                 >
-                    {isLoading ? 'Saving...' : 'Save Settings / 設定を保存'}
+                    {isLoading ? '保存中...' : '設定を保存'}
                 </button>
             </div>
         </form>

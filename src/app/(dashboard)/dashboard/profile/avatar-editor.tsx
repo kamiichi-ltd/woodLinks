@@ -16,9 +16,17 @@ export default function AvatarEditor({ initialAvatarUrl, userId }: { initialAvat
         }
         setUploading(true)
         const file = event.target.files[0]
+
+        // Validation: Size < 1MB
+        if (file.size > 1024 * 1024) {
+            alert('画像サイズは1MB以下にしてください。')
+            setUploading(false)
+            return
+        }
+
         const fileExt = file.name.split('.').pop()
-        const fileName = `${userId}/avatar-${Date.now()}.${fileExt}`
-        const filePath = `profiles/${fileName}`
+        const fileName = `${userId}-${Math.random()}.${fileExt}`
+        const filePath = `${fileName}`
 
         const supabase = createClient()
 
@@ -33,6 +41,7 @@ export default function AvatarEditor({ initialAvatarUrl, userId }: { initialAvat
 
             const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath)
 
+            // Update local state
             setAvatarUrl(publicUrl)
 
             // Update profile in DB
@@ -40,7 +49,7 @@ export default function AvatarEditor({ initialAvatarUrl, userId }: { initialAvat
 
         } catch (error) {
             console.error('Error uploading avatar:', error)
-            alert('Error uploading avatar!')
+            alert('画像のアップロードに失敗しました。')
         } finally {
             setUploading(false)
         }
@@ -52,7 +61,7 @@ export default function AvatarEditor({ initialAvatarUrl, userId }: { initialAvat
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                     src={avatarUrl}
-                    alt="Avatar"
+                    alt="Current Avatar"
                     className="h-24 w-24 flex-none rounded-full bg-gray-50 object-cover ring-2 ring-gray-100"
                 />
             ) : (
@@ -62,9 +71,9 @@ export default function AvatarEditor({ initialAvatarUrl, userId }: { initialAvat
             )}
 
             <div>
-                <h3 className="text-base font-semibold leading-7 text-gray-900">Profile Picture</h3>
+                <h3 className="text-base font-semibold leading-7 text-gray-900">現在の画像</h3>
                 <p className="mt-1 text-sm leading-6 text-gray-500">
-                    JPG, GIF or PNG. 1MB max.
+                    JPG, PNG, GIF (最大 1MB)
                 </p>
                 <div className="mt-4 flex items-center gap-x-3">
                     <button
@@ -74,7 +83,7 @@ export default function AvatarEditor({ initialAvatarUrl, userId }: { initialAvat
                         className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 flex items-center gap-2 disabled:opacity-50"
                     >
                         {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                        {uploading ? 'Uploading...' : 'Change avatar'}
+                        {uploading ? 'アップロード中...' : '画像を変更する'}
                     </button>
                     <input
                         type="file"

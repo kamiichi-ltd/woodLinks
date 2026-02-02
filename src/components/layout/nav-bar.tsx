@@ -12,9 +12,11 @@ export default async function NavBar() {
         <header className="bg-[#2c3e50] shadow-md border-b border-[#3e5266] text-[#fdfbf7]">
             <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
                 <div className="flex items-center gap-x-8">
-                    <h1 className="text-xl font-serif font-bold tracking-tight text-[#fdfbf7] flex items-center gap-2">
-                        <img src="/logo.png" alt="WoodLinks Logo" className="h-8 w-8 object-contain" />
-                        <span>WoodLinks</span>
+                    <h1 className="text-xl font-serif font-bold tracking-tight text-[#fdfbf7]">
+                        <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+                            <img src="/logo.png" alt="WoodLinks Logo" className="h-8 w-8 object-contain" />
+                            <span>WoodLinks</span>
+                        </Link>
                     </h1>
                     <nav className="hidden md:flex gap-x-6 items-center">
                         <Link href="/dashboard" className="text-[#aabdc1] hover:text-white transition-colors text-sm font-medium">ダッシュボード</Link>

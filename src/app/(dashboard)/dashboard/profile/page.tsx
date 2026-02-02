@@ -23,11 +23,11 @@ export default async function SettingsPage() {
 
     return (
         <div className="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-8">Settings</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-8">名刺の設定</h1>
 
             <div className="space-y-6">
                 <section>
-                    <h2 className="text-lg font-medium text-gray-900 mb-4">Profile Image</h2>
+                    <h2 className="text-lg font-medium text-gray-900 mb-4">プロフィール画像</h2>
                     <AvatarEditor
                         userId={user.id}
                         initialAvatarUrl={profile?.avatar_url || null}
@@ -35,7 +35,7 @@ export default async function SettingsPage() {
                 </section>
 
                 <section>
-                    <h2 className="text-lg font-medium text-gray-900 mb-4">Card Settings</h2>
+                    <h2 className="text-lg font-medium text-gray-900 mb-4">基本情報</h2>
                     {primaryCard ? (
                         <CardSettingsForm
                             cardId={primaryCard.id}
@@ -49,9 +49,9 @@ export default async function SettingsPage() {
                         <div className="rounded-md bg-yellow-50 p-4">
                             <div className="flex">
                                 <div className="ml-3">
-                                    <h3 className="text-sm font-medium text-yellow-800">No Card Found</h3>
+                                    <h3 className="text-sm font-medium text-yellow-800">名刺が見つかりません</h3>
                                     <div className="mt-2 text-sm text-yellow-700">
-                                        <p>You need to create a card first to edit its settings.</p>
+                                        <p>名刺の設定を編集するには、まず名刺を作成してください。</p>
                                     </div>
                                 </div>
                             </div>

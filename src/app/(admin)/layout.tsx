@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ShieldCheck, Package, LayoutDashboard } from 'lucide-react'
+import { ShieldCheck, Package, LayoutDashboard, ArrowRight, User } from 'lucide-react'
 
 export default async function AdminLayout({
     children,
@@ -14,9 +14,10 @@ export default async function AdminLayout({
     const adminEmail = process.env.ADMIN_EMAIL
 
     const NAV_ITEMS = [
-        { label: 'Orders', href: '/admin/orders', icon: Package, active: true },
-        // { label: 'Customers', href: '/admin/customers', icon: User, active: false }, // Future
-        { label: 'User Dashboard', href: '/dashboard', icon: LayoutDashboard, active: false },
+        { label: 'ホーム (計器盤)', href: '/admin', icon: LayoutDashboard, active: false },
+        { label: '注文管理', href: '/admin/orders', icon: Package, active: false },
+        { label: '顧客リスト', href: '/admin/customers', icon: User, active: false },
+        { label: 'ユーザー画面へ', href: '/dashboard', icon: ArrowRight, active: false },
     ]
 
 
@@ -41,11 +42,15 @@ export default async function AdminLayout({
                             <Link
                                 key={item.href}
                                 href={item.href}
+                                // Simple active check: strictly equal or starts with for nested routes?
+                                // For now, simple check. Since we are in Layout, we can't easily get access to pathname directly without client component hook.
+                                // But this is a Server Component layout. 
+                                // We can't know the current path here to determine 'active' dynamically without `usePathname` (Client).
+                                // Let's simplify: Remove 'active' logic from Server Layout or convert Sidebar to Client Component.
+                                // Quick fix: Just use hover styles for now as we don't want to refactor to Client Component yet.
                                 className={`
                                     flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors
-                                    ${item.active
-                                        ? 'bg-stone-800 text-white'
-                                        : 'text-stone-400 hover:text-white'}
+                                    text-stone-400 hover:text-white hover:bg-stone-800
                                 `}
                             >
                                 <item.icon className="h-4 w-4" />

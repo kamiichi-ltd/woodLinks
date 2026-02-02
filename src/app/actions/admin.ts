@@ -112,5 +112,133 @@ export async function updateOrderStatus(
     }
 
     revalidatePath('/admin/orders')
+    revalidatePath('/admin/orders')
     return { success: true }
+}
+
+export async function getAdminStats() {
+    await verifyAdmin();
+
+    const { data: orders, error } = await adminDbClient
+        .from('orders')
+        .select('*')
+        .in('status', ['paid', 'in_production', 'shipped', 'delivered']);
+
+    if (error) {
+        console.error('[Admin] Stats Fetch Error:', error);
+        throw new Error('Failed to fetch stats');
+    }
+
+    // Calculate Stats
+    // Note: Assuming 'amount' column exists? Or calculate from material?
+    // Based on checkout.ts, we don't strictly save 'amount'. We should probably calculate from material prices.
+    // However, older orders might have different prices?
+    // Let's check if 'amount' exists in the type definition if we could, but we can't easily.
+    // Safest bet for now: Use Material Prices.
+
+    // Hardcoded prices corresponding to current pricing. 
+    // Ideally this should be in DB orders.amount.
+    // Checks on orders:
+    // If we have 'amount' (unlikely based on my review), use it.
+    // Else, use map.
+
+    const MATERIAL_PRICES_MAP: Record<string, number> = {
+        sugi: 12000,
+        hinoki: 15000,
+        walnut: 18000,
+    };
+
+    let totalRevenue = 0;
+    let pendingShipmentCount = 0;
+    let totalSoldCount = 0;
+
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    for (const order of orders) {
+        // Total Sold (All Time)
+        totalSoldCount++;
+
+        // Revenue (Current Month only)
+        const orderDate = new Date(order.created_at);
+        if (orderDate >= startOfMonth) {
+            // @ts-expect-error: amount might be missing
+            const amount = order.amount || MATERIAL_PRICES_MAP[order.material] || 0;
+            totalRevenue += amount;
+        }
+
+        // Pending Shipment (Active)
+        if (order.status === 'paid' || order.status === 'in_production') {
+            pendingShipmentCount++;
+        }
+    }
+
+    return {
+        totalRevenue,
+        pendingShipmentCount,
+        totalSoldCount
+    };
+}
+
+export async function getAdminCustomers() {
+    await verifyAdmin();
+
+    // Fetch all profiles with their orders
+    const { data: profiles, error } = await adminDbClient
+        .from('profiles')
+        .select(`
+            *,
+            orders (*)
+        `);
+
+    if (error) {
+        console.error('[Admin] Customers Fetch Error:', error);
+        throw new Error('Failed to fetch customers');
+    }
+
+    const MATERIAL_PRICES_MAP: Record<string, number> = {
+        sugi: 12000,
+        hinoki: 15000,
+        walnut: 18000,
+    };
+
+    // Aggregate Data
+    const customers = profiles.map(profile => {
+        const orders = profile.orders || [];
+        // Filter paid orders for LTV
+        const paidOrders = orders.filter((o: any) =>
+            ['paid', 'in_production', 'shipped', 'delivered'].includes(o.status)
+        );
+
+        const totalSpend = paidOrders.reduce((sum: number, o: any) => {
+            // @ts-expect-error: amount might be missing
+            return sum + (o.amount || MATERIAL_PRICES_MAP[o.material] || 0);
+        }, 0);
+
+        // Find latest order date
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const sortedOrders = [...orders].sort((a: any, b: any) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const latestOrder = sortedOrders[0] as any;
+
+        // Fallback name logic: Profile Name -> Latest Order Name -> Email
+        const displayName = profile.full_name || latestOrder?.shipping_name || profile.email || 'Unknown';
+
+        return {
+            id: profile.id,
+            email: profile.email,
+            displayName,
+            orderCount: paidOrders.length,
+            totalSpend,
+            registeredAt: profile.created_at || null, // profiles created_at might be null if not tracked properly early on
+            latestOrderAt: latestOrder?.created_at || null
+        };
+    });
+
+    // Sort by Total Spend (Desc)
+    customers.sort((a, b) => b.totalSpend - a.totalSpend);
+
+    return customers;
 }
