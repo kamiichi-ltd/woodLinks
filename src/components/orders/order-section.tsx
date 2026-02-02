@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Database } from '@/database.types';
 import { OrderForm } from './order-form';
 import { OrderStatusView } from './order-status-view';
-import { CheckCircle2, XCircle } from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 
 type Order = Database['public']['Tables']['orders']['Row'];
 
@@ -34,14 +34,20 @@ export function OrderSection({ cardId, initialOrders }: OrderSectionProps) {
     // Find the active order
     const activeOrder = orders[0]; // Assuming sorted by created_at desc from server
 
-    const handleOrderCreated = () => {
-        router.refresh(); // Refresh Server Components to get new data
-        // Optimistically update or just wait for refresh?
-        // Since refresh is async, we might want to manually fetch or just wait.
-        // For simpler UX, we can just rely on refresh, but it might be slow.
-        // Ideally we should refetch orders here client side too or wait for the refresh.
+    // Poll for status update if payment was successful but DB is not yet updated
+    useEffect(() => {
+        if (status === 'success' && activeOrder?.status === 'pending_payment') {
+            const interval = setInterval(() => {
+                console.log('[OrderSection] Polling for payment status...');
+                router.refresh();
+            }, 3000);
 
-        // Using router.refresh() is the Next.js way.
+            return () => clearInterval(interval);
+        }
+    }, [status, activeOrder?.status, router]);
+
+    const handleOrderCreated = () => {
+        router.refresh();
     };
 
     return (
@@ -82,7 +88,19 @@ export function OrderSection({ cardId, initialOrders }: OrderSectionProps) {
                     {/* If order is completed/cancelled, we might want to allow new order.
                For now, Simplest: Just show the status view.
             */}
-                    <OrderStatusView order={activeOrder} />
+                    {/* If verifying payment, show loader instead of status view (which might show Pay button) */}
+                    {status === 'success' && activeOrder?.status === 'pending_payment' ? (
+                        <div className="bg-white p-8 rounded-lg shadow border border-stone-200 text-center">
+                            <Loader2 className="h-8 w-8 text-[#d4a373] animate-spin mx-auto mb-4" />
+                            <h3 className="text-lg font-bold text-stone-800">お支払いを確認中...</h3>
+                            <p className="text-stone-500 text-sm mt-2">
+                                決済システムの応答を待機しています。<br />
+                                画面を閉じずにお待ちください。通常数秒で完了します。
+                            </p>
+                        </div>
+                    ) : (
+                        <OrderStatusView order={activeOrder} />
+                    )}
 
                     {/* Allow re-order if cancelled or delivered (optional for now) 
                {(activeOrder.status === 'cancelled' || activeOrder.status === 'delivered') && (

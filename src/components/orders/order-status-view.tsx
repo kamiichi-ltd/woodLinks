@@ -39,6 +39,12 @@ export function OrderStatusView({ order }: OrderStatusViewProps) {
         refunded: '返金済み',
     };
 
+    const materialLabels: Record<string, string> = {
+        sugi: '杉 (Sugi)',
+        hinoki: '桧 (Hinoki)',
+        walnut: '胡桃 (Walnut)',
+    };
+
     const StatusIcon = () => {
         switch (order.status) {
             case 'pending_payment': return <CreditCard className="h-6 w-6 text-amber-500" />;
@@ -61,7 +67,7 @@ export function OrderStatusView({ order }: OrderStatusViewProps) {
 
             <div className="space-y-3 text-sm text-stone-600 mb-6">
                 <p>注文ID: <span className="font-mono">{order.id}</span></p>
-                <p>材質: {order.material}</p>
+                <p>材質: {materialLabels[order.material] || order.material}</p>
                 <p>枚数: {order.quantity}枚</p>
                 <p>配送先: {order.shipping_name} 様</p>
 
