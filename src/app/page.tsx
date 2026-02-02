@@ -21,8 +21,21 @@ import {
   X,
   Droplets,
   Hammer,
-  Award
+  Award,
+  Box,
+  ChevronDown,
+  CreditCard,
+  Layout,
+  Sparkles,
+  Mail,
+  Twitter,
+  Instagram,
+  Github,
+  Linkedin,
+  MessageCircle,
+  Share2
 } from 'lucide-react'
+import MaterialSelection from '@/components/landing/material-selection'
 
 // --- Animation Variants ---
 const fadeIn = {
@@ -385,54 +398,9 @@ export default function Home() {
           </div>
         </section>
 
-        {/* --- Material Selection --- */}
-        <section className="py-32 bg-[#f4f1ea] border-y border-[#e6e2d3]">
-          <div className="max-w-7xl mx-auto px-6">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeIn}
-              className="text-center mb-20"
-            >
-              <span className="text-[#8c7b6c] font-bold tracking-[0.2em] uppercase text-xs">MATERIAL SELECTION</span>
-              <h3 className="mt-4 text-4xl font-serif font-medium text-[#3d3126]">
-                あなたに呼応する、木の個性
-              </h3>
-            </motion.div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-              {[
-                { name: "杉", en: "Sugi", subtype: "JAPANESE CEDAR", color: "#d4a373", desc: "真っ直ぐな木目は誠実さの証。", tags: ["親しみ", "直感"] },
-                { name: "桧", en: "Hinoki", subtype: "JAPANESE CYPRESS", color: "#e9d8a6", desc: "香り高い、木の王様。", tags: ["高貴", "信頼"] },
-                { name: "胡桃", en: "Walnut", subtype: "BLACK WALNUT", color: "#6b4c3e", desc: "深く、知的な大人の色気。", tags: ["知性", "モダン"] }
-              ].map((wood) => (
-                <motion.div
-                  key={wood.en}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  variants={fadeIn}
-                  className="group relative bg-[#fdfbf7] shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden rounded-xl"
-                >
-                  <div className="h-2 w-full" style={{ backgroundColor: wood.color }}></div>
-                  <div className="p-10 relative z-10">
-                    <span className="text-xs font-bold tracking-widest mb-2 block" style={{ color: wood.color }}>{wood.subtype}</span>
-                    <h4 className="text-3xl font-serif font-bold text-[#3d3126] mb-6">{wood.name} <span className="text-lg font-normal text-[#8c7b6c] ml-2 font-sans">- {wood.en}</span></h4>
-                    <div className="w-12 h-0.5 bg-[#e6e2d3] mb-6 group-hover:w-full transition-all duration-500" style={{ backgroundColor: wood.color }}></div>
-                    <p className="text-[#5a4d41] leading-relaxed mb-8 min-h-[3rem]">{wood.desc}</p>
-                    <div className="flex gap-2">
-                      {wood.tags.map(tag => (
-                        <span key={tag} className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium rounded-full">{tag}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] mix-blend-multiply"></div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* --- Material Selection --- */}
+        <MaterialSelection />
 
         {/* --- Use Cases Section --- */}
         <section className="py-32 bg-[#fdfbf7]">
