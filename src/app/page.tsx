@@ -1,32 +1,98 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/utils/supabase/server'
-import { redirect } from 'next/navigation'
-import { Leaf, Palette, UserCheck, ArrowRight, Smartphone } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  ArrowRight,
+  Smartphone,
+  Leaf,
+  ShieldCheck,
+  Zap,
+  BarChart3,
+  Globe,
+  UserCheck,
+  Briefcase,
+  Palette,
+  User,
+  Plus,
+  Minus
+} from 'lucide-react'
 
-export default async function Home() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+// --- Animation Variants ---
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" }
+  }
+}
 
-  // if (user) {
-  //   redirect('/dashboard')
-  // }
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2
+    }
+  }
+}
+
+// --- Components ---
+const FaqItem = ({ question, answer }: { question: string, answer: string }) => {
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <div className="bg-[#fdfbf7] min-h-screen flex flex-col font-sans text-[#2c3e50]">
-      {/* Header */}
-      <header className="fixed w-full z-50 bg-[#fdfbf7]/80 backdrop-blur-md border-b border-[#e6e2d3]">
+    <div className="border-b border-[#e6e2d3] last:border-0">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full py-6 flex lg:items-center justify-between text-left gap-4 focus:outline-none group"
+      >
+        <span className="text-lg font-bold text-[#3d3126] group-hover:text-[#2c3e50] transition-colors">{question}</span>
+        <span className={`flex-shrink-0 w-6 h-6 rounded-full border border-[#d4c5ae] flex items-center justify-center transition-colors ${isOpen ? 'bg-[#2c3e50] border-[#2c3e50] text-[#fdfbf7]' : 'text-[#8c7b6c]'}`}>
+          {isOpen ? <Minus className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
+        </span>
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <p className="pb-6 text-[#5a4d41] leading-relaxed pr-8">
+              {answer}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+export default function Home() {
+  return (
+    <div className="bg-[#fdfbf7] min-h-screen flex flex-col font-sans text-[#2c3e50] selection:bg-[#d4c5ae] selection:text-[#2c3e50]">
+      {/* --- Header (Glassmorphism) --- */}
+      <header className="fixed w-full z-50 bg-[#fdfbf7]/80 backdrop-blur-md border-b border-[#e6e2d3]/50 supports-[backdrop-filter]:bg-[#fdfbf7]/60">
         <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-          <h1 className="text-2xl font-bold tracking-tight text-[#3d3126] flex items-center gap-2">
-            <img src="/logo.png" alt="WoodLinks Logo" className="h-10 w-10 object-contain" />
-            <span className="font-serif">WoodLinks</span>
-          </h1>
-          <nav className="flex items-center gap-4">
-            <Link href="/p/demo" className="text-sm font-medium text-[#5a4d41] hover:text-[#3d3126] transition-colors hidden sm:block">
+          <Link href="/" className="flex items-center gap-2 group">
+            {/* Logo Icon */}
+            <div className="relative h-10 w-10 overflow-hidden rounded-lg">
+              <img src="/logo.png" alt="WoodLinks Logo" className="h-full w-full object-contain group-hover:scale-110 transition-transform duration-500" />
+            </div>
+            <span className="font-serif text-xl font-bold tracking-tight text-[#3d3126]">WoodLinks</span>
+          </Link>
+          <nav className="flex items-center gap-6">
+            <Link href="/p/demo" className="text-sm font-medium text-[#8c7b6c] hover:text-[#3d3126] transition-colors hidden sm:block">
               デモを見る
             </Link>
             <Link
               href="/login"
-              className="rounded-full bg-[#fdfbf7] text-[#3d3126] px-5 py-2.5 text-sm font-semibold hover:bg-[#eae0cf] transition-colors"
+              className="rounded-full bg-[#2c3e50] text-[#fdfbf7] px-6 py-2.5 text-sm font-bold hover:bg-[#1a252f] transition-all hover:shadow-lg hover:-translate-y-0.5"
             >
               ログイン
             </Link>
@@ -34,259 +100,376 @@ export default async function Home() {
         </div>
       </header>
 
-      <main className="flex-1 pt-24">
-        {/* Hero Section */}
-        <section className="relative py-24 sm:py-32 lg:pb-40 overflow-hidden">
-          <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
-            <div className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#d4c5ae] to-[#a4b494] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"></div>
+      <main className="flex-1">
+        {/* --- Hero Section --- */}
+        <section className="relative pt-32 pb-20 sm:pt-40 sm:pb-32 overflow-hidden">
+          {/* Background Elements */}
+          <div className="absolute inset-0 -z-10 pointer-events-none">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-[#e6e2d3]/30 to-transparent rounded-[100%] blur-3xl opacity-50"></div>
           </div>
 
-          <div className="max-w-7xl mx-auto px-6 text-center">
-            <div className="mx-auto max-w-3xl">
-              <span className="inline-block py-1 px-3 rounded-full bg-[#f4f1ea] border border-[#e6e2d3] text-[#8c7b6c] text-xs font-bold tracking-widest uppercase mb-8">
-                唯一無二のウッドカード
-              </span>
-              <h2 className="text-5xl font-serif font-medium tracking-tight text-[#3d3126] sm:text-7xl mb-8 leading-tight">
-                木に、デジタルという<br className="hidden sm:block" />命を宿す。
-              </h2>
-              <p className="mt-8 text-xl leading-8 text-[#5a4d41] mb-12 font-light">
-                本物の木の温もりと、デジタル名刺の利便性を一つに。<br className="hidden sm:block" />
-                NFC技術を内蔵したウッドカードで、<br className="sm:hidden" />一期一会の出会いを、一生のつながりに。
-              </p>
-              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
+          <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
+            {/* Text Content */}
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
+              className="text-center lg:text-left"
+            >
+              <motion.span variants={fadeIn} className="inline-block py-1 px-3 rounded-full bg-[#f4f1ea] border border-[#e6e2d3] text-[#8c7b6c] text-[10px] font-bold tracking-[0.2em] uppercase mb-6">
+                TACTILE DIGITAL
+              </motion.span>
+              <motion.h1 variants={fadeIn} className="text-5xl sm:text-6xl lg:text-7xl font-serif font-medium tracking-tight text-[#3d3126] mb-8 leading-[1.1]">
+                木に、<br />デジタルという<br />命を宿す。
+              </motion.h1>
+              <motion.p variants={fadeIn} className="text-lg sm:text-xl text-[#5a4d41] mb-10 font-light leading-relaxed max-w-xl mx-auto lg:mx-0">
+                本物の木の温もりと、最先端のデジタル技術が融合。<br />
+                名刺交換の瞬間を、記憶に残る「体験」へ。
+              </motion.p>
+
+              <motion.div variants={fadeIn} className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
                 <Link
                   href="/login"
-                  className="w-full sm:w-auto rounded-full bg-[#2c3e50] px-10 py-4 text-lg font-bold text-white shadow-xl shadow-[#2c3e50]/20 hover:bg-[#1a252f] hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto h-14 px-8 rounded-full bg-[#2c3e50] text-white font-bold flex items-center justify-center gap-2 hover:bg-[#1a252f] transition-all shadow-xl shadow-[#2c3e50]/20 hover:-translate-y-1"
                 >
                   カードを作成する <ArrowRight className="h-5 w-5" />
                 </Link>
-                <Link href="/p/demo" className="text-sm font-bold tracking-wide text-[#3d3126] hover:text-[#8c7b6c] transition-colors flex items-center gap-2 border-b border-transparent hover:border-[#8c7b6c] pb-0.5">
-                  デモを見る <Smartphone className="h-4 w-4" />
+                <Link
+                  href="/p/demo"
+                  className="w-full sm:w-auto h-14 px-8 rounded-full border border-[#d4c5ae] text-[#3d3126] font-bold flex items-center justify-center gap-2 hover:bg-[#eae0cf] transition-all"
+                >
+                  デモを見る <Smartphone className="h-5 w-5" />
                 </Link>
+              </motion.div>
+            </motion.div>
+
+            {/* Visual / 3D-like Animation */}
+            <motion.div
+              initial={{ opacity: 0, x: 50, rotateY: 30 }}
+              animate={{ opacity: 1, x: 0, rotateY: 0 }}
+              transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+              className="relative lg:h-[600px] flex items-center justify-center perspective-1000"
+            >
+              {/* Visual */}
+              <div className="relative w-80 h-[500px] bg-[#d4a373] rounded-3xl shadow-[0_30px_60px_-15px_rgba(44,62,80,0.3)] border-[6px] border-white/20 overflow-hidden transform rotate-[-6deg] hover:rotate-0 transition-transform duration-700 ease-out">
+                <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] mix-blend-multiply"></div>
+                <div className="absolute top-10 left-10 right-10">
+                  <div className="h-12 w-12 bg-[#3d3126] rounded-full mb-6"></div>
+                  <div className="h-4 w-32 bg-[#3d3126]/20 rounded-full mb-3"></div>
+                  <div className="h-3 w-20 bg-[#3d3126]/10 rounded-full"></div>
+                </div>
+                <div className="absolute bottom-10 left-10 right-10">
+                  <div className="h-10 w-10 border-2 border-[#3d3126] rounded-lg flex items-center justify-center">
+                    <Zap className="h-5 w-5 text-[#3d3126]" />
+                  </div>
+                </div>
+              </div>
+              {/* Floating Elements */}
+              <div className="absolute top-1/2 right-10 w-20 h-20 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-4 flex items-center justify-center animate-bounce duration-[3000ms]">
+                <Smartphone className="h-8 w-8 text-[#2c3e50]" />
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* --- How It Works --- */}
+        <section className="py-24 bg-white border-y border-[#e6e2d3]/50">
+          <div className="max-w-7xl mx-auto px-6">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={fadeIn}
+              className="text-center mb-16"
+            >
+              <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[#3d3126] mb-4">かざす、伝わる、繋がる。</h2>
+              <p className="text-[#8c7b6c]">アプリは不要。直感的な3ステップ。</p>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={staggerContainer}
+              className="grid md:grid-cols-3 gap-12 relative"
+            >
+              <div className="hidden md:block absolute top-12 left-1/6 right-1/6 h-0.5 bg-[#e6e2d3] -z-10"></div>
+              {[
+                { title: "Tap", subtitle: "かざす", desc: "相手のスマホにカードをかざすだけ。", icon: Zap },
+                { title: "Showcase", subtitle: "伝わる", desc: "あなたのプロフィールが瞬時に開きます。", icon: Globe },
+                { title: "Connect", subtitle: "繋がる", desc: "ワンタップで連絡先を保存。", icon: UserCheck }
+              ].map((step, idx) => (
+                <motion.div key={idx} variants={fadeIn} className="flex flex-col items-center text-center bg-white p-6">
+                  <div className="w-24 h-24 rounded-full bg-[#fdfbf7] border border-[#e6e2d3] flex items-center justify-center mb-6 shadow-sm relative group">
+                    <step.icon className="h-8 w-8 text-[#2c3e50] group-hover:scale-110 transition-transform duration-300" />
+                    <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-[#d4a373] text-white text-sm font-bold flex items-center justify-center border-2 border-white">
+                      {idx + 1}
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-bold text-[#2c3e50] mb-1">{step.subtitle}</h3>
+                  <span className="text-xs font-bold tracking-widest text-[#d4c5ae] uppercase mb-3">{step.title}</span>
+                  <p className="text-[#5a4d41] text-sm leading-relaxed max-w-xs">{step.desc}</p>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* --- Features (Bento Grid) --- */}
+        <section className="py-32 bg-[#fdfbf7]">
+          <div className="max-w-7xl mx-auto px-6">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeIn}
+              className="mb-16"
+            >
+              <span className="text-[#8c7b6c] font-bold tracking-[0.2em] uppercase text-xs block mb-3">FEATURES</span>
+              <h2 className="text-4xl font-serif font-bold text-[#3d3126]">機能美という、おもてなし。</h2>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-6 h-auto md:h-[600px]">
+              <div className="md:col-span-2 bg-white rounded-3xl p-8 border border-[#e6e2d3] hover:shadow-xl transition-shadow duration-300 relative overflow-hidden group">
+                <div className="relative z-10">
+                  <div className="w-12 h-12 bg-[#2c3e50] rounded-xl flex items-center justify-center text-white mb-6">
+                    <Zap className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-[#3d3126] mb-3">No App Required</h3>
+                  <p className="text-[#5a4d41] max-w-md">専用アプリのインストールは一切不要。<br />スマホ標準搭載のNFC機能で、誰とでもスムーズに繋がれます。</p>
+                </div>
+                <div className="absolute right-0 bottom-0 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
+                  <Zap className="w-64 h-64 text-[#2c3e50]" />
+                </div>
+              </div>
+              <div className="md:row-span-2 bg-[#2c3e50] rounded-3xl p-8 text-[#fdfbf7] flex flex-col relative overflow-hidden group">
+                <div className="relative z-10">
+                  <div className="w-12 h-12 bg-[#fdfbf7]/10 rounded-xl flex items-center justify-center text-[#fdfbf7] mb-6">
+                    <BarChart3 className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-3">Analytics</h3>
+                  <p className="text-[#d4c5ae] text-sm leading-relaxed mb-6">
+                    「いつ、誰に、どこで」見られたか。<br />
+                    アクセス解析機能で、出会いの価値を可視化します。
+                  </p>
+                  <div className="mt-auto bg-white/5 rounded-xl p-4 border border-white/10 backdrop-blur-sm">
+                    <div className="flex items-end justify-between h-32 gap-2">
+                      {[30, 50, 45, 80, 60, 90, 75].map((h, i) => (
+                        <div key={i} className="w-full bg-[#d4c5ae] opacity-50 rounded-t-sm hover:opacity-100 transition-opacity" style={{ height: `${h}%` }}></div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-[#f4f1ea] rounded-3xl p-8 border border-[#d4c5ae] hover:border-[#8c7b6c] transition-colors group">
+                <Globe className="h-8 w-8 text-[#8c7b6c] mb-4 group-hover:scale-110 transition-transform" />
+                <h3 className="text-lg font-bold text-[#3d3126] mb-2">Real-time Update</h3>
+                <p className="text-xs text-[#5a4d41]">情報はダッシュボードから即更新。名刺の刷り直しはもう不要です。</p>
+              </div>
+              <div className="bg-white rounded-3xl p-8 border border-[#e6e2d3] flex flex-col justify-between group hover:bg-[#faf9f6] transition-colors">
+                <div>
+                  <div className="flex gap-4 mb-4">
+                    <Leaf className="h-6 w-6 text-[#a4b494]" />
+                    <ShieldCheck className="h-6 w-6 text-[#d4a373]" />
+                  </div>
+                  <h3 className="text-lg font-bold text-[#3d3126] mb-2">Eco & Secure</h3>
+                  <p className="text-xs text-[#5a4d41]">ペーパーレスで環境に優しく。<br />紛失時もリモートロックで安心。</p>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Wood Selection (Encyclopedia Style) */}
+        {/* --- [NEW] Brand Story Section --- */}
+        <section className="py-32 bg-[#2c3e50] text-[#fdfbf7] relative overflow-hidden">
+          {/* Shapes */}
+          <div className="absolute -top-20 -right-20 w-96 h-96 bg-[#3e5266] rounded-full blur-[100px] opacity-40"></div>
+          <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-[#1a252f] rounded-full blur-[100px] opacity-40"></div>
+
+          <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeIn}
+            >
+              <span className="text-[#d4c5ae] font-bold tracking-[0.2em] uppercase text-xs block mb-3">OUR AUTHENTICITY</span>
+              <h2 className="text-4xl sm:text-5xl font-serif font-bold text-white mb-10 leading-tight">大阪・北摂、<br className="sm:hidden" />上一木材の誇り。</h2>
+              <p className="text-lg sm:text-xl text-[#d4c5ae] font-light leading-relaxed max-w-3xl mx-auto mb-12">
+                私たちはITベンチャーではありません。<br className="hidden sm:block" />
+                大阪・北摂（吹田）の地で代々続く、材木屋です。<br />
+                デジタル全盛の今だからこそ、「本物の木の力」を届けたい。<br />
+                0.1ミリの職人技と、最新のNFC技術の融合。
+              </p>
+              <div className="inline-block p-6 border border-[#d4c5ae]/30 rounded-xl bg-white/5 backdrop-blur-sm">
+                <p className="font-serif text-[#fdfbf7] text-lg">
+                  &quot;手に取った瞬間、違いがわかる。それが私たちの品質です。&quot;
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* --- Material Selection --- */}
         <section className="py-32 bg-[#f4f1ea] border-y border-[#e6e2d3]">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-20">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeIn}
+              className="text-center mb-20"
+            >
               <span className="text-[#8c7b6c] font-bold tracking-[0.2em] uppercase text-xs">MATERIAL SELECTION</span>
               <h3 className="mt-4 text-4xl font-serif font-medium text-[#3d3126]">
                 あなたに呼応する、木の個性
               </h3>
-              <p className="mt-6 text-[#5a4d41] max-w-2xl mx-auto">
-                木にはそれぞれ、生まれた土地や育った環境による「性格」があります。<br />
-                あなたのビジネススタイルに共鳴する一枚を見つけてください。
-              </p>
-            </div>
+            </motion.div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-              {/* Cedar */}
-              <div className="group relative bg-[#fdfbf7] rounded-none sm:rounded-sm shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden">
-                <div className="h-2 bg-[#d4a373]"></div>
-                <div className="p-10">
-                  <span className="text-[#d4a373] text-xs font-bold tracking-widest mb-2 block">JAPANESE CEDAR</span>
-                  <h4 className="text-3xl font-serif font-bold text-[#3d3126] mb-6">杉 <span className="text-lg font-normal text-[#8c7b6c] ml-2">- Sugi</span></h4>
-                  <div className="w-12 h-0.5 bg-[#e6e2d3] mb-6 group-hover:w-full group-hover:bg-[#d4a373] transition-all duration-500"></div>
-                  <p className="text-[#5a4d41] leading-relaxed mb-8">
-                    真っ直ぐに伸びる木目は、嘘のない誠実さを表します。柔らかく温かみのある手触りは、初対面の相手にも安心感を与え、心の距離を縮めます。
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium">親しみやすさ</span>
-                    <span className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium">直感</span>
-                    <span className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium">スピード</span>
+              {[
+                { name: "杉", en: "Sugi", subtype: "JAPANESE CEDAR", color: "#d4a373", desc: "真っ直ぐな木目は誠実さの証。", tags: ["親しみ", "直感"] },
+                { name: "桧", en: "Hinoki", subtype: "JAPANESE CYPRESS", color: "#e9d8a6", desc: "香り高い、木の王様。", tags: ["高貴", "信頼"] },
+                { name: "胡桃", en: "Walnut", subtype: "BLACK WALNUT", color: "#6b4c3e", desc: "深く、知的な大人の色気。", tags: ["知性", "モダン"] }
+              ].map((wood) => (
+                <motion.div
+                  key={wood.en}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeIn}
+                  className="group relative bg-[#fdfbf7] shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden rounded-xl"
+                >
+                  <div className="h-2 w-full" style={{ backgroundColor: wood.color }}></div>
+                  <div className="p-10 relative z-10">
+                    <span className="text-xs font-bold tracking-widest mb-2 block" style={{ color: wood.color }}>{wood.subtype}</span>
+                    <h4 className="text-3xl font-serif font-bold text-[#3d3126] mb-6">{wood.name} <span className="text-lg font-normal text-[#8c7b6c] ml-2 font-sans">- {wood.en}</span></h4>
+                    <div className="w-12 h-0.5 bg-[#e6e2d3] mb-6 group-hover:w-full transition-all duration-500" style={{ backgroundColor: wood.color }}></div>
+                    <p className="text-[#5a4d41] leading-relaxed mb-8 min-h-[3rem]">{wood.desc}</p>
+                    <div className="flex gap-2">
+                      {wood.tags.map(tag => (
+                        <span key={tag} className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium rounded-full">{tag}</span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Cypress */}
-              <div className="group relative bg-[#fdfbf7] rounded-none sm:rounded-sm shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden transform lg:-translate-y-4">
-                <div className="h-2 bg-[#e9d8a6]"></div>
-                <div className="p-10">
-                  <span className="text-[#cbb89d] text-xs font-bold tracking-widest mb-2 block">JAPANESE CYPRESS</span>
-                  <h4 className="text-3xl font-serif font-bold text-[#3d3126] mb-6">桧 <span className="text-lg font-normal text-[#8c7b6c] ml-2">- Hinoki</span></h4>
-                  <div className="w-12 h-0.5 bg-[#e6e2d3] mb-6 group-hover:w-full group-hover:bg-[#e9d8a6] transition-all duration-500"></div>
-                  <p className="text-[#5a4d41] leading-relaxed mb-8">
-                    古来より寺社仏閣に使われてきた「木の王様」。その特有の香りと美しい白木の色合いは、揺るぎない信頼と品格を無言のうちに語ります。
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium">高貴</span>
-                    <span className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium">信頼</span>
-                    <span className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium">持続性</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Walnut */}
-              <div className="group relative bg-[#fdfbf7] rounded-none sm:rounded-sm shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden">
-                <div className="h-2 bg-[#6b4c3e]"></div>
-                <div className="p-10">
-                  <span className="text-[#8c7b6c] text-xs font-bold tracking-widest mb-2 block">BLACK WALNUT</span>
-                  <h4 className="text-3xl font-serif font-bold text-[#3d3126] mb-6">胡桃 <span className="text-lg font-normal text-[#8c7b6c] ml-2">- Walnut</span></h4>
-                  <div className="w-12 h-0.5 bg-[#e6e2d3] mb-6 group-hover:w-full group-hover:bg-[#6b4c3e] transition-all duration-500"></div>
-                  <p className="text-[#5a4d41] leading-relaxed mb-8">
-                    深く濃い色合いと美しい縞模様は、成熟した大人の知性を演出します。使い込むほどに艶が増し、あなたのキャリアと共に深みを増していくでしょう。
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium">知性</span>
-                    <span className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium">重厚</span>
-                    <span className="px-3 py-1 bg-[#f4f1ea] text-[#5a4d41] text-xs font-medium">モダン</span>
-                  </div>
-                </div>
-              </div>
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] mix-blend-multiply"></div>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* Aging Story Section (Revised Timeline) */}
-        <section className="py-32 bg-white overflow-hidden">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="lg:grid lg:grid-cols-2 lg:gap-24 items-center">
-              <div className="order-2 lg:order-1 relative mt-16 lg:mt-0">
-                {/* Abstract visualization of 0-3 years againg */}
-                <div className="relative">
-                  <div className="absolute top-0 bottom-0 left-8 w-0.5 bg-[#e6e2d3]"></div>
-
-                  {/* Year 0 */}
-                  <div className="relative flex items-center gap-8 mb-12">
-                    <div className="w-16 h-16 rounded-full bg-[#fdfbf7] border-2 border-[#e6e2d3] flex items-center justify-center relative z-10 font-serif font-bold text-[#8c7b6c]">0</div>
-                    <div className="flex-1 bg-[#fdfbf7] p-6 rounded-xl border border-[#e6e2d3] shadow-sm">
-                      <h5 className="font-bold text-[#3d3126] mb-1">新品</h5>
-                      <p className="text-xs text-[#8c7b6c]">まだ若々しい、フレッシュな表情。</p>
-                    </div>
-                  </div>
-
-                  {/* Year 1 */}
-                  <div className="relative flex items-center gap-8 mb-12">
-                    <div className="w-16 h-16 rounded-full bg-[#f4f1ea] border-2 border-[#d4c5ae] flex items-center justify-center relative z-10 font-serif font-bold text-[#5a4d41]">1</div>
-                    <div className="flex-1 bg-[#f4f1ea] p-6 rounded-xl border border-[#d4c5ae] shadow-sm">
-                      <h5 className="font-bold text-[#3d3126] mb-1">1年後</h5>
-                      <p className="text-xs text-[#5a4d41]">手の油分が馴染み、艶が生まれます。</p>
-                    </div>
-                  </div>
-
-                  {/* Year 3 */}
-                  <div className="relative flex items-center gap-8">
-                    <div className="w-16 h-16 rounded-full bg-[#d4c5ae] border-2 border-[#8c7b6c] flex items-center justify-center relative z-10 font-serif font-bold text-[#3d3126]">3</div>
-                    <div className="flex-1 bg-[#eae0cf] p-6 rounded-xl border border-[#8c7b6c] shadow-md">
-                      <h5 className="font-bold text-[#3d3126] mb-1">3年後</h5>
-                      <p className="text-xs text-[#3d3126]">角が取れ、あなただけの色＝「飴色」へ。</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="order-1 lg:order-2">
-                <span className="text-[#8c7b6c] font-bold tracking-[0.2em] uppercase text-xs">AGING PROCESS</span>
-                <h3 className="mt-4 text-4xl font-serif font-medium text-[#3d3126] mb-8">
-                  「劣化」ではなく、「熟成」。
-                </h3>
-                <p className="text-[#5a4d41] leading-relaxed mb-6 text-lg">
-                  プラスチックの名刺は傷つけば「劣化」しますが、木の名刺は傷さえも「味」になります。<br />
-                </p>
-                <p className="text-[#5a4d41] leading-relaxed mb-8">
-                  手動でコーヒーを挽く時間を愛でるように、名刺が飴色に変わり、角が取れて手に馴染んでいく過程そのものを楽しんでください。
-                  それは、あなたのビジネスが時間をかけて信頼を積み重ねていく姿と重なります。
-                </p>
-                <div className="inline-block p-4 border-l-2 border-[#d4c5ae] bg-[#fdfbf7]">
-                  <p className="text-sm text-[#8c7b6c] italic font-serif">
-                    &quot;世界に一つだけの、あなたと共に育つ名刺です。&quot;
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Our Roots Section (Kamiichi Lumber) */}
-        <section className="py-32 bg-[#2c3e50] text-[#d4c5ae] relative overflow-hidden">
-          {/* Decorative shapes */}
-          <div className="absolute top-0 right-0 -mr-40 -mt-40 w-[30rem] h-[30rem] bg-[#3e5266] rounded-full opacity-30 blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 -ml-40 -mb-40 w-[30rem] h-[30rem] bg-[#1a252f] rounded-full opacity-50 blur-3xl"></div>
-
-          <div className="max-w-7xl mx-auto px-6 relative z-10">
-            <div className="max-w-3xl mx-auto text-center">
-              <span className="text-[#8c7b6c] font-bold tracking-[0.2em] uppercase text-xs">OUR AUTHENTICITY</span>
-              <h3 className="mt-4 text-4xl font-serif font-medium text-white mb-10">
-                大阪・北摂、上一木材の誇り。
-              </h3>
-              <p className="text-lg leading-8 text-[#d4c5ae]/90 mb-12 font-light">
-                私たちはIT企業ではありません。<br />
-                大阪・北摂（吹田）の地で代々続く、<span className="text-white font-medium border-b border-[#d4c5ae]/30 pb-0.5">材木屋</span>から生まれました。<br />
-                デジタル全盛の今だからこそ、「本物の木の力」を届けたい。
-              </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
-                <div className="p-8 rounded-2xl bg-[#3e5266]/30 border border-[#3e5266] backdrop-blur-sm">
-                  <h5 className="text-white font-serif text-lg mb-3">0.1ミリの職人技</h5>
-                  <p className="text-sm text-[#d4c5ae]/80 leading-relaxed">
-                    職人が一枚ずつ木目を読み、ICチップを埋め込む。その妥協なき精度は、単なるガジェットではなく、工芸品としての品格を宿します。
-                  </p>
-                </div>
-                <div className="p-8 rounded-2xl bg-[#3e5266]/30 border border-[#3e5266] backdrop-blur-sm">
-                  <h5 className="text-white font-serif text-lg mb-3">サステナブルな循環</h5>
-                  <p className="text-sm text-[#d4c5ae]/80 leading-relaxed">
-                    使用する木材は、適切な管理下にある国産材を中心に使用。木を使うことで森を守る、美しい循環の一部を担っています。
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Use Cases Grid */}
+        {/* --- [NEW] Use Cases Section --- */}
         <section className="py-32 bg-[#fdfbf7]">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-20">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeIn}
+              className="text-center mb-20"
+            >
               <h3 className="text-3xl font-serif font-bold text-[#3d3126]">
-                あらゆるシーンで、<br className="sm:hidden" />あなたらしさを表現
+                あらゆるシーンで、<br className="sm:hidden" />あなたらしさを表現。
               </h3>
-            </div>
+            </motion.div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Business */}
-              <div className="bg-white p-10 rounded-3xl shadow-sm border border-[#e6e2d3] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-                <div className="h-14 w-14 bg-[#2c3e50] rounded-2xl flex items-center justify-center text-white mb-8 group-hover:scale-110 transition-transform">
-                  <UserCheck className="h-7 w-7" />
-                </div>
-                <h4 className="text-xl font-bold text-[#2c3e50] mb-4 font-serif">Business</h4>
-                <p className="text-[#5a4d41] text-sm leading-relaxed">
-                  商談や交流会で、信頼感を伝える唯一無二のツールとして。環境への配慮もアピールでき、企業のブランドイメージを高めます。
-                </p>
-              </div>
-
-              {/* Creator */}
-              <div className="bg-white p-10 rounded-3xl shadow-sm border border-[#e6e2d3] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-                <div className="h-14 w-14 bg-[#a4b494] rounded-2xl flex items-center justify-center text-white mb-8 group-hover:scale-110 transition-transform">
-                  <Palette className="h-7 w-7" />
-                </div>
-                <h4 className="text-xl font-bold text-[#2c3e50] mb-4 font-serif">Creator</h4>
-                <p className="text-[#5a4d41] text-sm leading-relaxed">
-                  作品への想いを、一枚の木に込めて。ポートフォリオサイトやSNSへのリンクをまとめ、あなたの世界観を余すことなく伝えます。
-                </p>
-              </div>
-
-              {/* Personal */}
-              <div className="bg-white p-10 rounded-3xl shadow-sm border border-[#e6e2d3] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-                <div className="h-14 w-14 bg-[#d4c5ae] rounded-2xl flex items-center justify-center text-white mb-8 group-hover:scale-110 transition-transform">
-                  <Leaf className="h-7 w-7" />
-                </div>
-                <h4 className="text-xl font-bold text-[#2c3e50] mb-4 font-serif">Personal</h4>
-                <p className="text-[#5a4d41] text-sm leading-relaxed">
-                  趣味やSNSを、自然な形で共有。無機質なQRコードではなく、温かみのある木の名刺で、より親密なつながりを築きましょう。
-                </p>
-              </div>
+              {[
+                { title: "Business", icon: Briefcase, desc: "商談や交流会で。信頼感を伝える唯一無二のツール。" },
+                { title: "Creator", icon: Palette, desc: "作品への想いを、一枚の木に込めて。ポートフォリオへのリンク。" },
+                { title: "Personal", icon: User, desc: "趣味やSNSを、自然な形で共有。" }
+              ].map((useCase) => (
+                <motion.div
+                  key={useCase.title}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeIn}
+                  className="bg-white p-10 rounded-3xl border border-[#e6e2d3] shadow-sm hover:shadow-lg transition-shadow duration-300 text-center group"
+                >
+                  <div className="w-16 h-16 mx-auto bg-[#fdfbf7] rounded-full flex items-center justify-center mb-6 group-hover:bg-[#2c3e50] group-hover:text-white transition-colors duration-300">
+                    <useCase.icon className="h-7 w-7 text-[#2c3e50] group-hover:text-white" />
+                  </div>
+                  <h4 className="text-xl font-bold text-[#2c3e50] mb-4 font-serif">{useCase.title}</h4>
+                  <p className="text-[#5a4d41] text-sm leading-relaxed">{useCase.desc}</p>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
+
+        {/* --- [NEW] FAQ Section --- */}
+        <section className="py-24 bg-white border-y border-[#e6e2d3]/50">
+          <div className="max-w-3xl mx-auto px-6">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeIn}
+              className="text-center mb-16"
+            >
+              <h2 className="text-2xl font-bold text-[#3d3126]">よくある質問</h2>
+            </motion.div>
+
+            <div className="space-y-2">
+              <FaqItem
+                question="アプリのインストールは必要ですか？"
+                answer="必要ありません。相手のスマートフォンのNFC読み取り部分（上部背面など）にかざすだけで、標準ブラウザにてプロフィールが表示されます。"
+              />
+              <FaqItem
+                question="電池交換は必要ですか？"
+                answer="いいえ、不要です。スマートフォンから発せられる微弱な電波で動作するNFC技術を使用しているため、充電や電池交換なしで半永久的にご使用いただけます。"
+              />
+              <FaqItem
+                question="水に濡れても大丈夫ですか？"
+                answer="生活防水レベルのコーティングを施しておりますので、多少の水濡れは問題ありません。ただし、天然木を使用しているため、長時間の水没や高温多湿な環境は避けてください。"
+              />
+              <FaqItem
+                question="名刺の内容は後から変更できますか？"
+                answer="はい、可能です。専用のダッシュボードにログインしていただくことで、いつでもリアルタイムに登録情報を変更・更新できます。相手に再配布する必要はありません。"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* --- CTA Section --- */}
+        <section className="py-32 bg-[#2c3e50] text-center px-6 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] mix-blend-overlay"></div>
+          <div className="relative z-10 max-w-3xl mx-auto">
+            <motion.h2
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeIn}
+              className="text-4xl sm:text-5xl font-serif font-bold text-[#fdfbf7] mb-8"
+            >
+              最初で最後の、名刺を持とう。
+            </motion.h2>
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeIn}
+            >
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-2 rounded-full bg-[#d4a373] text-[#2c3e50] px-12 py-5 text-xl font-bold hover:bg-[#e6b88a] transition-colors shadow-lg hover:shadow-xl hover:-translate-y-1"
+              >
+                無料でカードを作成 <ArrowRight className="h-6 w-6" />
+              </Link>
+            </motion.div>
+          </div>
+        </section>
+
       </main>
 
-      <footer className="bg-[#3d3126] py-12 px-6 text-[#d4c5ae]">
+      {/* --- Footer --- */}
+      <footer className="bg-[#3d3126] py-12 px-6 text-[#d4c5ae] border-t border-[#d4c5ae]/10">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="WoodLinks Logo" className="h-8 w-8 object-contain" />
-            <span className="font-serif text-xl font-bold text-white">WoodLinks</span>
+            <img src="/logo.png" alt="WoodLinks Logo" className="h-8 w-8 object-contain opacity-80" />
+            <span className="font-serif text-xl font-bold text-white tracking-wide">WoodLinks</span>
           </div>
           <p className="text-sm opacity-60">
             &copy; {new Date().getFullYear()} WoodLinks. All rights reserved.
