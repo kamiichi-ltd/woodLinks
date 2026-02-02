@@ -15,6 +15,7 @@ if (!supabaseServiceKey || !adminEmail) {
 }
 
 // Admin Service Role Client (for data access)
+// Inject Database type to ensure orders table is recognized
 const adminDbClient = createClient<Database>(supabaseUrl, supabaseServiceKey)
 
 async function verifyAdmin() {
