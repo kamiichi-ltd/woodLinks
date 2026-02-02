@@ -27,7 +27,8 @@ export async function logAnalyticsEvent(event: AnalyticsEvent) {
         osName = os.name || 'unknown'
     }
 
-    const { error } = await supabase.from('analytics').insert({
+    // supabaseをanyにキャストして型チェックをスキップする
+    const { error } = await (supabase as any).from('analytics').insert({
         card_id: event.cardId,
         event_type: event.eventType,
         device_type: deviceType,
