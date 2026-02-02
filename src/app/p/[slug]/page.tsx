@@ -8,7 +8,8 @@ import { ViewCounter } from '@/components/analytics/view-counter'
 import PublicNavigation from '@/components/public/public-navigation'
 import ContactSaveButton from '@/components/public/contact-save-button'
 
-type CardContent = Database['public']['Tables']['card_contents']['Row']
+// 変更前: Database['public']['Tables']['card_contents']['Row']
+type CardContent = any
 
 // Helper guard
 function isSnsContent(content: unknown): content is { platform: string; url: string } {
