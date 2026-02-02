@@ -41,7 +41,7 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
-                    {orders.map((order) => (
+                    {orders.map((order: any) => (
                         <tr key={order.id} className="hover:bg-stone-50/50 transition-colors">
                             <td className="px-6 py-4 align-top">
                                 <div className="font-mono text-xs text-stone-400 mb-1">
@@ -56,7 +56,7 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                             </td>
                             <td className="px-6 py-4 align-top">
                                 <div className="font-bold text-stone-800">
-                                    {order.profiles?.full_name || order.shipping_name || order.profiles?.email || 'Unknown'}
+                                    {order.profiles?.full_name || (order as any).shipping_name || order.profiles?.email || 'Unknown'}
                                 </div>
                                 <div className="text-stone-500 text-xs">
                                     {order.profiles?.email}
@@ -76,11 +76,11 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                                 </div>
                             </td>
                             <td className="px-6 py-4 align-top text-stone-600 max-w-xs">
-                                <div className="font-bold">{order.shipping_name}</div>
-                                <div>〒{order.shipping_postal}</div>
-                                <div>{order.shipping_address1}</div>
-                                {order.shipping_address2 && <div>{order.shipping_address2}</div>}
-                                <div className="text-xs text-stone-400 mt-1">📞 {order.shipping_phone}</div>
+                                <div className="font-bold">{(order as any).shipping_name}</div>
+                                <div>〒{(order as any).shipping_postal}</div>
+                                <div>{(order as any).shipping_address1}</div>
+                                {(order as any).shipping_address2 && <div>{(order as any).shipping_address2}</div>}
+                                <div className="text-xs text-stone-400 mt-1">📞 {(order as any).shipping_phone}</div>
                             </td>
                             <td className="px-6 py-4 align-top">
                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${order.status === 'paid' ? 'bg-green-100 text-green-800' :
