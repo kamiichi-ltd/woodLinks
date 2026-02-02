@@ -16,7 +16,12 @@ import {
   Palette,
   User,
   Plus,
-  Minus
+  Minus,
+  Check,
+  X,
+  Droplets,
+  Hammer,
+  Award
 } from 'lucide-react'
 
 // --- Animation Variants ---
@@ -127,7 +132,7 @@ export default function Home() {
                 名刺交換の瞬間を、記憶に残る「体験」へ。
               </motion.p>
 
-              <motion.div variants={fadeIn} className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+              <motion.div variants={fadeIn} className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-8">
                 <Link
                   href="/login"
                   className="w-full sm:w-auto h-14 px-8 rounded-full bg-[#2c3e50] text-white font-bold flex items-center justify-center gap-2 hover:bg-[#1a252f] transition-all shadow-xl shadow-[#2c3e50]/20 hover:-translate-y-1"
@@ -140,6 +145,19 @@ export default function Home() {
                 >
                   デモを見る <Smartphone className="h-5 w-5" />
                 </Link>
+              </motion.div>
+
+              {/* [NEW] Compatibility Badge */}
+              <motion.div variants={fadeIn} className="flex items-center justify-center lg:justify-start gap-4 text-xs font-semibold text-[#8c7b6c] opacity-80">
+                <div className="flex items-center gap-1.5">
+                  <Check className="h-4 w-4 text-[#a4b494]" />
+                  Works with iPhone & Android
+                </div>
+                <span className="w-1 h-1 rounded-full bg-[#e6e2d3]"></span>
+                <div className="flex items-center gap-1.5">
+                  <Check className="h-4 w-4 text-[#a4b494]" />
+                  No App Needed
+                </div>
               </motion.div>
             </motion.div>
 
@@ -280,7 +298,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* --- [NEW] Brand Story Section --- */}
+        {/* --- Brand Story Section --- */}
         <section className="py-32 bg-[#2c3e50] text-[#fdfbf7] relative overflow-hidden">
           {/* Shapes */}
           <div className="absolute -top-20 -right-20 w-96 h-96 bg-[#3e5266] rounded-full blur-[100px] opacity-40"></div>
@@ -307,6 +325,63 @@ export default function Home() {
                 </p>
               </div>
             </motion.div>
+          </div>
+        </section>
+
+        {/* --- [NEW] Comparison Section (ROI) --- */}
+        <section className="py-24 bg-white border-b border-[#e6e2d3]">
+          <div className="max-w-4xl mx-auto px-6">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeIn}
+              className="text-center mb-16"
+            >
+              <h2 className="text-3xl font-serif font-bold text-[#3d3126] mb-4">コストも、資源も、無駄にしない。</h2>
+              <p className="text-[#8c7b6c]">使い捨ての時代に、一生モノの選択を。</p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Paper Card */}
+              <div className="p-8 rounded-2xl bg-[#f4f4f4] border border-[#dddddd] text-[#777777]">
+                <h4 className="text-xl font-bold mb-6 text-center">一般的な紙名刺</h4>
+                <ul className="space-y-4">
+                  <li className="flex items-center gap-3">
+                    <X className="h-5 w-5 text-red-400 shrink-0" />
+                    <span>終わりのない印刷コスト</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <X className="h-5 w-5 text-red-400 shrink-0" />
+                    <span>情報変更のたびに廃棄</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <X className="h-5 w-5 text-red-400 shrink-0" />
+                    <span>90%は1週間以内に捨てられる</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* WoodLinks Card */}
+              <div className="p-8 rounded-2xl bg-white border-2 border-[#d4a373] shadow-lg relative overflow-hidden">
+                <div className="absolute top-0 right-0 bg-[#d4a373] text-white text-xs font-bold px-3 py-1 rounded-bl-lg">RECOMMENDED</div>
+                <h4 className="text-xl font-bold mb-6 text-center text-[#3d3126]">WoodLinks</h4>
+                <ul className="space-y-4">
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-[#d4a373] shrink-0" />
+                    <span className="font-bold text-[#2c3e50]">一度の投資で、半永久的に</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-[#d4a373] shrink-0" />
+                    <span className="font-bold text-[#2c3e50]">リアルタイムで情報更新</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-[#d4a373] shrink-0" />
+                    <span className="font-bold text-[#2c3e50]">相手のスマホに確実に残る</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -359,7 +434,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* --- [NEW] Use Cases Section --- */}
+        {/* --- Use Cases Section --- */}
         <section className="py-32 bg-[#fdfbf7]">
           <div className="max-w-7xl mx-auto px-6">
             <motion.div
@@ -399,7 +474,47 @@ export default function Home() {
           </div>
         </section>
 
-        {/* --- [NEW] FAQ Section --- */}
+        {/* --- [NEW] Specs & Warranty --- */}
+        <section className="py-20 bg-white border-t border-[#e6e2d3]">
+          <div className="max-w-5xl mx-auto px-6">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeIn}
+              className="text-center mb-12"
+            >
+              <h3 className="text-2xl font-bold text-[#3d3126] mb-2 font-serif">材木屋の品質保証</h3>
+              <p className="text-sm text-[#8c7b6c]">長く愛用していただくための、こだわり。</p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-12 h-12 bg-[#ecf4ff] rounded-full flex items-center justify-center text-[#4a90e2] mb-4">
+                  <Droplets className="h-6 w-6" />
+                </div>
+                <h4 className="font-bold text-[#2c3e50] mb-2">Water Resistant</h4>
+                <p className="text-xs text-[#5a4d41] leading-relaxed max-w-xs">独自のウレタン/オイル塗装で、水濡れや汚れに強い。</p>
+              </div>
+              <div className="flex flex-col items-center text-center">
+                <div className="w-12 h-12 bg-[#fff4e5] rounded-full flex items-center justify-center text-[#f5a623] mb-4">
+                  <Hammer className="h-6 w-6" />
+                </div>
+                <h4 className="font-bold text-[#2c3e50] mb-2">Durable</h4>
+                <p className="text-xs text-[#5a4d41] leading-relaxed max-w-xs">特殊乾燥技術により、木の反りや割れを極限まで抑制。</p>
+              </div>
+              <div className="flex flex-col items-center text-center">
+                <div className="w-12 h-12 bg-[#e8f5e9] rounded-full flex items-center justify-center text-[#66bb6a] mb-4">
+                  <Award className="h-6 w-6" />
+                </div>
+                <h4 className="font-bold text-[#2c3e50] mb-2">1-Year Warranty</h4>
+                <p className="text-xs text-[#5a4d41] leading-relaxed max-w-xs">万が一のNFCチップ不良には、1年間の無料交換保証。</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* --- FAQ Section --- */}
         <section className="py-24 bg-white border-y border-[#e6e2d3]/50">
           <div className="max-w-3xl mx-auto px-6">
             <motion.div

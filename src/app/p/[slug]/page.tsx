@@ -6,6 +6,7 @@ import { createClient } from '@/utils/supabase/server'
 
 import { ViewCounter } from '@/components/analytics/view-counter'
 import PublicNavigation from '@/components/public/public-navigation'
+import ContactSaveButton from '@/components/public/contact-save-button'
 
 type CardContent = Database['public']['Tables']['card_contents']['Row']
 
@@ -24,12 +25,12 @@ function isTextContent(content: unknown): content is { text: string } {
 }
 
 const platformConfig: Record<string, { icon: LucideIcon, label: string, color: string }> = {
-    twitter: { icon: Twitter, label: 'X (Twitter)', color: 'text-black' },
-    instagram: { icon: Instagram, label: 'Instagram', color: 'text-pink-600' },
-    facebook: { icon: Facebook, label: 'Facebook', color: 'text-[#1877F2]' },
-    github: { icon: Github, label: 'GitHub', color: 'text-gray-900' },
-    website: { icon: Globe, label: 'Website', color: 'text-gray-600' },
-    phone: { icon: Phone, label: 'Phone', color: 'text-green-600' },
+    twitter: { icon: Twitter, label: 'X (Twitter)', color: 'text-stone-700' },
+    instagram: { icon: Instagram, label: 'Instagram', color: 'text-rose-600' },
+    facebook: { icon: Facebook, label: 'Facebook', color: 'text-blue-700' },
+    github: { icon: Github, label: 'GitHub', color: 'text-stone-800' },
+    website: { icon: Globe, label: 'Website', color: 'text-stone-600' },
+    phone: { icon: Phone, label: 'Phone', color: 'text-green-700' },
     email: { icon: Mail, label: 'Email', color: 'text-stone-600' },
 }
 
@@ -49,37 +50,25 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
 }
 
-// Theme Configurations
+// Refined Themes - Controls Header Accent
 const themes = {
     sugi: {
-        bg: 'bg-[#faf9f6]',
-        text: 'text-stone-800',
-        accent: 'text-[#d4a373]',
-        border: 'border-[#d4a373]',
-        fontHead: 'font-sans',
-        pattern: 'opacity-10 bg-[url("https://www.transparenttextures.com/patterns/wood-pattern.png")]',
-        button: 'bg-[#d4a373] hover:bg-[#c5915d] text-white',
-        cardBg: 'bg-white',
+        name: 'Sugi',
+        headerBg: 'bg-[#d4a373]',
+        accentText: 'text-[#d4a373]',
+        texture: 'opacity-20 bg-[url("https://www.transparenttextures.com/patterns/wood-pattern.png")]',
     },
     hinoki: {
-        bg: 'bg-[#fdfbf7]',
-        text: 'text-[#2c3e50]',
-        accent: 'text-[#e9d8a6]',
-        border: 'border-[#e9d8a6]',
-        fontHead: 'font-serif',
-        pattern: 'opacity-5 bg-[url("https://www.transparenttextures.com/patterns/wood-pattern.png")]',
-        button: 'bg-[#2c3e50] hover:bg-[#1a252f] text-[#fdfbf7]',
-        cardBg: 'bg-[#ffffff]',
+        name: 'Hinoki',
+        headerBg: 'bg-[#e9d8a6]',
+        accentText: 'text-[#cbb89d]', // Darker for text visibility
+        texture: 'opacity-10 bg-[url("https://www.transparenttextures.com/patterns/wood-pattern.png")]',
     },
     walnut: {
-        bg: 'bg-[#1a1a1a]',
-        text: 'text-[#e6e2d3]',
-        accent: 'text-[#6b4c3e]',
-        border: 'border-[#6b4c3e]',
-        fontHead: 'font-serif',
-        pattern: 'opacity-20 bg-[url("https://www.transparenttextures.com/patterns/wood-pattern.png")]',
-        button: 'bg-[#6b4c3e] hover:bg-[#5a3b2f] text-[#fdfbf7]',
-        cardBg: 'bg-[#2c2c2c] border-[#444]',
+        name: 'Walnut',
+        headerBg: 'bg-[#6b4c3e]',
+        accentText: 'text-[#6b4c3e]',
+        texture: 'opacity-30 bg-[url("https://www.transparenttextures.com/patterns/wood-pattern.png")]',
     },
 }
 
@@ -97,63 +86,69 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
     const isOwner = user?.id === card.user_id
 
     const material = card.material_type || 'sugi'
-    const theme = themes[material]
+    const theme = themes[material as keyof typeof themes] || themes.sugi
 
     return (
-        <div className={`min-h-screen ${theme.bg} flex flex-col items-center py-12 sm:px-6 lg:px-8 font-sans ${theme.text} relative overflow-hidden transition-colors duration-500`}>
+        <div className="min-h-screen bg-[#fdfbf7] flex flex-col items-center justify-center py-12 px-4 sm:px-6 relative overflow-hidden font-sans">
+            {/* Global Noise Texture */}
+            <div className="absolute inset-0 pointer-events-none opacity-50 z-0 bg-[url('https://www.transparenttextures.com/patterns/noise-lines.png')] mix-blend-multiply"></div>
+
             {/* Navigation & Actions */}
             <PublicNavigation isOwner={isOwner} cardId={card.id} />
-
-            {/* Background Texture */}
-            <div className={`absolute inset-0 ${theme.pattern} pointer-events-none mix-blend-multiply`}></div>
-
             <ViewCounter cardId={card.id} />
 
-            <div className={`w-full max-w-sm space-y-6 ${theme.cardBg} p-8 shadow-2xl rounded-[2rem] border ${material === 'walnut' ? 'border-[#444]' : 'border-stone-100'} relative z-10`}>
+            {/* Main Card Container */}
+            <div className="w-full max-w-[400px] bg-white rounded-[2.5rem] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15),0_0_0_1px_rgba(0,0,0,0.02)] overflow-hidden relative z-10 transform transition-all duration-500 hover:shadow-[0_35px_60px_-15px_rgba(0,0,0,0.2)]">
 
-                {/* Header */}
-                <div className="text-center pt-2">
-                    {/* Logo/Avatar */}
-                    <div className={`mx-auto h-28 w-28 rounded-full flex items-center justify-center text-5xl mb-6 shadow-lg overflow-hidden relative border-4 ${material === 'walnut' ? 'border-[#3d3126]' : 'border-white'} bg-stone-100`}>
-                        {(card as { avatar_url?: string | null } & typeof card).avatar_url ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                                src={(card as { avatar_url?: string | null } & typeof card).avatar_url!}
-                                alt={card.title || 'Avatar'}
-                                className="h-full w-full object-cover"
-                            />
-                        ) : (
-                            <span className="text-4xl">
-                                {card.title ? card.title.charAt(0).toUpperCase() : '🌲'}
-                            </span>
+                {/* Wood Accent Header */}
+                <div className={`h-32 w-full relative ${theme.headerBg} overflow-hidden`}>
+                    <div className={`absolute inset-0 ${theme.texture} mix-blend-multiply`}></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+                </div>
+
+                {/* Profile Avatar (Floating over header) */}
+                <div className="px-8 relative -mt-16 text-center">
+                    <div className="mx-auto h-32 w-32 rounded-full p-1.5 bg-white shadow-lg">
+                        <div className="h-full w-full rounded-full overflow-hidden bg-stone-100 flex items-center justify-center relative">
+                            {(card as { avatar_url?: string | null } & typeof card).avatar_url ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                    src={(card as { avatar_url?: string | null } & typeof card).avatar_url!}
+                                    alt={card.title || 'Avatar'}
+                                    className="h-full w-full object-cover"
+                                />
+                            ) : (
+                                <span className="text-4xl text-stone-400">
+                                    {card.title ? card.title.charAt(0).toUpperCase() : '🌲'}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Name & Title */}
+                    <div className="mt-4 mb-8">
+                        <h1 className="text-3xl font-serif font-bold text-[#2c3e50] tracking-wide mb-3">
+                            {card.title}
+                        </h1>
+                        {card.description && (
+                            <p className="text-sm text-[#8c7b6c] whitespace-pre-wrap leading-relaxed font-medium">
+                                {card.description}
+                            </p>
                         )}
                     </div>
-                    <h1 className={`text-3xl ${theme.fontHead} font-bold tracking-tight mb-3`}>
-                        {card.title}
-                    </h1>
-                    {card.description && (
-                        <p className={`text-sm ${material === 'walnut' ? 'text-stone-400' : 'text-stone-500'} whitespace-pre-wrap leading-relaxed`}>
-                            {card.description}
-                        </p>
-                    )}
+
+                    {/* CTA Button */}
+                    <ContactSaveButton
+                        cardId={card.id}
+                        themeButtonClass="bg-gradient-to-br from-[#5d4037] to-[#3e2723] text-white shadow-lg shadow-[#3e2723]/30 flex items-center justify-center gap-2 group"
+                    />
                 </div>
 
-                {/* Action Buttons */}
-                <div className="mt-8">
-                    <a
-                        href={`/api/cards/${card.id}/vcard`}
-                        className={`w-full flex justify-center items-center py-4 px-4 rounded-xl shadow-md text-sm font-bold tracking-wide transform transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] ${theme.button}`}
-                    >
-                        <UserPlus className="h-4 w-4 mr-2" />
-                        Add to Contacts / 連絡先に追加
-                    </a>
-                </div>
-
-                {/* Contents List */}
-                <div className="mt-10 space-y-4">
+                {/* Links Section */}
+                <div className="px-6 py-8 space-y-4 bg-gradient-to-b from-white to-[#faf9f6]">
                     {card.contents.length === 0 && (
-                        <div className="text-center py-10">
-                            <p className="text-stone-400 text-sm">表示できる情報がありません</p>
+                        <div className="text-center py-6 border-2 border-dashed border-stone-200 rounded-xl">
+                            <p className="text-stone-400 text-sm font-sans">情報がまだありません</p>
                         </div>
                     )}
 
@@ -163,47 +158,55 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
                             const config = platformConfig[platform] || { icon: LinkIcon, label: platform, color: 'text-gray-600' }
                             const Icon = config.icon
 
-                            // Customizing icon colors for walnut/dark theme if needed, or keeping brand colors
-                            // For consistency, let's keep brand colors but ensure visibility
-
                             return (
                                 <a
                                     key={item.id}
                                     href={url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className={`
-                                        w-full flex items-center px-6 py-4 rounded-xl transition-all duration-300 group
-                                        ${material === 'walnut'
-                                            ? 'bg-[#333] border border-[#444] hover:bg-[#444] text-stone-300 hover:text-white shadow-none'
-                                            : 'bg-white border border-stone-100 hover:bg-[#faf9f6] hover:shadow-md text-stone-700 hover:text-stone-900 shadow-sm'}
-                                    `}
+                                    className="group flex items-center p-1 rounded-xl bg-white border border-[#e6e2d3] shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0"
                                 >
-                                    <Icon className={`h-5 w-5 mr-4 ${config.color} ${material === 'walnut' ? 'opacity-90' : ''}`} />
-                                    <span className="flex-1 text-base font-bold capitalize">{config.label}</span>
-                                    <span className={`${material === 'walnut' ? 'text-stone-600' : 'text-stone-300'} group-hover:text-stone-500`}>↗</span>
+                                    <div className="h-12 w-12 rounded-lg bg-[#fdfbf7] flex items-center justify-center border border-[#f0ebe0] group-hover:bg-[#f4f1ea] transition-colors">
+                                        <Icon className={`h-5 w-5 ${config.color}`} />
+                                    </div>
+                                    <div className="ml-4 flex-1">
+                                        <span className="block text-sm font-bold text-[#3d3126] group-hover:text-black transition-colors">{config.label}</span>
+                                    </div>
+                                    <div className="mr-4 text-stone-300 group-hover:text-[#d4a373] transition-colors">
+                                        <ArrowUpRightIcon />
+                                    </div>
                                 </a>
                             )
                         }
 
                         if (item.type === 'text' && isTextContent(item.content)) {
                             return (
-                                <div key={item.id} className={`rounded-xl p-6 text-center text-sm leading-relaxed border ${material === 'walnut' ? 'bg-[#333] border-[#444] text-stone-400' : 'bg-[#faf9f6] border-stone-100 text-stone-600'}`}>
-                                    <p className="whitespace-pre-wrap">{item.content.text}</p>
+                                <div key={item.id} className="relative p-6 rounded-xl bg-[#fdfbf7] border border-[#e6e2d3] shadow-inner text-center">
+                                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#e6e2d3] to-transparent opacity-50"></div>
+                                    <p className="text-[#5a4d41] text-sm leading-relaxed whitespace-pre-wrap font-medium">
+                                        {item.content.text}
+                                    </p>
                                 </div>
                             )
                         }
-
                         return null
                     })}
                 </div>
 
-                {/* Footer */}
-                <div className="mt-12 text-center text-xs opacity-50">
-                    <span className="font-serif">WoodLinks</span> Digital Card
+                {/* Footer Brand */}
+                <div className="pb-6 text-center">
+                    <p className="text-[10px] text-[#d4c5ae] font-bold tracking-[0.2em] uppercase">POWERED BY WOODLINKS</p>
                 </div>
-
             </div>
         </div>
+    )
+}
+
+function ArrowUpRightIcon() {
+    return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="7" y1="17" x2="17" y2="7"></line>
+            <polyline points="7 7 17 7 17 17"></polyline>
+        </svg>
     )
 }
