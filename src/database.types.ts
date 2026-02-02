@@ -29,15 +29,17 @@ export interface Database {
                     email?: string | null
                 }
             }
-            orders: { // ここが重要！ cards ではなく orders にします
+            orders: {
                 Row: {
                     id: string
                     created_at: string
+                    updated_at: string | null // 追加
                     user_id: string
                     slug: string
                     title: string | null
                     description: string | null
                     status: string | null
+                    tracking_number: string | null // 追加（念のため）
                     image_url: string | null
                     theme: string | null
                     social_links: Json | null
@@ -45,11 +47,13 @@ export interface Database {
                 Insert: {
                     id?: string
                     created_at?: string
+                    updated_at?: string | null // 追加
                     user_id?: string
                     slug: string
                     title?: string | null
                     description?: string | null
                     status?: string | null
+                    tracking_number?: string | null // 追加
                     image_url?: string | null
                     theme?: string | null
                     social_links?: Json | null
@@ -57,11 +61,13 @@ export interface Database {
                 Update: {
                     id?: string
                     created_at?: string
+                    updated_at?: string | null // 追加
                     user_id?: string
                     slug?: string
                     title?: string | null
                     description?: string | null
                     status?: string | null
+                    tracking_number?: string | null // 追加
                     image_url?: string | null
                     theme?: string | null
                     social_links?: Json | null
