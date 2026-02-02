@@ -1,8 +1,6 @@
 import { Database } from '@/database.types';
-import { cn } from '@/utils/cn'; // Assuming utils/cn or similar exists, if not I'll use template literals or classnames. 
-// Just in case, I will use standard template literals if cn is not confirmed, but checking used files usually shows if cn is available. 
-// WoodLinks usually has Tailwind. I'll stick to standard template literals for safety or check imports.
-// Checking previous file reads... No utils/cn seen. Safe bet is just template strings.
+import { cn } from '@/lib/utils';
+
 
 import { Check, Circle, Clock, Truck, Hammer, CreditCard, FileText } from 'lucide-react';
 
