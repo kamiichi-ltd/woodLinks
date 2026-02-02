@@ -2,7 +2,8 @@ import { getPublicCardById } from '@/services/card-service'
 import { NextRequest, NextResponse } from 'next/server'
 import { Database } from '@/database.types'
 
-type CardContent = Database['public']['Tables']['card_contents']['Row']
+// 変更前: Database['public']['Tables']['card_contents']['Row']
+type CardContent = any
 
 // Helper guard
 function isSnsContent(content: unknown): content is { platform: string; url: string } {
