@@ -44,7 +44,7 @@ export default function AnalyticsChart({ data }: { data: DailyViews[] }) {
                             allowDecimals={false}
                         />
                         <Tooltip
-                            formatter={(value: number) => [value, '閲覧数']}
+                            formatter={(value: any) => [value, '閲覧数']}
                             contentStyle={{
                                 backgroundColor: '#2c3e50',
                                 border: 'none',
