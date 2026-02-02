@@ -8,6 +8,7 @@ import CardQRCode from '@/components/cards/card-qr-code'
 import { createClient } from '@/utils/supabase/server'
 import { OrderSection } from '@/components/orders/order-section'
 import { Database } from '@/database.types'
+import { DeleteProjectButton } from '@/components/dashboard/delete-project-button'
 
 type Order = Database['public']['Tables']['orders']['Row']
 
@@ -131,6 +132,20 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
                         initialStatus={card.status}
                         initialMaterialType={card.material_type || 'sugi'}
                     />
+
+                    {/* Danger Zone */}
+                    <div className="pt-8 mt-8 border-t border-stone-200">
+                        <h3 className="text-sm font-bold text-red-800 mb-4 uppercase tracking-wider">Danger Zone</h3>
+                        <div className="bg-red-50 border border-red-200 rounded-2xl p-6">
+                            <p className="text-sm text-red-700 mb-4">
+                                このプロジェクト（名刺）を削除すると、設定したコンテンツやリンクは全て失われます。<br />
+                                支払い済みの注文がある場合は削除できません。
+                            </p>
+                            <div className="flex justify-end">
+                                <DeleteProjectButton cardId={card.id} layout="text" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

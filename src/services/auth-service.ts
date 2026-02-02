@@ -27,6 +27,15 @@ export async function login(formData: FormData) {
     }
 
     revalidatePath('/', 'layout')
+
+    // Admin Redirect
+    const { data: { user } } = await supabase.auth.getUser()
+    const adminEmail = process.env.ADMIN_EMAIL
+
+    if (user && adminEmail && user.email === adminEmail) {
+        redirect('/admin/orders')
+    }
+
     redirect('/dashboard')
 }
 

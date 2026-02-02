@@ -1,6 +1,7 @@
 import { getCards } from '@/services/card-service'
 import CreateCardForm from './create-card-form'
 import Link from 'next/link'
+import { DeleteProjectButton } from '@/components/dashboard/delete-project-button'
 
 export const dynamic = 'force-dynamic'
 
@@ -90,6 +91,11 @@ export default async function DashboardPage() {
                                         </span>
                                     </div>
                                 </div>
+                            </div>
+
+                            {/* Delete Button (Overlay) - Visible on hover or always for draft? Let's make it visible on hover */}
+                            <div className="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <DeleteProjectButton cardId={card.id} layout="icon" />
                             </div>
                         </Link>
                     ))}

@@ -56,7 +56,7 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                             </td>
                             <td className="px-6 py-4 align-top">
                                 <div className="font-bold text-stone-800">
-                                    {order.profiles?.full_name || 'Unknown'}
+                                    {order.profiles?.full_name || order.shipping_name || order.profiles?.email || 'Unknown'}
                                 </div>
                                 <div className="text-stone-500 text-xs">
                                     {order.profiles?.email}

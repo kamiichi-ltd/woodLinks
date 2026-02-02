@@ -7,6 +7,7 @@ import { OrderForm } from './order-form';
 import { OrderStatusView } from './order-status-view';
 import { OrderTimeline } from './order-timeline';
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { deleteOrder } from '@/app/actions/order';
 
 type Order = Database['public']['Tables']['orders']['Row'];
 
@@ -85,11 +86,8 @@ export function OrderSection({ cardId, initialOrders }: OrderSectionProps) {
             {!activeOrder ? (
                 <OrderForm cardId={cardId} onOrderCreated={handleOrderCreated} />
             ) : (
-                <div className="space-y-4">
-                    {/* If order is completed/cancelled, we might want to allow new order.
-               For now, Simplest: Just show the status view.
-            */}
-                    {/* If verifying payment, show loader instead of status view (which might show Pay button) */}
+                <div className="space-y-6">
+                    {/* Payment Success Polling View */}
                     {status === 'success' && activeOrder?.status === 'pending_payment' ? (
                         <div className="bg-white p-8 rounded-lg shadow border border-stone-200 text-center">
                             <Loader2 className="h-8 w-8 text-[#d4a373] animate-spin mx-auto mb-4" />
@@ -103,14 +101,30 @@ export function OrderSection({ cardId, initialOrders }: OrderSectionProps) {
                         <div className="space-y-6">
                             <OrderTimeline status={activeOrder.status} />
                             <OrderStatusView order={activeOrder} />
+
+                            {/* Delete Option for Pending Orders */}
+                            {activeOrder.status === 'pending_payment' && (
+                                <div className="text-center pt-4 border-t border-stone-200">
+                                    <button
+                                        onClick={async () => {
+                                            if (confirm('本当にこの名刺プロジェクトを削除しますか？\nこの操作は取り消せません。')) {
+                                                try {
+                                                    await deleteOrder(activeOrder.id);
+                                                    router.refresh();
+                                                } catch (e) {
+                                                    alert('削除に失敗しました');
+                                                    console.error(e);
+                                                }
+                                            }
+                                        }}
+                                        className="text-sm text-red-500 hover:text-red-700 hover:underline font-medium"
+                                    >
+                                        この名刺プロジェクトを削除する
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     )}
-
-                    {/* Allow re-order if cancelled or delivered (optional for now) 
-               {(activeOrder.status === 'cancelled' || activeOrder.status === 'delivered') && (
-                  <button onClick={() => setViewingForm(true)} ...>Order Again</button>
-               )}
-           */}
                 </div>
             )}
         </div>

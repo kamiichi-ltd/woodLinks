@@ -13,6 +13,13 @@ export default async function AdminLayout({
 
     const adminEmail = process.env.ADMIN_EMAIL
 
+    const NAV_ITEMS = [
+        { label: 'Orders', href: '/admin/orders', icon: Package, active: true },
+        // { label: 'Customers', href: '/admin/customers', icon: User, active: false }, // Future
+        { label: 'User Dashboard', href: '/dashboard', icon: LayoutDashboard, active: false },
+    ]
+
+
     // Security Check
     // 1. Must be logged in
     // 2. Must match ADMIN_EMAIL
@@ -30,14 +37,21 @@ export default async function AdminLayout({
                         <span className="font-bold text-lg tracking-tight">WoodLinks Admin</span>
                     </div>
                     <nav className="flex items-center gap-6 text-sm font-medium">
-                        <Link href="/admin/orders" className="hover:text-white transition-colors flex items-center gap-2 bg-stone-800 px-3 py-1.5 rounded-md">
-                            <Package className="h-4 w-4" />
-                            Orders
-                        </Link>
-                        <Link href="/dashboard" className="text-stone-400 hover:text-white transition-colors flex items-center gap-2">
-                            <LayoutDashboard className="h-4 w-4" />
-                            User Dashboard
-                        </Link>
+                        {NAV_ITEMS.map((item) => (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`
+                                    flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors
+                                    ${item.active
+                                        ? 'bg-stone-800 text-white'
+                                        : 'text-stone-400 hover:text-white'}
+                                `}
+                            >
+                                <item.icon className="h-4 w-4" />
+                                {item.label}
+                            </Link>
+                        ))}
                     </nav>
                 </div>
             </header>

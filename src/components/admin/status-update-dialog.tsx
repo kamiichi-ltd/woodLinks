@@ -60,9 +60,9 @@ export function StatusUpdateDialog({ orderId, currentStatus, onUpdate }: StatusU
         return (
             <button
                 onClick={() => setIsOpen(true)}
-                className="text-xs border border-stone-300 rounded px-2 py-1 hover:bg-stone-100 transition-colors"
+                className="text-xs border border-stone-300 rounded px-2 py-1 hover:bg-stone-100 transition-colors font-medium text-stone-600"
             >
-                Edit
+                詳細・更新
             </button>
         )
     }

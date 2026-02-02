@@ -13,11 +13,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: '2025-01-27.acacia' as any, // Bypass strict type check for now to match installed SDK
 })
 
-const PRICES = {
-    sugi: 5000,
-    hinoki: 6000,
-    walnut: 8000,
-} as const
+import { MATERIAL_PRICES, MaterialType } from '@/constants/prices';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
@@ -74,27 +70,30 @@ export async function createStripeCheckoutSession(orderIdInput: string | { id: s
     // 4. Calculate Price
     // Logic: Price is per 100 cards (implied by user request "5000JPY / 100 cards")
     // If quantity is e.g. 100, price is PRICES[material]
-    // If quantity is e.g. 200, price is PRICES[material] * 2? 
+    // If quantity is e.g. 200, price is PRICES[material] * 2?
     // For PoC, let's assume quantity is always a multiple of 100 or calculate prorated?
     // User request said: "Sugi: 5000 JPY / 100 cards"
     // Let's treat it as (Price / 100) * quantity
 
     // Validate material
-    const material = orderData.material as keyof typeof PRICES
-    if (!PRICES[material]) {
+    const material = orderData.material as MaterialType;
+
+    // Force quantity to 1 for "One Card Project" model
+    const quantity = 1;
+
+    if (!MATERIAL_PRICES[material]) {
         throw new Error('Invalid material')
     }
 
-    const unitPricePer100 = PRICES[material]
+    const price = MATERIAL_PRICES[material];
 
-    if (orderData.quantity <= 0) {
-        throw new Error('Invalid quantity')
+    // Check strict positive just in case
+    if (price <= 0) {
+        throw new Error('Invalid price')
     }
 
-    // quantity is total cards. 
-    // Stripe expects amount in smallest currency unit (JPY is 1 unit = 1 JPY, no decimals)
-    // Math.ceil just in case
-    const amount = Math.ceil((unitPricePer100 / 100) * orderData.quantity)
+    // Stripe expects amount in smallest currency unit (JPY is 1 unit = 1 JPY)
+    const amount = price;
 
     // 5. Create Stripe Session
     const session = await stripe.checkout.sessions.create({
@@ -103,8 +102,8 @@ export async function createStripeCheckoutSession(orderIdInput: string | { id: s
                 price_data: {
                     currency: 'jpy',
                     product_data: {
-                        name: `WoodLinks Card Order (${orderData.material})`,
-                        description: `Quantity: ${orderData.quantity}, Card: ${orderData.cards.title}`,
+                        name: `WoodLinks Device - ${orderData.material}`,
+                        description: `Digital Business Card Device (${orderData.cards.title})`,
                         metadata: {
                             card_id: orderData.card_id,
                         },

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createOrder, startCheckout } from '@/services/order-service';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { MATERIAL_PRICES, MaterialType } from '@/constants/prices';
 
 interface OrderFormProps {
     cardId: string;
@@ -17,7 +18,7 @@ export function OrderForm({ cardId, onOrderCreated }: OrderFormProps) {
 
     // Form States
     const [material, setMaterial] = useState<'sugi' | 'hinoki' | 'walnut'>('sugi');
-    const [quantity, setQuantity] = useState(100);
+    // quantity implicitly 1 (representing 1 set/project)
     const [shippingName, setShippingName] = useState('');
     const [shippingPostal, setShippingPostal] = useState('');
     const [shippingAddress1, setShippingAddress1] = useState('');
@@ -35,8 +36,8 @@ export function OrderForm({ cardId, onOrderCreated }: OrderFormProps) {
             console.log('[OrderForm] Calling createOrder...');
             const orderId = await createOrder({
                 card_id: cardId,
-                material,
-                quantity,
+                material: material as 'sugi' | 'hinoki' | 'walnut',
+                quantity: 1, // Fixed to 1 set per project
                 shipping_name: shippingName,
                 shipping_postal: shippingPostal,
                 shipping_address1: shippingAddress1,
@@ -97,18 +98,16 @@ export function OrderForm({ cardId, onOrderCreated }: OrderFormProps) {
                     </select>
                 </div>
 
-                {/* Quantity */}
+                {/* Quantity - Removed (Always 1) */}
+
+                {/* Price Display */}
                 <div>
-                    <label className="block text-sm font-medium text-stone-700 mb-1">枚数</label>
-                    <select
-                        value={quantity}
-                        onChange={(e) => setQuantity(Number(e.target.value))}
-                        className="w-full border border-stone-300 rounded px-3 py-2 focus:ring-2 focus:ring-stone-500 focus:outline-none"
-                    >
-                        <option value={100}>100枚</option>
-                        <option value={200}>200枚</option>
-                        <option value={300}>300枚</option>
-                    </select>
+                    <p className="block text-sm font-medium text-stone-700 mb-1">製作費用</p>
+                    <div className="w-full bg-stone-50 border border-stone-200 rounded px-3 py-3 flex justify-between items-center text-stone-800">
+                        <span className="text-sm">NFC搭載 木の名刺デバイス (1枚)</span>
+                        <span className="font-bold text-lg">¥{MATERIAL_PRICES[material as MaterialType].toLocaleString()}</span>
+                    </div>
+                    <p className="text-right text-xs text-stone-500 mt-1">※送料込み・税込</p>
                 </div>
 
                 <div className="border-t border-stone-200 my-4" />
