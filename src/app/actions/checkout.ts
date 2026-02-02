@@ -21,7 +21,20 @@ const PRICES = {
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
-export async function createStripeCheckoutSession(orderId: string) {
+// Safe Input Handler
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function createStripeCheckoutSession(orderIdInput: string | { id: string } | any) {
+    // Sanitize Input: If object is passed (e.g. from RPC return), extract ID
+    const orderId = typeof orderIdInput === 'object' && orderIdInput?.id
+        ? orderIdInput.id
+        : typeof orderIdInput === 'string'
+            ? orderIdInput
+            : null;
+
+    if (!orderId) {
+        throw new Error(`Invalid Order ID format: ${JSON.stringify(orderIdInput)}`);
+    }
+
     const supabase = await createClient()
 
     // 1. Get User
@@ -99,7 +112,6 @@ export async function createStripeCheckoutSession(orderId: string) {
         mode: 'payment',
         success_url: `${BASE_URL}/dashboard/cards/${orderData.card_id}?status=success`,
         cancel_url: `${BASE_URL}/dashboard/cards/${orderData.card_id}?status=cancel`,
-        client_reference_id: orderData.id,
         metadata: {
             order_id: orderData.id,
             user_id: user.id,

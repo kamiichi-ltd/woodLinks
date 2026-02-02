@@ -38,6 +38,14 @@ async function verifyAdmin() {
 export async function getAdminOrders() {
     await verifyAdmin();
 
+    // Debug: Check total count without joins first
+    const { count, error: countError } = await adminDbClient
+        .from('orders')
+        .select('*', { count: 'exact', head: true });
+
+    console.log('[Admin] 注文総数 (Raw Count):', count);
+    if (countError) console.error('[Admin] カウント取得エラー:', countError);
+
     const { data, error } = await adminDbClient
         .from('orders')
         .select(`
@@ -60,6 +68,7 @@ export async function getAdminOrders() {
         throw new Error(`Join Failed: ${error.message}`);
     }
 
+    console.log('[Admin] 結合後の取得件数:', data?.length);
     return data;
 }
 

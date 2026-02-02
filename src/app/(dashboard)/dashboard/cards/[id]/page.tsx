@@ -33,14 +33,14 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
                 <div>
                     <nav className="sm:hidden" aria-label="Back">
                         <Link href="/dashboard" className="flex items-center text-sm font-medium text-[#8c7b6c] hover:text-[#3d3126]">
-                            &larr; Back to Dashboard
+                            &larr; ダッシュボードに戻る
                         </Link>
                     </nav>
                     <nav className="hidden sm:flex" aria-label="Breadcrumb">
                         <ol role="list" className="flex items-center space-x-4">
                             <li>
                                 <div className="flex">
-                                    <Link href="/dashboard" className="text-sm font-medium text-[#8c7b6c] hover:text-[#3d3126] transition-colors">Dashboard</Link>
+                                    <Link href="/dashboard" className="text-sm font-medium text-[#8c7b6c] hover:text-[#3d3126] transition-colors">ダッシュボード</Link>
                                 </div>
                             </li>
                             <li>
@@ -54,7 +54,7 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
                 </div>
                 <div className="flex items-center gap-3">
                     <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold tracking-wide border ${card.status === 'published' ? 'bg-[#f4f1ea] text-[#3d3126] border-[#3d3126]' : 'bg-[#e6e2d3] text-[#8c7b6c] border-transparent'}`}>
-                        {card.status === 'published' ? 'LIVE' : card.status.toUpperCase()}
+                        {card.status === 'published' ? '公開中' : card.status === 'draft' ? '下書き' : card.status.toUpperCase()}
                     </span>
                     {card.slug && card.status === 'published' && (
                         <a
@@ -64,7 +64,7 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
                             className="inline-flex items-center rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#3d3126] shadow-sm ring-1 ring-inset ring-[#d4c5ae] hover:bg-[#faf9f6] transition-colors"
                         >
                             <ExternalLink className="h-4 w-4 mr-2 text-[#8c7b6c]" />
-                            View Page / 公開ページ
+                            公開ページを見る
                         </a>
                     )}
                 </div>
@@ -92,8 +92,7 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
                 <div className="lg:col-span-7 xl:col-span-8 space-y-6">
                     <div className="flex items-end gap-3 mb-2">
-                        <h2 className="text-2xl font-serif font-bold text-[#2c3e50] leading-none">Content Editor</h2>
-                        <span className="text-sm font-medium text-[#8c7b6c] mb-0.5">/ コンテンツ編集</span>
+                        <h2 className="text-2xl font-serif font-bold text-[#2c3e50] leading-none">コンテンツ編集</h2>
                     </div>
                     <ContentEditor cardId={card.id} initialContents={card.contents as unknown as ContentItem[]} />
                 </div>
@@ -105,8 +104,7 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
                     {/* QR Code Section */}
                     <div>
                         <div className="flex items-end gap-3 mb-2">
-                            <h2 className="text-2xl font-serif font-bold text-[#2c3e50] leading-none">QR Code</h2>
-                            <span className="text-sm font-medium text-[#8c7b6c] mb-0.5">/ 繋がり</span>
+                            <h2 className="text-2xl font-serif font-bold text-[#2c3e50] leading-none">QRコード</h2>
                         </div>
                         <div className="bg-white/90 backdrop-blur-md shadow-lg border border-[#e6e2d3] rounded-3xl p-6 sm:p-8 transition-all hover:shadow-xl">
                             <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -123,8 +121,7 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
                     </div>
 
                     <div className="flex items-end gap-3 mb-2">
-                        <h2 className="text-2xl font-serif font-bold text-[#2c3e50] leading-none">Card Settings</h2>
-                        <span className="text-sm font-medium text-[#8c7b6c] mb-0.5">/ 名刺設定</span>
+                        <h2 className="text-2xl font-serif font-bold text-[#2c3e50] leading-none">名刺設定</h2>
                     </div>
                     <CardSettingsForm
                         cardId={card.id}

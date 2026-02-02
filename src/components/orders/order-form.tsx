@@ -46,7 +46,7 @@ export function OrderForm({ cardId, onOrderCreated }: OrderFormProps) {
             console.log('[OrderForm] Order created. ID:', orderId);
 
             if (!orderId) {
-                throw new Error('Order creation returned no ID');
+                throw new Error('注文IDの取得に失敗しました');
             }
 
             // 2. Initiate Checkout (Server Action)
@@ -59,7 +59,7 @@ export function OrderForm({ cardId, onOrderCreated }: OrderFormProps) {
                 console.log('[OrderForm] Redirecting to Stripe...');
                 window.location.href = checkoutUrl;
             } else {
-                throw new Error('Failed to retrieve checkout URL');
+                throw new Error('決済URLの取得に失敗しました');
             }
 
             onOrderCreated(); // Optional: Refresh parent state (background)

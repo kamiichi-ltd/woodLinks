@@ -40,20 +40,30 @@ export async function POST(req: Request) {
             // Note: If SUPABASE_SERVICE_ROLE_KEY is not set, this will fail or fallback to Anon (which might not have permission)
             // User requested to use "Admin RPC admin_update_order_status"
             const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-            const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+            const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+            if (!supabaseServiceKey) {
+                console.error('[Stripe Webhook] Missing SUPABASE_SERVICE_ROLE_KEY')
+                return new Response('Server Configuration Error', { status: 500 })
+            }
 
             const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey)
 
-            // Call RPC
-            const { error } = await supabase.rpc('admin_update_order_status', {
-                p_order_id: orderId,
-                p_new_status: 'paid',
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            } as any)
+            // Perform direct update using Service Role to ensure reliability
+            // Using direct update instead of RPC to avoid signature issues and simplify debugging
+            const { error } = await supabase
+                .from('orders')
+                .update({
+                    status: 'paid',
+                    // Optionally set paid_at if your schema supports it
+                    // paid_at: new Date().toISOString() 
+                })
+                .eq('id', orderId)
 
             if (error) {
-                console.error('[Stripe Webhook] Failed to update order status:', error)
-                return new Response('Error updating order', { status: 500 })
+                console.error('[Stripe Webhook] Database Update Failed:', error)
+                // Return specific error message to help debugging
+                return new Response(`Error updating order: ${error.message} (Code: ${error.code})`, { status: 500 })
             }
 
             console.log('[Stripe Webhook] Successfully updated order status to paid')

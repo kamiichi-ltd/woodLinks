@@ -36,8 +36,8 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                         <th className="px-6 py-3 text-left">顧客名</th>
                         <th className="px-6 py-3 text-left">注文内容</th>
                         <th className="px-6 py-3 text-left">配送先住所</th>
-                        <th className="px-6 py-3 text-left">状態</th>
-                        <th className="px-6 py-3 text-right">ステータス更新</th>
+                        <th className="px-6 py-3 text-left">ステータス</th>
+                        <th className="px-6 py-3 text-right">更新</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
@@ -91,7 +91,7 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                                 </span>
                                 {order.tracking_number && (
                                     <div className="text-xs text-stone-500 mt-1 font-mono">
-                                        Tracking: {order.tracking_number}
+                                        追跡番号: {order.tracking_number}
                                     </div>
                                 )}
                             </td>
@@ -107,7 +107,7 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
             </table>
             {orders.length === 0 && (
                 <div className="p-8 text-center text-stone-400">
-                    No orders found.
+                    該当する注文は見つかりませんでした。
                 </div>
             )}
         </div>

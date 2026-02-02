@@ -44,7 +44,7 @@ export default async function Home() {
           <div className="max-w-7xl mx-auto px-6 text-center">
             <div className="mx-auto max-w-3xl">
               <span className="inline-block py-1 px-3 rounded-full bg-[#f4f1ea] border border-[#e6e2d3] text-[#8c7b6c] text-xs font-bold tracking-widest uppercase mb-8">
-                The Original Wood Card
+                唯一無二のウッドカード
               </span>
               <h2 className="text-5xl font-serif font-medium tracking-tight text-[#3d3126] sm:text-7xl mb-8 leading-tight">
                 木に、デジタルという<br className="hidden sm:block" />命を宿す。
@@ -58,10 +58,10 @@ export default async function Home() {
                   href="/login"
                   className="w-full sm:w-auto rounded-full bg-[#2c3e50] px-10 py-4 text-lg font-bold text-white shadow-xl shadow-[#2c3e50]/20 hover:bg-[#1a252f] hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2"
                 >
-                  Create Your Card <ArrowRight className="h-5 w-5" />
+                  カードを作成する <ArrowRight className="h-5 w-5" />
                 </Link>
                 <Link href="/p/demo" className="text-sm font-bold tracking-wide text-[#3d3126] hover:text-[#8c7b6c] transition-colors flex items-center gap-2 border-b border-transparent hover:border-[#8c7b6c] pb-0.5">
-                  VIEW DEMO <Smartphone className="h-4 w-4" />
+                  デモを見る <Smartphone className="h-4 w-4" />
                 </Link>
               </div>
             </div>
@@ -72,7 +72,7 @@ export default async function Home() {
         <section className="py-32 bg-[#f4f1ea] border-y border-[#e6e2d3]">
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center mb-20">
-              <span className="text-[#8c7b6c] font-bold tracking-[0.2em] uppercase text-xs">Material Selection</span>
+              <span className="text-[#8c7b6c] font-bold tracking-[0.2em] uppercase text-xs">MATERIAL SELECTION</span>
               <h3 className="mt-4 text-4xl font-serif font-medium text-[#3d3126]">
                 あなたに呼応する、木の個性
               </h3>
@@ -153,7 +153,7 @@ export default async function Home() {
                   <div className="relative flex items-center gap-8 mb-12">
                     <div className="w-16 h-16 rounded-full bg-[#fdfbf7] border-2 border-[#e6e2d3] flex items-center justify-center relative z-10 font-serif font-bold text-[#8c7b6c]">0</div>
                     <div className="flex-1 bg-[#fdfbf7] p-6 rounded-xl border border-[#e6e2d3] shadow-sm">
-                      <h5 className="font-bold text-[#3d3126] mb-1">Brand New</h5>
+                      <h5 className="font-bold text-[#3d3126] mb-1">新品</h5>
                       <p className="text-xs text-[#8c7b6c]">まだ若々しい、フレッシュな表情。</p>
                     </div>
                   </div>
@@ -162,7 +162,7 @@ export default async function Home() {
                   <div className="relative flex items-center gap-8 mb-12">
                     <div className="w-16 h-16 rounded-full bg-[#f4f1ea] border-2 border-[#d4c5ae] flex items-center justify-center relative z-10 font-serif font-bold text-[#5a4d41]">1</div>
                     <div className="flex-1 bg-[#f4f1ea] p-6 rounded-xl border border-[#d4c5ae] shadow-sm">
-                      <h5 className="font-bold text-[#3d3126] mb-1">1 Year Later</h5>
+                      <h5 className="font-bold text-[#3d3126] mb-1">1年後</h5>
                       <p className="text-xs text-[#5a4d41]">手の油分が馴染み、艶が生まれます。</p>
                     </div>
                   </div>
@@ -171,7 +171,7 @@ export default async function Home() {
                   <div className="relative flex items-center gap-8">
                     <div className="w-16 h-16 rounded-full bg-[#d4c5ae] border-2 border-[#8c7b6c] flex items-center justify-center relative z-10 font-serif font-bold text-[#3d3126]">3</div>
                     <div className="flex-1 bg-[#eae0cf] p-6 rounded-xl border border-[#8c7b6c] shadow-md">
-                      <h5 className="font-bold text-[#3d3126] mb-1">3 Years Later</h5>
+                      <h5 className="font-bold text-[#3d3126] mb-1">3年後</h5>
                       <p className="text-xs text-[#3d3126]">角が取れ、あなただけの色＝「飴色」へ。</p>
                     </div>
                   </div>
@@ -179,7 +179,7 @@ export default async function Home() {
               </div>
 
               <div className="order-1 lg:order-2">
-                <span className="text-[#8c7b6c] font-bold tracking-[0.2em] uppercase text-xs">Aging Process</span>
+                <span className="text-[#8c7b6c] font-bold tracking-[0.2em] uppercase text-xs">AGING PROCESS</span>
                 <h3 className="mt-4 text-4xl font-serif font-medium text-[#3d3126] mb-8">
                   「劣化」ではなく、「熟成」。
                 </h3>
@@ -208,7 +208,7 @@ export default async function Home() {
 
           <div className="max-w-7xl mx-auto px-6 relative z-10">
             <div className="max-w-3xl mx-auto text-center">
-              <span className="text-[#8c7b6c] font-bold tracking-[0.2em] uppercase text-xs">Our Authenticity</span>
+              <span className="text-[#8c7b6c] font-bold tracking-[0.2em] uppercase text-xs">OUR AUTHENTICITY</span>
               <h3 className="mt-4 text-4xl font-serif font-medium text-white mb-10">
                 大阪・北摂、上一木材の誇り。
               </h3>

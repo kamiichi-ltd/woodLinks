@@ -19,14 +19,14 @@ export default async function AdminOrdersPage() {
                 <div>
                     <h1 className="text-2xl font-bold flex items-center gap-2">
                         <Package className="text-stone-400" />
-                        Order Management
+                        注文管理
                     </h1>
                     <p className="text-stone-500 text-sm mt-1">
-                        View and manage all physical card orders.
+                        すべての注文状況を確認・管理します。
                     </p>
                 </div>
                 <div className="bg-stone-100 px-4 py-2 rounded-lg text-sm font-medium">
-                    Total: <span className="text-stone-900 font-bold ml-1">{orders.length}</span>
+                    受注件数: <span className="text-stone-900 font-bold ml-1">{orders.length}</span>
                 </div>
             </div>
 
