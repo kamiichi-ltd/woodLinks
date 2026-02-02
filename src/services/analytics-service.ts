@@ -65,7 +65,8 @@ export async function getDashboardAnalytics(userId: string): Promise<DashboardAn
         return { totalViews: 0, totalSaves: 0, dailyViews: [] }
     }
 
-    const cardIds = cards.map(c => c.id)
+    // c を any として扱うことで id へのアクセスを許可する
+    const cardIds = cards.map((c: any) => c.id)
 
     // 2. Fetch analytics for these cards (Last 30 days)
     const thirtyDaysAgo = new Date()
