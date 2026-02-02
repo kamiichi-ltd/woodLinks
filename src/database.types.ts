@@ -29,7 +29,7 @@ export interface Database {
                     email?: string | null
                 }
             }
-            cards: {
+            orders: { // ここが重要！ cards ではなく orders にします
                 Row: {
                     id: string
                     created_at: string
@@ -65,32 +65,6 @@ export interface Database {
                     image_url?: string | null
                     theme?: string | null
                     social_links?: Json | null
-                }
-            }
-            card_contents: {
-                Row: {
-                    id: string
-                    card_id: string
-                    type: string
-                    content: Json
-                    order_index: number
-                    created_at: string
-                }
-                Insert: {
-                    id?: string
-                    card_id: string
-                    type: string
-                    content: Json
-                    order_index?: number
-                    created_at?: string
-                }
-                Update: {
-                    id?: string
-                    card_id?: string
-                    type?: string
-                    content?: Json
-                    order_index?: number
-                    created_at?: string
                 }
             }
             analytics: {
