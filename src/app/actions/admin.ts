@@ -212,7 +212,7 @@ export async function getAdminCustomers() {
     };
 
     // Aggregate Data
-    const customers = profiles.map(profile => {
+    const customers = profiles.map((profile: any) => {
         const orders = profile.orders || [];
         // Filter paid orders for LTV
         const paidOrders = orders.filter((o: any) =>
@@ -246,7 +246,7 @@ export async function getAdminCustomers() {
     });
 
     // Sort by Total Spend (Desc)
-    customers.sort((a, b) => b.totalSpend - a.totalSpend);
+    customers.sort((a: any, b: any) => b.totalSpend - a.totalSpend);
 
     return customers;
 }
