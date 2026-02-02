@@ -61,15 +61,15 @@ export function OrderStatusView({ order }: OrderStatusViewProps) {
             <div className="flex items-center gap-3 mb-4">
                 <StatusIcon />
                 <h3 className="text-lg font-bold text-stone-800">
-                    ステータス: {statusLabels[order.status] || order.status}
+                    ステータス: {statusLabels[order.status || ''] || order.status || '未設定'}
                 </h3>
             </div>
 
             <div className="space-y-3 text-sm text-stone-600 mb-6">
                 <p>注文ID: <span className="font-mono">{order.id}</span></p>
-                <p>材質: {materialLabels[order.material] || order.material}</p>
-                <p>枚数: {order.quantity}枚</p>
-                <p>配送先: {order.shipping_name} 様</p>
+                <p>材質: {materialLabels[(order as any).material] || (order as any).material}</p>
+                <p>枚数: {(order as any).quantity}枚</p>
+                <p>配送先: {(order as any).shipping_name} 様</p>
 
                 {order.status === 'shipped' && order.tracking_number && (
                     <div className="p-3 bg-blue-50 text-blue-800 rounded mt-2">
