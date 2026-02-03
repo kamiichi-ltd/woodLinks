@@ -2,6 +2,7 @@ import { getCardBySlug } from '@/services/card-service'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import PublicCardClient from '@/components/public/public-card-client'
+import CardActivation from '@/components/public/card-activation'
 import { Metadata } from 'next'
 import { logEvent } from '@/app/actions/analytics'
 
@@ -34,6 +35,11 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
         notFound()
     }
 
+    // 1. Activation Check (If owner_id is NULL)
+    if (!card.owner_id) {
+        return <CardActivation card={card} />
+    }
+
     // Log View (Server Side)
     // await is used as requested to ensure logging happens
     await logEvent(card.id, 'view')
@@ -41,7 +47,9 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
     // Check ownership
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
-    const isOwner = user?.id === card.user_id
+
+    // Updated isOwner check to use owner_id
+    const isOwner = user?.id === card.owner_id
 
     return <PublicCardClient card={card} isOwner={isOwner} />
 }

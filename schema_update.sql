@@ -1,11 +1,12 @@
--- Add Wood Traceability Columns to 'cards' table
+-- Add owner_id column to cards table
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'cards' AND column_name = 'owner_id') THEN
+        ALTER TABLE cards ADD COLUMN owner_id UUID REFERENCES auth.users(id);
+    END IF;
+END $$;
 
-ALTER TABLE public.cards
-ADD COLUMN IF NOT EXISTS wood_origin text,
-ADD COLUMN IF NOT EXISTS wood_age text,
-ADD COLUMN IF NOT EXISTS wood_story text;
+-- Backfill owner_id with user_id for existing cards (Assume existing cards are owned by their creator)
+UPDATE cards SET owner_id = user_id WHERE owner_id IS NULL;
 
--- Add comments for documentation
-COMMENT ON COLUMN public.cards.wood_origin IS '産地 (例: 奈良県吉野)';
-COMMENT ON COLUMN public.cards.wood_age IS '樹齢 (例: 100年以上)';
-COMMENT ON COLUMN public.cards.wood_story IS '木材に関するストーリー';
+-- Note: We do NOT set NOT NULL constraint because future inventory cards will have owner_id = NULL

@@ -123,6 +123,7 @@ export interface Database {
                     wood_origin: string | null // NEW
                     wood_age: string | null // NEW
                     wood_story: string | null // NEW
+                    owner_id: string | null // NEW
                 }
                 Insert: {
                     id?: string
@@ -138,6 +139,7 @@ export interface Database {
                     wood_origin?: string | null
                     wood_age?: string | null
                     wood_story?: string | null
+                    owner_id?: string | null // NEW
                 }
                 Update: {
                     id?: string
@@ -153,6 +155,7 @@ export interface Database {
                     wood_origin?: string | null
                     wood_age?: string | null
                     wood_story?: string | null
+                    owner_id?: string | null // NEW
                 }
             }
         }
