@@ -128,7 +128,7 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
 
                     {/* Name & Title */}
                     <div className="mt-4 mb-8">
-                        <h1 className="text-3xl font-serif font-bold text-[#2c3e50] tracking-wide mb-3">
+                        <h1 className="text-2xl md:text-3xl font-serif font-bold text-[#2c3e50] tracking-wide mb-3">
                             {card.title}
                         </h1>
                         {card.description && (

@@ -32,12 +32,12 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
             <table className="min-w-full divide-y divide-stone-200 text-sm">
                 <thead className="bg-stone-50 text-stone-500 font-medium">
                     <tr>
-                        <th className="px-6 py-3 text-left">注文ID / 受注日時</th>
-                        <th className="px-6 py-3 text-left">顧客名</th>
-                        <th className="px-6 py-3 text-left">注文内容</th>
-                        <th className="px-6 py-3 text-left">配送先住所</th>
-                        <th className="px-6 py-3 text-left">ステータス</th>
-                        <th className="px-6 py-3 text-right">更新</th>
+                        <th className="px-6 py-3 text-left whitespace-nowrap">注文ID / 受注日時</th>
+                        <th className="px-6 py-3 text-left whitespace-nowrap">顧客名</th>
+                        <th className="px-6 py-3 text-left whitespace-nowrap">注文内容</th>
+                        <th className="px-6 py-3 text-left whitespace-nowrap">配送先住所</th>
+                        <th className="px-6 py-3 text-left whitespace-nowrap">ステータス</th>
+                        <th className="px-6 py-3 text-right whitespace-nowrap">更新</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">

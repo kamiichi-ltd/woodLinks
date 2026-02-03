@@ -96,7 +96,7 @@ export default function Home() {
     <div className="bg-[#fdfbf7] min-h-screen flex flex-col font-sans text-[#2c3e50] selection:bg-[#d4c5ae] selection:text-[#2c3e50]">
       {/* --- Header (Glassmorphism) --- */}
       <header className="fixed w-full z-50 bg-[#fdfbf7]/80 backdrop-blur-md border-b border-[#e6e2d3]/50 supports-[backdrop-filter]:bg-[#fdfbf7]/60">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-20 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2 group">
             {/* Logo Icon */}
             <div className="relative h-10 w-10 overflow-hidden rounded-lg">
@@ -126,7 +126,7 @@ export default function Home() {
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-[#e6e2d3]/30 to-transparent rounded-[100%] blur-3xl opacity-50"></div>
           </div>
 
-          <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 grid lg:grid-cols-2 gap-16 items-center">
             {/* Text Content */}
             <motion.div
               initial="hidden"
@@ -182,7 +182,7 @@ export default function Home() {
               className="relative lg:h-[600px] flex items-center justify-center perspective-1000"
             >
               {/* Visual */}
-              <div className="relative w-80 h-[500px] bg-[#d4a373] rounded-3xl shadow-[0_30px_60px_-15px_rgba(44,62,80,0.3)] border-[6px] border-white/20 overflow-hidden transform rotate-[-6deg] hover:rotate-0 transition-transform duration-700 ease-out">
+              <div className="relative w-full max-w-[320px] h-[400px] sm:h-[500px] bg-[#d4a373] rounded-3xl shadow-[0_30px_60px_-15px_rgba(44,62,80,0.3)] border-[6px] border-white/20 overflow-hidden transform rotate-[-6deg] hover:rotate-0 transition-transform duration-700 ease-out">
                 <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] mix-blend-multiply"></div>
                 <div className="absolute top-10 left-10 right-10">
                   <div className="h-12 w-12 bg-[#3d3126] rounded-full mb-6"></div>
@@ -205,7 +205,7 @@ export default function Home() {
 
         {/* --- How It Works --- */}
         <section className="py-24 bg-white border-y border-[#e6e2d3]/50">
-          <div className="max-w-7xl mx-auto px-6">
+          <div className="max-w-7xl mx-auto px-4 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -248,7 +248,7 @@ export default function Home() {
 
         {/* --- Features (Bento Grid) --- */}
         <section className="py-32 bg-[#fdfbf7]">
-          <div className="max-w-7xl mx-auto px-6">
+          <div className="max-w-7xl mx-auto px-4 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -257,7 +257,7 @@ export default function Home() {
               className="mb-16"
             >
               <span className="text-[#8c7b6c] font-bold tracking-[0.2em] uppercase text-xs block mb-3">FEATURES</span>
-              <h2 className="text-4xl font-serif font-bold text-[#3d3126]">機能美という、おもてなし。</h2>
+              <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#3d3126]">機能美という、おもてなし。</h2>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-6 h-auto md:h-[600px]">
@@ -317,7 +317,7 @@ export default function Home() {
           <div className="absolute -top-20 -right-20 w-96 h-96 bg-[#3e5266] rounded-full blur-[100px] opacity-40"></div>
           <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-[#1a252f] rounded-full blur-[100px] opacity-40"></div>
 
-          <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10 text-center">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -325,7 +325,7 @@ export default function Home() {
               variants={fadeIn}
             >
               <span className="text-[#d4c5ae] font-bold tracking-[0.2em] uppercase text-xs block mb-3">OUR AUTHENTICITY</span>
-              <h2 className="text-4xl sm:text-5xl font-serif font-bold text-white mb-10 leading-tight">大阪・北摂、<br className="sm:hidden" />上一木材の誇り。</h2>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-white mb-10 leading-tight">大阪・北摂、<br className="sm:hidden" />上一木材の誇り。</h2>
               <p className="text-lg sm:text-xl text-[#d4c5ae] font-light leading-relaxed max-w-3xl mx-auto mb-12">
                 私たちはITベンチャーではありません。<br className="hidden sm:block" />
                 大阪・北摂（吹田）の地で代々続く、材木屋です。<br />
@@ -343,7 +343,7 @@ export default function Home() {
 
         {/* --- [NEW] Comparison Section (ROI) --- */}
         <section className="py-24 bg-white border-b border-[#e6e2d3]">
-          <div className="max-w-4xl mx-auto px-6">
+          <div className="max-w-4xl mx-auto px-4 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -404,7 +404,7 @@ export default function Home() {
 
         {/* --- Use Cases Section --- */}
         <section className="py-32 bg-[#fdfbf7]">
-          <div className="max-w-7xl mx-auto px-6">
+          <div className="max-w-7xl mx-auto px-4 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -444,7 +444,7 @@ export default function Home() {
 
         {/* --- [NEW] Specs & Warranty --- */}
         <section className="py-20 bg-white border-t border-[#e6e2d3]">
-          <div className="max-w-5xl mx-auto px-6">
+          <div className="max-w-5xl mx-auto px-4 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -484,7 +484,7 @@ export default function Home() {
 
         {/* --- FAQ Section --- */}
         <section className="py-24 bg-white border-y border-[#e6e2d3]/50">
-          <div className="max-w-3xl mx-auto px-6">
+          <div className="max-w-3xl mx-auto px-4 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -517,7 +517,7 @@ export default function Home() {
         </section>
 
         {/* --- CTA Section --- */}
-        <section className="py-32 bg-[#2c3e50] text-center px-6 relative overflow-hidden">
+        <section className="py-20 md:py-32 bg-[#2c3e50] text-center px-6 relative overflow-hidden">
           <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] mix-blend-overlay"></div>
           <div className="relative z-10 max-w-3xl mx-auto">
             <motion.h2
@@ -525,7 +525,7 @@ export default function Home() {
               whileInView="visible"
               viewport={{ once: true }}
               variants={fadeIn}
-              className="text-4xl sm:text-5xl font-serif font-bold text-[#fdfbf7] mb-8"
+              className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-[#fdfbf7] mb-8"
             >
               最初で最後の、名刺を持とう。
             </motion.h2>
@@ -548,7 +548,7 @@ export default function Home() {
       </main>
 
       {/* --- Footer --- */}
-      <footer className="bg-[#3d3126] py-12 px-6 text-[#d4c5ae] border-t border-[#d4c5ae]/10">
+      <footer className="bg-[#3d3126] py-12 px-4 md:px-6 text-[#d4c5ae] border-t border-[#d4c5ae]/10">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
             <img src="/logo.png" alt="WoodLinks Logo" className="h-8 w-8 object-contain opacity-80" />
@@ -559,6 +559,6 @@ export default function Home() {
           </p>
         </div>
       </footer>
-    </div>
+    </div >
   )
 }

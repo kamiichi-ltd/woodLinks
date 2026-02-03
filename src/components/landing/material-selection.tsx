@@ -37,7 +37,7 @@ const materials = [
 
 export default function MaterialSelection() {
     return (
-        <section className="py-32 bg-[#1a1a1a] relative overflow-hidden">
+        <section className="py-20 md:py-32 bg-[#1a1a1a] relative overflow-hidden">
             {/* Background Texture for the whole section to give museum feel */}
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none"></div>
 
@@ -50,10 +50,10 @@ export default function MaterialSelection() {
                         hidden: { opacity: 0, y: 20 },
                         visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
                     }}
-                    className="text-center mb-24"
+                    className="text-center mb-12 md:mb-24"
                 >
                     <span className="text-[#8c7b6c] font-bold tracking-[0.3em] uppercase text-xs block mb-4">MATERIAL SELECTION</span>
-                    <h3 className="text-3xl sm:text-4xl font-serif font-medium text-[#fdfbf7]">
+                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif font-medium text-[#fdfbf7]">
                         あなたに呼応する、木の個性
                     </h3>
                 </motion.div>
@@ -94,7 +94,7 @@ function MaterialCard({ wood, index }: { wood: typeof materials[0], index: numbe
                 </span>
 
                 {/* Main Name */}
-                <h4 className="text-6xl font-serif font-bold text-[#fdfbf7] mb-2 tracking-widest">
+                <h4 className="text-4xl md:text-6xl font-serif font-bold text-[#fdfbf7] mb-2 tracking-widest">
                     {wood.name}
                 </h4>
                 <span className="text-sm font-serif text-[#d4c5ae] italic mb-8">
