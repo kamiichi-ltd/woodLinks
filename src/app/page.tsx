@@ -33,7 +33,8 @@ import {
   Github,
   Linkedin,
   MessageCircle,
-  Share2
+  Share2,
+  Menu // Added Menu icon
 } from 'lucide-react'
 import MaterialSelection from '@/components/landing/material-selection'
 
@@ -92,11 +93,13 @@ const FaqItem = ({ question, answer }: { question: string, answer: string }) => 
 }
 
 export default function Home() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false) // State for mobile menu
+
   return (
     <div className="bg-[#fdfbf7] min-h-screen flex flex-col font-sans text-[#2c3e50] selection:bg-[#d4c5ae] selection:text-[#2c3e50]">
       {/* --- Header (Glassmorphism) --- */}
       <header className="fixed w-full z-50 bg-[#fdfbf7]/80 backdrop-blur-md border-b border-[#e6e2d3]/50 supports-[backdrop-filter]:bg-[#fdfbf7]/60">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 h-20 flex justify-between items-center">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-20 flex justify-between items-center relative">
           <Link href="/" className="flex items-center gap-2 group">
             {/* Logo Icon */}
             <div className="relative h-10 w-10 overflow-hidden rounded-lg">
@@ -104,7 +107,8 @@ export default function Home() {
             </div>
             <span className="font-serif text-xl font-bold tracking-tight text-[#3d3126]">WoodLinks</span>
           </Link>
-          <nav className="flex items-center gap-6">
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-6">
             <Link href="/p/demo" className="text-sm font-medium text-[#8c7b6c] hover:text-[#3d3126] transition-colors hidden sm:block">
               デモを見る
             </Link>
@@ -115,18 +119,54 @@ export default function Home() {
               ログイン
             </Link>
           </nav>
+
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden z-50 p-2 text-[#3d3126]"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+
+          {/* Mobile Overlay Menu */}
+          <AnimatePresence>
+            {isMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.2 }}
+                className="absolute top-20 left-0 w-full bg-[#fdfbf7] border-b border-[#e6e2d3] shadow-xl p-6 md:hidden flex flex-col gap-6 items-center text-center"
+              >
+                <Link
+                  href="/p/demo"
+                  className="text-lg font-medium text-[#3d3126] py-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  デモを見る
+                </Link>
+                <Link
+                  href="/login"
+                  className="w-full rounded-full bg-[#2c3e50] text-[#fdfbf7] px-6 py-3.5 text-base font-bold shadow-lg"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  ログイン
+                </Link>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </header>
 
       <main className="flex-1">
         {/* --- Hero Section --- */}
-        <section className="relative pt-32 pb-20 sm:pt-40 sm:pb-32 overflow-hidden">
+        <section className="relative pt-24 pb-16 sm:pt-40 sm:pb-32 overflow-hidden">
           {/* Background Elements */}
           <div className="absolute inset-0 -z-10 pointer-events-none">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-[#e6e2d3]/30 to-transparent rounded-[100%] blur-3xl opacity-50"></div>
           </div>
 
-          <div className="max-w-7xl mx-auto px-4 md:px-6 grid lg:grid-cols-2 gap-16 items-center">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Text Content */}
             <motion.div
               initial="hidden"
@@ -137,10 +177,10 @@ export default function Home() {
               <motion.span variants={fadeIn} className="inline-block py-1 px-3 rounded-full bg-[#f4f1ea] border border-[#e6e2d3] text-[#8c7b6c] text-[10px] font-bold tracking-[0.2em] uppercase mb-6">
                 TACTILE DIGITAL
               </motion.span>
-              <motion.h1 variants={fadeIn} className="text-5xl sm:text-6xl lg:text-7xl font-serif font-medium tracking-tight text-[#3d3126] mb-8 leading-[1.1]">
+              <motion.h1 variants={fadeIn} className="text-4xl sm:text-5xl lg:text-7xl font-serif font-medium tracking-tight text-[#3d3126] mb-8 leading-[1.1]">
                 木に、<br />デジタルという<br />命を宿す。
               </motion.h1>
-              <motion.p variants={fadeIn} className="text-lg sm:text-xl text-[#5a4d41] mb-10 font-light leading-relaxed max-w-xl mx-auto lg:mx-0">
+              <motion.p variants={fadeIn} className="text-base sm:text-xl text-[#5a4d41] mb-10 font-light leading-relaxed max-w-xl mx-auto lg:mx-0 px-4 sm:px-0">
                 本物の木の温もりと、最先端のデジタル技術が融合。<br />
                 名刺交換の瞬間を、記憶に残る「体験」へ。
               </motion.p>
@@ -179,7 +219,7 @@ export default function Home() {
               initial={{ opacity: 0, x: 50, rotateY: 30 }}
               animate={{ opacity: 1, x: 0, rotateY: 0 }}
               transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-              className="relative lg:h-[600px] flex items-center justify-center perspective-1000"
+              className="relative h-[400px] lg:h-[600px] flex items-center justify-center perspective-1000 mt-8 lg:mt-0"
             >
               {/* Visual */}
               <div className="relative w-full max-w-[320px] h-[400px] sm:h-[500px] bg-[#d4a373] rounded-3xl shadow-[0_30px_60px_-15px_rgba(44,62,80,0.3)] border-[6px] border-white/20 overflow-hidden transform rotate-[-6deg] hover:rotate-0 transition-transform duration-700 ease-out">
