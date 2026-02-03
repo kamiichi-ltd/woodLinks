@@ -52,25 +52,43 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 // Refined Themes - Controls Header Accent
-const themes = {
-    sugi: {
-        name: 'Sugi',
-        headerBg: 'bg-[#d4a373]',
-        accentText: 'text-[#d4a373]',
-        texture: 'opacity-20 bg-[url("https://www.transparenttextures.com/patterns/wood-pattern.png")]',
-    },
-    hinoki: {
-        name: 'Hinoki',
-        headerBg: 'bg-[#e9d8a6]',
-        accentText: 'text-[#cbb89d]', // Darker for text visibility
-        texture: 'opacity-10 bg-[url("https://www.transparenttextures.com/patterns/wood-pattern.png")]',
-    },
-    walnut: {
+// Refined Themes - Dynamic Styling based on wood type
+const getMaterialTheme = (material: string = 'walnut') => {
+    const defaultTheme = {
         name: 'Walnut',
-        headerBg: 'bg-[#6b4c3e]',
-        accentText: 'text-[#6b4c3e]',
+        headerBg: 'bg-stone-800',
+        textColor: 'text-white',
+        buttonClass: 'bg-stone-800 text-white',
         texture: 'opacity-30 bg-[url("https://www.transparenttextures.com/patterns/wood-pattern.png")]',
-    },
+    }
+
+    const themes: Record<string, typeof defaultTheme> = {
+        walnut: defaultTheme,
+        maple: {
+            name: 'Maple',
+            headerBg: 'bg-amber-100',
+            textColor: 'text-stone-800',
+            buttonClass: 'bg-amber-100 text-stone-800',
+            texture: 'opacity-20 bg-[url("https://www.transparenttextures.com/patterns/wood-pattern.png")]',
+        },
+        hinoki: {
+            name: 'Hinoki',
+            headerBg: 'bg-yellow-50',
+            textColor: 'text-stone-900',
+            buttonClass: 'bg-yellow-50 text-stone-900 border border-stone-200',
+            texture: 'opacity-10 bg-[url("https://www.transparenttextures.com/patterns/wood-pattern.png")]',
+        },
+        // Fallback or aliases
+        sugi: {
+            name: 'Sugi',
+            headerBg: 'bg-[#d4a373]',
+            textColor: 'text-white',
+            buttonClass: 'bg-[#d4a373] text-white',
+            texture: 'opacity-20 bg-[url("https://www.transparenttextures.com/patterns/wood-pattern.png")]',
+        }
+    }
+
+    return themes[material] || defaultTheme
 }
 
 export default async function PublicCardPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -86,8 +104,8 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
     const { data: { user } } = await supabase.auth.getUser()
     const isOwner = user?.id === card.user_id
 
-    const material = card.material_type || 'sugi'
-    const theme = themes[material as keyof typeof themes] || themes.sugi
+    const material = card.material_type || 'walnut'
+    const theme = getMaterialTheme(material)
 
     return (
         <div className="min-h-screen bg-[#fdfbf7] flex flex-col items-center justify-center py-12 px-4 sm:px-6 relative overflow-hidden font-sans">
@@ -141,7 +159,7 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
                     {/* CTA Button */}
                     <ContactSaveButton
                         cardId={card.id}
-                        themeButtonClass="bg-gradient-to-br from-[#5d4037] to-[#3e2723] text-white shadow-lg shadow-[#3e2723]/30 flex items-center justify-center gap-2 group"
+                        themeButtonClass={`${theme.buttonClass} shadow-lg flex items-center justify-center gap-2 group hover:shadow-xl`}
                     />
                 </div>
 
