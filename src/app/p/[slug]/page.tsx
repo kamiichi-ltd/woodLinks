@@ -53,4 +53,3 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
 
     return <PublicCardClient card={card} isOwner={isOwner} />
 }
-```
