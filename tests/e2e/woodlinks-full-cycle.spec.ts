@@ -58,7 +58,7 @@ test.describe('WoodLinks Full Cycle', () => {
         await expect(page).toHaveTitle(/WoodLinks/);
 
         // Verify Traceability Info
-        await expect(page.getByText('Origin')).toBeVisible();
+        await expect(page.getByText('Origin', { exact: true })).toBeVisible();
         await expect(page.getByText(TEST_ORIGIN_VALUE)).toBeVisible();
 
         // Verify Contact Button
@@ -82,8 +82,9 @@ test.describe('WoodLinks Full Cycle', () => {
         // Verify Wood Story/Origin is included in NOTE (checking substring)
         expect(text).toContain(`Origin: ${TEST_ORIGIN_VALUE}`);
 
-        // Verify URL field
-        expect(text).toContain(`URL:https://wood-links.vercel.app/p/${TEST_SLUG}`);
+        // Verify URL field (Flexible check as base URL depends on env)
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://wood-links.vercel.app';
+        expect(text).toContain(`URL:${baseUrl}/p/${TEST_SLUG}`);
     });
 
     test('Analytics tracks page view', async ({ page }) => {
