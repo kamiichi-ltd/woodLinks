@@ -187,6 +187,34 @@ export default function PublicCardClient({ card, isOwner }: PublicCardClientProp
                     })}
                 </div>
 
+                {/* Traceability Footer (Engraved Look) */}
+                {(card.wood_origin || card.wood_age || card.wood_story) && (
+                    <div className="px-8 pb-10 pt-4 text-center">
+                        <div className="w-8 h-px bg-stone-300 mx-auto mb-6 opacity-50"></div>
+                        <div className="font-serif text-[#8c7b6c] space-y-3">
+                            {card.wood_origin && (
+                                <div>
+                                    <span className="block text-[10px] uppercase tracking-[0.15em] opacity-60 mb-0.5">Origin</span>
+                                    <span className="text-sm font-medium">{card.wood_origin}</span>
+                                </div>
+                            )}
+                            {card.wood_age && (
+                                <div>
+                                    <span className="block text-[10px] uppercase tracking-[0.15em] opacity-60 mb-0.5">Age</span>
+                                    <span className="text-sm font-medium">{card.wood_age}</span>
+                                </div>
+                            )}
+                            {card.wood_story && (
+                                <div className="pt-2">
+                                    <p className="text-xs italic leading-relaxed opacity-80 max-w-[240px] mx-auto">
+                                        &ldquo;{card.wood_story}&rdquo;
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
                 {/* Footer Brand */}
                 <div className="pb-6 text-center">
                     <p className="text-[10px] text-[#d4c5ae] font-bold tracking-[0.2em] uppercase">POWERED BY WOODLINKS</p>

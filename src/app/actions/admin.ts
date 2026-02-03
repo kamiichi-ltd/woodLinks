@@ -250,3 +250,53 @@ export async function getAdminCustomers() {
 
     return customers;
 }
+
+export async function getAdminCard(id: string) {
+    await verifyAdmin();
+
+    const { data, error } = await (adminDbClient as any)
+        .from('cards')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+    if (error) {
+        console.error('[Admin] Card Fetch Error:', error);
+        throw new Error('Failed to fetch card');
+    }
+
+    return data;
+}
+
+export async function updateAdminCard(
+    id: string,
+    data: {
+        title: string
+        description: string
+        slug: string
+        material_type: string
+        wood_origin: string
+        wood_age: string
+        wood_story: string
+    }
+) {
+    await verifyAdmin();
+    console.log(`[Admin] Updating card ${id}`, data);
+
+    const { error } = await (adminDbClient as any)
+        .from('cards')
+        .update({
+            ...data,
+            updated_at: new Date().toISOString()
+        })
+        .eq('id', id);
+
+    if (error) {
+        console.error('[Admin] Card Update Error:', error);
+        throw new Error('Failed to update card: ' + error.message);
+    }
+
+    revalidatePath('/admin/cards')
+    revalidatePath(`/p/${data.slug}`) // Revalidate public page
+    return { success: true };
+}

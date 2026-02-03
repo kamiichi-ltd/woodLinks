@@ -108,6 +108,53 @@ export interface Database {
                     os?: string | null
                 }
             }
+            cards: {
+                Row: {
+                    id: string
+                    created_at: string
+                    updated_at: string | null
+                    user_id: string
+                    slug: string
+                    title: string | null
+                    description: string | null
+                    avatar_url: string | null
+                    material_type: string | null
+                    is_public: boolean
+                    wood_origin: string | null // NEW
+                    wood_age: string | null // NEW
+                    wood_story: string | null // NEW
+                }
+                Insert: {
+                    id?: string
+                    created_at?: string
+                    updated_at?: string | null
+                    user_id?: string
+                    slug: string
+                    title?: string | null
+                    description?: string | null
+                    avatar_url?: string | null
+                    material_type?: string | null
+                    is_public?: boolean
+                    wood_origin?: string | null
+                    wood_age?: string | null
+                    wood_story?: string | null
+                }
+                Update: {
+                    id?: string
+                    created_at?: string
+                    updated_at?: string | null
+                    user_id?: string
+                    slug?: string
+                    title?: string | null
+                    description?: string | null
+                    avatar_url?: string | null
+                    material_type?: string | null
+                    is_public?: boolean
+                    wood_origin?: string | null
+                    wood_age?: string | null
+                    wood_story?: string | null
+                }
+            }
         }
         Views: {
             [_ in never]: never
