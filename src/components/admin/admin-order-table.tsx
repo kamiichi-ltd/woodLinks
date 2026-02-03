@@ -29,7 +29,8 @@ type Order = Database['public']['Tables']['orders']['Row'] & {
 export function AdminOrderTable({ orders }: { orders: Order[] }) {
     return (
         <div className="bg-white rounded-xl shadow border border-stone-200">
-            <div className="overflow-x-auto">
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
                 <table className="min-w-full divide-y divide-stone-200 text-sm">
                     <thead className="bg-stone-50 text-stone-500 font-medium">
                         <tr>
@@ -48,14 +49,14 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                                     <div className="font-mono text-xs text-stone-400 mb-1">
                                         {order.id.slice(0, 8)}...
                                     </div>
-                                    <div className="text-stone-900 font-medium whitespace-nowrap">
+                                    <div className="text-stone-900 font-medium">
                                         {new Date(order.created_at).toLocaleDateString('ja-JP')}
                                         <span className="text-stone-400 text-xs ml-1">
                                             {new Date(order.created_at).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
                                         </span>
                                     </div>
                                 </td>
-                                <td className="px-6 py-4 align-top whitespace-nowrap">
+                                <td className="px-6 py-4 align-top">
                                     <div className="font-bold text-stone-800">
                                         {order.profiles?.full_name || (order as any).shipping_name || order.profiles?.email || 'Unknown'}
                                     </div>
@@ -63,7 +64,7 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                                         {order.profiles?.email}
                                     </div>
                                 </td>
-                                <td className="px-6 py-4 align-top whitespace-nowrap">
+                                <td className="px-6 py-4 align-top">
                                     <div className="flex flex-col gap-1">
                                         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium w-fit
                                             ${order.material === 'walnut' ? 'bg-[#4a3b32] text-[#e6e2d3]' :
@@ -83,7 +84,7 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                                     {(order as any).shipping_address2 && <div>{(order as any).shipping_address2}</div>}
                                     <div className="text-xs text-stone-400 mt-1">📞 {(order as any).shipping_phone}</div>
                                 </td>
-                                <td className="px-6 py-4 align-top whitespace-nowrap">
+                                <td className="px-6 py-4 align-top">
                                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${order.status === 'paid' ? 'bg-green-100 text-green-800' :
                                         order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
                                             'bg-gray-100 text-gray-800'
@@ -96,7 +97,7 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                                         </div>
                                     )}
                                 </td>
-                                <td className="px-6 py-4 align-top text-right whitespace-nowrap">
+                                <td className="px-6 py-4 align-top text-right">
                                     <StatusUpdateDialog
                                         orderId={order.id}
                                         currentStatus={order.status}
@@ -107,6 +108,74 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                     </tbody>
                 </table>
             </div>
+
+            {/* Mobile Card View */}
+            <div className="block md:hidden p-4 space-y-4">
+                {orders.map((order: any) => (
+                    <div key={order.id} className="border border-stone-200 rounded-lg p-4 bg-white shadow-sm flex flex-col gap-3">
+                        {/* Header: ID and Date */}
+                        <div className="flex justify-between items-start border-b border-stone-100 pb-2">
+                            <div className="font-mono text-xs text-stone-400">
+                                #{order.id.slice(0, 8)}
+                            </div>
+                            <div className="text-right">
+                                <div className="text-xs font-medium text-stone-900">
+                                    {new Date(order.created_at).toLocaleDateString('ja-JP')}
+                                </div>
+                                <div className="text-[10px] text-stone-400">
+                                    {new Date(order.created_at).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Customer Info */}
+                        <div>
+                            <div className="font-bold text-lg text-stone-800">
+                                {order.profiles?.full_name || (order as any).shipping_name || order.profiles?.email || 'Unknown'}
+                            </div>
+                            <div className="text-xs text-stone-500 truncate">
+                                {order.profiles?.email}
+                            </div>
+                        </div>
+
+                        {/* Type & Quantity */}
+                        <div className="flex items-center justify-between bg-stone-50 p-2 rounded">
+                            <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-bold
+                                ${order.material === 'walnut' ? 'bg-[#4a3b32] text-[#e6e2d3]' :
+                                    order.material === 'hinoki' ? 'bg-[#fdfbf7] text-[#2c3e50] border border-[#e9d8a6]' :
+                                        'bg-[#faf9f6] text-[#5e5045] border border-[#d4a373]'}
+                            `}>
+                                {order.material === 'walnut' ? 'ウォールナット' : order.material === 'hinoki' ? '檜 (Hinoki)' : '杉 (Sugi)'}
+                            </span>
+                            <span className="font-bold text-stone-700">x {order.quantity}</span>
+                        </div>
+                        <div className="text-xs text-stone-500">
+                            Card Plan: {order.cards?.title}
+                        </div>
+
+                        {/* Status Badge */}
+                        <div className="flex justify-between items-center">
+                            <span className="text-xs text-stone-500 font-medium">Status</span>
+                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${order.status === 'paid' ? 'bg-green-100 text-green-800' :
+                                order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                                    'bg-gray-100 text-gray-800'
+                                }`}>
+                                {STATUS_MAP[order.status] || order.status}
+                            </span>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="pt-2">
+                            <StatusUpdateDialog
+                                orderId={order.id}
+                                currentStatus={order.status}
+                            />
+                            {/* Note: Additional "View Details" button could be added here if a detail page exists */}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
             {orders.length === 0 && (
                 <div className="p-8 text-center text-stone-400">
                     該当する注文は見つかりませんでした。
