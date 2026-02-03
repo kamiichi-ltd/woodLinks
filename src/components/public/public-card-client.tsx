@@ -134,6 +134,7 @@ export default function PublicCardClient({ card, isOwner }: PublicCardClientProp
                     {/* CTA Button */}
                     <ContactSaveButton
                         cardId={card.id}
+                        slug={card.slug}
                         themeButtonClass={`${theme.buttonClass} shadow-lg flex items-center justify-center gap-2 group hover:shadow-xl transition-colors duration-500`}
                     />
                 </div>

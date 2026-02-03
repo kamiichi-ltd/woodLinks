@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { Database } from '@/database.types'
 import { StatusUpdateDialog } from './status-update-dialog'
-import { ClipboardCopy, Check, ExternalLink } from 'lucide-react'
+import { ClipboardCopy, Check, ExternalLink, Pencil } from 'lucide-react'
+import Link from 'next/link'
 
 const STATUS_MAP: Record<string, string> = {
     pending_payment: '支払い待ち',
@@ -21,6 +22,7 @@ type Order = Database['public']['Tables']['orders']['Row'] & {
         full_name: string | null
     } | null
     cards: {
+        id: string
         title: string | null
         slug: string | null
     } | null
@@ -105,6 +107,13 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                                                         </span>
                                                     )}
                                                 </button>
+                                                <Link
+                                                    href={`/admin/cards/${order.cards?.id}`}
+                                                    className="p-1 hover:bg-stone-100 rounded text-stone-400 hover:text-stone-600 transition-colors"
+                                                    title="カード編集"
+                                                >
+                                                    <Pencil className="h-3 w-3" />
+                                                </Link>
                                             </div>
                                         )}
                                     </div>
@@ -187,8 +196,8 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                                 <button
                                     onClick={() => handleCopyUrl(order.cards?.slug || '', order.id)}
                                     className={`flex items-center gap-1 px-2 py-1 rounded-full border transition-all ${copiedId === order.id
-                                            ? 'bg-green-50 border-green-200 text-green-700'
-                                            : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50'
+                                        ? 'bg-green-50 border-green-200 text-green-700'
+                                        : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50'
                                         }`}
                                 >
                                     {copiedId === order.id ? <Check className="h-3 w-3" /> : <ClipboardCopy className="h-3 w-3" />}
