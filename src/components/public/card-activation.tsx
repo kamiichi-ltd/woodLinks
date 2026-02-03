@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { claimCard } from '@/app/actions/activation'
-import { Loader2, Sparkles } from 'lucide-react'
+import { Loader2, Sparkles, LogIn } from 'lucide-react'
+import Link from 'next/link'
 
 // Using strict typing from database type if available, or just partial
 type Card = {
@@ -10,7 +11,7 @@ type Card = {
     slug: string
 }
 
-export default function CardActivation({ card }: { card: Card }) {
+export default function CardActivation({ card, isLoggedIn }: { card: Card, isLoggedIn: boolean }) {
     const [isClaiming, setIsClaiming] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
@@ -50,23 +51,33 @@ export default function CardActivation({ card }: { card: Card }) {
                     </div>
                 )}
 
-                <button
-                    onClick={handleClaim}
-                    disabled={isClaiming}
-                    className="w-full bg-stone-800 text-stone-50 hover:bg-stone-700 disabled:opacity-70 disabled:cursor-not-allowed py-4 px-6 rounded-xl font-bold transition-all shadow-md active:scale-95 flex justify-center items-center gap-2"
-                >
-                    {isClaiming ? (
-                        <>
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                            セットアップ中...
-                        </>
-                    ) : (
-                        'セットアップを開始する'
-                    )}
-                </button>
+                {isLoggedIn ? (
+                    <button
+                        onClick={handleClaim}
+                        disabled={isClaiming}
+                        className="w-full bg-stone-800 text-stone-50 hover:bg-stone-700 disabled:opacity-70 disabled:cursor-not-allowed py-4 px-6 rounded-xl font-bold transition-all shadow-md active:scale-95 flex justify-center items-center gap-2"
+                    >
+                        {isClaiming ? (
+                            <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                セットアップ中...
+                            </>
+                        ) : (
+                            'セットアップを開始する'
+                        )}
+                    </button>
+                ) : (
+                    <Link
+                        href={`/login?next=/p/${card.slug}`}
+                        className="w-full bg-stone-800 text-stone-50 hover:bg-stone-700 py-4 px-6 rounded-xl font-bold transition-all shadow-md active:scale-95 flex justify-center items-center gap-2"
+                    >
+                        <LogIn className="w-5 h-5" />
+                        ログイン / アカウント作成して開始
+                    </Link>
+                )}
 
                 <p className="mt-6 text-xs text-stone-400">
-                    ※ログインまたはアカウント登録が必要です
+                    {isLoggedIn ? 'あなたのアカウントにこのカードを紐付けます' : 'カードを有効化するにはログインが必要です'}
                 </p>
             </div>
 

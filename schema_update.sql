@@ -6,7 +6,20 @@ BEGIN
     END IF;
 END $$;
 
--- Backfill owner_id with user_id for existing cards (Assume existing cards are owned by their creator)
+-- Backfill owner_id with user_id for existing cards
 UPDATE cards SET owner_id = user_id WHERE owner_id IS NULL;
 
--- Note: We do NOT set NOT NULL constraint because future inventory cards will have owner_id = NULL
+-- Enable RLS (if not already enabled)
+ALTER TABLE cards ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Allow authenticated users to claim unowned cards
+-- They can UPDATE rows where owner_id IS NULL
+-- The CHECK ensures they set themselves as the owner (and don't mess up other things ideally, but Postgres RLS CHECK applies to the NEW row)
+DROP POLICY IF EXISTS "Allow claim unowned cards" ON cards;
+
+CREATE POLICY "Allow claim unowned cards"
+ON cards
+FOR UPDATE
+TO authenticated
+USING (owner_id IS NULL)
+WITH CHECK (owner_id = auth.uid());

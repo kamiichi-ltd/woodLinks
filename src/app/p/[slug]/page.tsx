@@ -35,21 +35,22 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
         notFound()
     }
 
+    // Check ownership
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
     // 1. Activation Check (If owner_id is NULL)
     if (!card.owner_id) {
-        return <CardActivation card={card} />
+        return <CardActivation card={card} isLoggedIn={!!user} />
     }
 
     // Log View (Server Side)
     // await is used as requested to ensure logging happens
     await logEvent(card.id, 'view')
 
-    // Check ownership
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
     // Updated isOwner check to use owner_id
     const isOwner = user?.id === card.owner_id
 
     return <PublicCardClient card={card} isOwner={isOwner} />
 }
+```
