@@ -5,6 +5,7 @@ import { Link as LinkIcon, Phone, Mail, Instagram, Twitter, Facebook, Github, Gl
 import ContactSaveButton from '@/components/public/contact-save-button'
 import PublicNavigation from '@/components/public/public-navigation'
 import { ViewCounter } from '@/components/analytics/view-counter'
+import { logEvent } from '@/app/actions/analytics'
 
 // Helper guard
 function isSnsContent(content: unknown): content is { platform: string; url: string } {
@@ -159,6 +160,7 @@ export default function PublicCardClient({ card, isOwner }: PublicCardClientProp
                                     href={url}
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    onClick={() => logEvent(card.id, 'link_click')}
                                     className="group flex items-center p-1 rounded-xl bg-white border border-[#e6e2d3] shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0"
                                 >
                                     <div className="h-12 w-12 rounded-lg bg-[#fdfbf7] flex items-center justify-center border border-[#f0ebe0] group-hover:bg-[#f4f1ea] transition-colors">

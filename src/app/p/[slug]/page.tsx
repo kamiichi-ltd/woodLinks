@@ -1,21 +1,29 @@
+```typescript
 import { getCardBySlug } from '@/services/card-service'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import PublicCardClient from '@/components/public/public-card-client'
+import { Metadata } from 'next' // Added for Metadata type
+import { logEvent } from '@/app/actions/analytics'
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params
     const card = await getCardBySlug(slug)
 
     if (!card) {
         return {
-            title: 'Card Not Found',
+            title: 'Card Not Found - WoodLinks',
         }
     }
 
     return {
-        title: `${card.title} | WoodLinks`,
-        description: card.description || 'Digital Business Card',
+        title: `${ card.title } | WoodLinks`,
+        description: card.description || 'Digital Business Card by WoodLinks',
+        openGraph: {
+            title: card.title || 'WoodLinks Profile',
+            description: card.description || '',
+            images: card.avatar_url ? [card.avatar_url] : [],
+        },
     }
 }
 
@@ -27,6 +35,9 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
         notFound()
     }
 
+    // Log View (Fire and forget to avoid blocking)
+    void logEvent(card.id, 'view')
+
     // Check ownership
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -34,3 +45,4 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
 
     return <PublicCardClient card={card} isOwner={isOwner} />
 }
+```

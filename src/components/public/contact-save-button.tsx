@@ -1,15 +1,11 @@
 'use client'
 
-import { logAnalyticsEvent } from '@/services/analytics-service'
+import { logEvent } from '@/app/actions/analytics'
 import { UserPlus } from 'lucide-react'
 
 export default function ContactSaveButton({ cardId, slug, themeButtonClass }: { cardId: string, slug: string, themeButtonClass: string }) {
     const handleClick = () => {
-        logAnalyticsEvent({
-            cardId,
-            eventType: 'contact_save',
-            userAgent: navigator.userAgent
-        })
+        logEvent(cardId, 'contact_save')
     }
 
     return (
