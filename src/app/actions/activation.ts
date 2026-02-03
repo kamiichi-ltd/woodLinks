@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 
 export async function claimCard(cardId: string) {
@@ -17,7 +18,8 @@ export async function claimCard(cardId: string) {
     // 2. Check Card Status (Must be unowned)
     // We use a separate query or enforce in update to be safe
     // Ideally we check first to provide good error message
-    const { data: card, error: fetchError } = await supabase
+    // Use 'as any' to bypass strict inference if column is missing from local types during update
+    const { data: card, error: fetchError } = await (supabase as any)
         .from('cards')
         .select('owner_id')
         .eq('id', cardId)
@@ -57,7 +59,7 @@ export async function claimCard(cardId: string) {
     // because regular users shouldn't be able to update arbitrary cards unless they own them.
     // But "Claiming" is a special transition.
 
-    const supabaseAdmin = createClient(
+    const supabaseAdmin = createAdminClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!,
         {
