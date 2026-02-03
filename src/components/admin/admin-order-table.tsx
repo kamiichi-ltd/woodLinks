@@ -1,7 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import { Database } from '@/database.types'
 import { StatusUpdateDialog } from './status-update-dialog'
+import { ClipboardCopy, Check, ExternalLink } from 'lucide-react'
 
 const STATUS_MAP: Record<string, string> = {
     pending_payment: '支払い待ち',
@@ -13,9 +15,6 @@ const STATUS_MAP: Record<string, string> = {
     refunded: '返金済み',
 }
 
-// If date-fns not available, use simple formatter
-// Checking package.json... I will stick to standard Intl for zero dependency risk
-
 type Order = Database['public']['Tables']['orders']['Row'] & {
     profiles: {
         email: string | null
@@ -23,10 +22,27 @@ type Order = Database['public']['Tables']['orders']['Row'] & {
     } | null
     cards: {
         title: string | null
+        slug: string | null
     } | null
 }
 
 export function AdminOrderTable({ orders }: { orders: Order[] }) {
+    const [copiedId, setCopiedId] = useState<string | null>(null)
+
+    const handleCopyUrl = async (slug: string, orderId: string) => {
+        if (!slug) return
+        const url = `https://wood-links.vercel.app/p/${slug}`
+
+        try {
+            await navigator.clipboard.writeText(url)
+            setCopiedId(orderId)
+            setTimeout(() => setCopiedId(null), 2000)
+        } catch (err) {
+            console.error('Failed to copy:', err)
+            alert('コピーに失敗しました')
+        }
+    }
+
     return (
         <div className="bg-white rounded-xl shadow border border-stone-200">
             {/* Desktop Table View */}
@@ -74,7 +90,23 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                                             {order.material === 'walnut' ? 'ウォールナット' : order.material === 'hinoki' ? '檜 (Hinoki)' : '杉 (Sugi)'}
                                         </span>
                                         <span className="text-stone-600 font-medium">x {order.quantity}枚</span>
-                                        <span className="text-stone-400 text-xs">Card: {order.cards?.title}</span>
+                                        {order.cards && (
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <span className="text-stone-400 text-xs">Card: {order.cards.title}</span>
+                                                <button
+                                                    onClick={() => handleCopyUrl(order.cards?.slug || '', order.id)}
+                                                    className="p-1 hover:bg-stone-100 rounded text-stone-400 hover:text-stone-600 transition-colors relative group"
+                                                    title="URLをコピー"
+                                                >
+                                                    {copiedId === order.id ? <Check className="h-3 w-3 text-green-500" /> : <ClipboardCopy className="h-3 w-3" />}
+                                                    {copiedId === order.id && (
+                                                        <span className="absolute -top-6 left-1/2 -translate-x-1/2 bg-stone-800 text-white text-[10px] px-2 py-0.5 rounded shadow whitespace-nowrap">
+                                                            Copied!
+                                                        </span>
+                                                    )}
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 align-top text-stone-600 max-w-xs min-w-[200px]">
@@ -149,9 +181,21 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                             </span>
                             <span className="font-bold text-stone-700">x {order.quantity}</span>
                         </div>
-                        <div className="text-xs text-stone-500">
-                            Card Plan: {order.cards?.title}
-                        </div>
+                        {order.cards && (
+                            <div className="flex items-center justify-between text-xs text-stone-500">
+                                <span>Card Plan: {order.cards.title}</span>
+                                <button
+                                    onClick={() => handleCopyUrl(order.cards?.slug || '', order.id)}
+                                    className={`flex items-center gap-1 px-2 py-1 rounded-full border transition-all ${copiedId === order.id
+                                            ? 'bg-green-50 border-green-200 text-green-700'
+                                            : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50'
+                                        }`}
+                                >
+                                    {copiedId === order.id ? <Check className="h-3 w-3" /> : <ClipboardCopy className="h-3 w-3" />}
+                                    <span className="font-medium">URLをコピー</span>
+                                </button>
+                            </div>
+                        )}
 
                         {/* Status Badge */}
                         <div className="flex justify-between items-center">
@@ -170,7 +214,6 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                                 orderId={order.id}
                                 currentStatus={order.status}
                             />
-                            {/* Note: Additional "View Details" button could be added here if a detail page exists */}
                         </div>
                     </div>
                 ))}
