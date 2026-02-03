@@ -68,6 +68,7 @@ export default function MaterialSelection() {
     )
 }
 
+
 function MaterialCard({ wood, index }: { wood: typeof materials[0], index: number }) {
     return (
         <motion.div
@@ -75,19 +76,24 @@ function MaterialCard({ wood, index }: { wood: typeof materials[0], index: numbe
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: index * 0.2 }}
-            className="group relative h-[500px] rounded-xl overflow-hidden cursor-pointer shadow-xl"
+            className="group relative flex flex-col md:block h-auto md:h-[500px] rounded-xl overflow-hidden cursor-pointer shadow-xl bg-[#1a1510]"
         >
-            {/* Background Layer (Zoom Effect) */}
-            <div className={`absolute inset-0 bg-gradient-to-br ${wood.bgGradient} transition-transform duration-[1.5s] ease-out group-hover:scale-110`}></div>
+            {/* --- Mobile Layout: Image Section --- */}
+            <div className="relative h-[250px] md:absolute md:inset-0 overflow-hidden">
+                {/* Background Layer (Zoom Effect) */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${wood.bgGradient} transition-transform duration-[1.5s] ease-out group-hover:scale-110`}></div>
 
-            {/* Wood Texture Overlay */}
-            <div className={`absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] mix-blend-multiply ${wood.textureOpacity} transition-transform duration-[1.5s] ease-out group-hover:scale-110`}></div>
+                {/* Wood Texture Overlay */}
+                <div className={`absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] mix-blend-multiply ${wood.textureOpacity} transition-transform duration-[1.5s] ease-out group-hover:scale-110`}></div>
 
-            {/* Dark Overlay (Fade Effect) */}
-            <div className="absolute inset-0 bg-[#1a1510]/60 transition-opacity duration-700 group-hover:opacity-40"></div>
+                {/* Dark Overlay (Fade Effect) - Desktop only (or lighter on mobile) */}
+                <div className="absolute inset-0 bg-[#1a1510]/30 md:bg-[#1a1510]/60 transition-opacity duration-700 group-hover:opacity-40"></div>
+            </div>
 
-            {/* Content Content - Centered */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center z-10 transform transition-transform duration-700 group-hover:-translate-y-4">
+            {/* --- Content Section --- */}
+            <div className="relative md:absolute md:inset-0 flex flex-col items-center justify-center p-8 text-center z-10 transform transition-transform duration-700 group-hover:-translate-y-4 bg-[#1a1510] md:bg-transparent">
+                {/* Visual connection to top image on mobile (optional, but clean separation requested) */}
+
                 {/* Subtype */}
                 <span className="text-[10px] tracking-[0.3em] text-[#d4c5ae]/80 uppercase mb-6 border-b border-[#d4c5ae]/30 pb-2">
                     {wood.subtype}
@@ -102,33 +108,33 @@ function MaterialCard({ wood, index }: { wood: typeof materials[0], index: numbe
                 </span>
 
                 {/* Description */}
-                <p className="text-[#e6e2d3] text-sm leading-relaxed mb-10 max-w-[80%] opacity-90">
+                <p className="text-[#e6e2d3] text-sm leading-relaxed mb-10 max-w-[90%] md:max-w-[80%] opacity-90">
                     {wood.desc}
                 </p>
 
                 {/* Specs Meter */}
-                <div className="w-full max-w-[200px] space-y-3">
+                <div className="w-full max-w-[240px] md:max-w-[200px] space-y-4 md:space-y-3 bg-white/5 md:bg-transparent p-6 md:p-0 rounded-xl md:rounded-none border border-white/5 md:border-none">
                     <SpecMeter label="Scent" value={wood.specs.scent} />
                     <SpecMeter label="Hardness" value={wood.specs.hardness} />
                     <SpecMeter label="Aging" value={wood.specs.aging} />
                 </div>
             </div>
 
-            {/* Border / Frame effect */}
-            <div className="absolute inset-4 border border-[#fdfbf7]/10 rounded-lg pointer-events-none transition-colors duration-500 group-hover:border-[#fdfbf7]/30"></div>
+            {/* Border / Frame effect - Desktop only */}
+            <div className="hidden md:block absolute inset-4 border border-[#fdfbf7]/10 rounded-lg pointer-events-none transition-colors duration-500 group-hover:border-[#fdfbf7]/30"></div>
         </motion.div>
     )
 }
 
 function SpecMeter({ label, value }: { label: string, value: number }) {
     return (
-        <div className="flex items-center justify-between text-[10px] text-[#d4c5ae]/80">
+        <div className="flex items-center justify-between text-xs md:text-[10px] text-[#d4c5ae]/80">
             <span className="w-16 text-left tracking-widest uppercase">{label}</span>
             <div className="flex gap-1.5">
                 {[1, 2, 3, 4, 5].map((dot) => (
                     <div
                         key={dot}
-                        className={`w-1.5 h-1.5 rounded-full transition-colors duration-500 ${dot <= value ? 'bg-[#d4c5ae]' : 'bg-[#d4c5ae]/20'}`}
+                        className={`w-2 h-2 md:w-1.5 md:h-1.5 rounded-full transition-colors duration-500 ${dot <= value ? 'bg-[#d4c5ae]' : 'bg-[#d4c5ae]/20'}`}
                     ></div>
                 ))}
             </div>

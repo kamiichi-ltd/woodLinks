@@ -160,13 +160,13 @@ export default function Home() {
 
       <main className="flex-1">
         {/* --- Hero Section --- */}
-        <section className="relative pt-24 pb-16 sm:pt-40 sm:pb-32 overflow-hidden">
+        <section className="relative pt-24 pb-24 sm:pt-40 sm:pb-32 overflow-hidden">
           {/* Background Elements */}
           <div className="absolute inset-0 -z-10 pointer-events-none">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-[#e6e2d3]/30 to-transparent rounded-[100%] blur-3xl opacity-50"></div>
           </div>
 
-          <div className="max-w-7xl mx-auto px-4 md:px-6 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div className="max-w-7xl mx-auto px-6 md:px-6 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Text Content */}
             <motion.div
               initial="hidden"
@@ -177,7 +177,7 @@ export default function Home() {
               <motion.span variants={fadeIn} className="inline-block py-1 px-3 rounded-full bg-[#f4f1ea] border border-[#e6e2d3] text-[#8c7b6c] text-[10px] font-bold tracking-[0.2em] uppercase mb-6">
                 TACTILE DIGITAL
               </motion.span>
-              <motion.h1 variants={fadeIn} className="text-4xl sm:text-5xl lg:text-7xl font-serif font-medium tracking-tight text-[#3d3126] mb-8 leading-[1.1]">
+              <motion.h1 variants={fadeIn} className="text-3xl sm:text-5xl lg:text-7xl font-serif font-medium tracking-tight text-[#3d3126] mb-8 leading-loose sm:leading-[1.1]">
                 木に、<br />デジタルという<br />命を宿す。
               </motion.h1>
               <motion.p variants={fadeIn} className="text-base sm:text-xl text-[#5a4d41] mb-10 font-light leading-relaxed max-w-xl mx-auto lg:mx-0 px-4 sm:px-0">
@@ -245,7 +245,7 @@ export default function Home() {
 
         {/* --- How It Works --- */}
         <section className="py-24 bg-white border-y border-[#e6e2d3]/50">
-          <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="max-w-7xl mx-auto px-6 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -288,7 +288,7 @@ export default function Home() {
 
         {/* --- Features (Bento Grid) --- */}
         <section className="py-32 bg-[#fdfbf7]">
-          <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="max-w-7xl mx-auto px-6 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -300,21 +300,21 @@ export default function Home() {
               <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#3d3126]">機能美という、おもてなし。</h2>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-6 h-auto md:h-[600px]">
+            <div className="flex flex-col md:grid md:grid-cols-3 md:grid-rows-2 gap-16 md:gap-6 md:h-[600px]">
               <div className="md:col-span-2 bg-white rounded-3xl p-8 border border-[#e6e2d3] hover:shadow-xl transition-shadow duration-300 relative overflow-hidden group">
                 <div className="relative z-10">
                   <div className="w-12 h-12 bg-[#2c3e50] rounded-xl flex items-center justify-center text-white mb-6">
                     <Zap className="h-6 w-6" />
                   </div>
                   <h3 className="text-2xl font-bold text-[#3d3126] mb-3">No App Required</h3>
-                  <p className="text-[#5a4d41] max-w-md">専用アプリのインストールは一切不要。<br />スマホ標準搭載のNFC機能で、誰とでもスムーズに繋がれます。</p>
+                  <p className="text-[#5a4d41] max-w-md mb-6 md:mb-0">専用アプリのインストールは一切不要。<br />スマホ標準搭載のNFC機能で、誰とでもスムーズに繋がれます。</p>
                 </div>
-                <div className="absolute right-0 bottom-0 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
-                  <Zap className="w-64 h-64 text-[#2c3e50]" />
+                <div className="relative md:absolute md:right-0 md:bottom-0 opacity-10 md:opacity-5 group-hover:opacity-10 transition-opacity duration-500 mt-6 md:mt-0 flex justify-end">
+                  <Zap className="w-48 h-48 md:w-64 md:h-64 text-[#2c3e50]" />
                 </div>
               </div>
               <div className="md:row-span-2 bg-[#2c3e50] rounded-3xl p-8 text-[#fdfbf7] flex flex-col relative overflow-hidden group">
-                <div className="relative z-10">
+                <div className="relative z-10 flex flex-col h-full">
                   <div className="w-12 h-12 bg-[#fdfbf7]/10 rounded-xl flex items-center justify-center text-[#fdfbf7] mb-6">
                     <BarChart3 className="h-6 w-6" />
                   </div>
@@ -323,7 +323,7 @@ export default function Home() {
                     「いつ、誰に、どこで」見られたか。<br />
                     アクセス解析機能で、出会いの価値を可視化します。
                   </p>
-                  <div className="mt-auto bg-white/5 rounded-xl p-4 border border-white/10 backdrop-blur-sm">
+                  <div className="mt-8 md:mt-auto bg-white/5 rounded-xl p-4 border border-white/10 backdrop-blur-sm">
                     <div className="flex items-end justify-between h-32 gap-2">
                       {[30, 50, 45, 80, 60, 90, 75].map((h, i) => (
                         <div key={i} className="w-full bg-[#d4c5ae] opacity-50 rounded-t-sm hover:opacity-100 transition-opacity" style={{ height: `${h}%` }}></div>
@@ -357,7 +357,7 @@ export default function Home() {
           <div className="absolute -top-20 -right-20 w-96 h-96 bg-[#3e5266] rounded-full blur-[100px] opacity-40"></div>
           <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-[#1a252f] rounded-full blur-[100px] opacity-40"></div>
 
-          <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10 text-center">
+          <div className="max-w-7xl mx-auto px-6 md:px-6 relative z-10 text-center">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -383,7 +383,7 @@ export default function Home() {
 
         {/* --- [NEW] Comparison Section (ROI) --- */}
         <section className="py-24 bg-white border-b border-[#e6e2d3]">
-          <div className="max-w-4xl mx-auto px-4 md:px-6">
+          <div className="max-w-4xl mx-auto px-6 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -444,7 +444,7 @@ export default function Home() {
 
         {/* --- Use Cases Section --- */}
         <section className="py-32 bg-[#fdfbf7]">
-          <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="max-w-7xl mx-auto px-6 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -484,7 +484,7 @@ export default function Home() {
 
         {/* --- [NEW] Specs & Warranty --- */}
         <section className="py-20 bg-white border-t border-[#e6e2d3]">
-          <div className="max-w-5xl mx-auto px-4 md:px-6">
+          <div className="max-w-5xl mx-auto px-6 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -524,7 +524,7 @@ export default function Home() {
 
         {/* --- FAQ Section --- */}
         <section className="py-24 bg-white border-y border-[#e6e2d3]/50">
-          <div className="max-w-3xl mx-auto px-4 md:px-6">
+          <div className="max-w-3xl mx-auto px-6 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
