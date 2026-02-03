@@ -40,19 +40,22 @@ const getMaterialTheme = (material: string = 'walnut') => {
     }
 
     const themes: Record<string, typeof defaultTheme> = {
-        walnut: defaultTheme,
+        walnut: {
+            ...defaultTheme,
+            textColor: 'text-stone-50', // Soft white
+        },
         maple: {
             name: 'Maple',
-            headerBg: 'bg-amber-100',
+            headerBg: 'bg-orange-100', // Yellowish beige
             textColor: 'text-stone-800',
-            buttonClass: 'bg-amber-100 text-stone-800',
+            buttonClass: 'bg-orange-100 text-stone-800',
             texture: 'opacity-20 bg-[url("https://www.transparenttextures.com/patterns/wood-pattern.png")]',
         },
         hinoki: {
             name: 'Hinoki',
-            headerBg: 'bg-yellow-50',
-            textColor: 'text-stone-900',
-            buttonClass: 'bg-yellow-50 text-stone-900 border border-stone-200',
+            headerBg: 'bg-stone-50', // Warm off-white
+            textColor: 'text-stone-800',
+            buttonClass: 'bg-stone-50 text-stone-800 border border-stone-200',
             texture: 'opacity-10 bg-[url("https://www.transparenttextures.com/patterns/wood-pattern.png")]',
         },
         sugi: {
@@ -199,17 +202,17 @@ export default function PublicCardClient({ card, isOwner }: PublicCardClientProp
                         <div className="w-px h-4 bg-stone-200"></div>
                         <button
                             onClick={() => setCurrentMaterial('walnut')}
-                            className={`w-6 h-6 rounded-full bg-[#4a3b32] ring-2 ring-offset-2 transition-all hover:scale-110 ${currentMaterial === 'walnut' ? 'ring-[#4a3b32]' : 'ring-transparent opacity-70 hover:opacity-100'}`}
+                            className={`w-6 h-6 rounded-full bg-stone-800 ring-2 ring-offset-2 transition-all hover:scale-110 ${currentMaterial === 'walnut' ? 'ring-stone-800' : 'ring-transparent opacity-70 hover:opacity-100'}`}
                             title="Walnut"
                         />
                         <button
                             onClick={() => setCurrentMaterial('maple')}
-                            className={`w-6 h-6 rounded-full bg-[#e6b88a] ring-2 ring-offset-2 transition-all hover:scale-110 ${currentMaterial === 'maple' ? 'ring-[#e6b88a]' : 'ring-transparent opacity-70 hover:opacity-100'}`}
+                            className={`w-6 h-6 rounded-full bg-orange-100 ring-2 ring-offset-2 transition-all hover:scale-110 ${currentMaterial === 'maple' ? 'ring-orange-200' : 'ring-transparent opacity-70 hover:opacity-100'}`}
                             title="Maple"
                         />
                         <button
                             onClick={() => setCurrentMaterial('hinoki')}
-                            className={`w-6 h-6 rounded-full bg-[#fdfbf7] border border-stone-200 ring-2 ring-offset-2 transition-all hover:scale-110 ${currentMaterial === 'hinoki' ? 'ring-stone-300' : 'ring-transparent opacity-70 hover:opacity-100'}`}
+                            className={`w-6 h-6 rounded-full bg-stone-50 border border-stone-200 ring-2 ring-offset-2 transition-all hover:scale-110 ${currentMaterial === 'hinoki' ? 'ring-stone-200' : 'ring-transparent opacity-70 hover:opacity-100'}`}
                             title="Hinoki"
                         />
                     </div>
