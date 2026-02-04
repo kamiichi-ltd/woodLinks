@@ -49,15 +49,17 @@ export function CardEditForm({ card }: { card: CardData }) {
         }))
     }
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setIsPending(true)
 
+        const payload = new FormData(e.currentTarget)
+        // Ensure is_published is set (though hidden input handles this, manual append doubles safety if needed, 
+        // but hidden input with correct value is enough)
+        // console.log([...payload.entries()]) // Debug if needed
+
         try {
-            await updateAdminCard(card.id, {
-                ...formData,
-                wood_story: formData.wood_story || '', // Ensure explicit string or handling optional
-            })
+            await updateAdminCard(card.id, payload)
             alert('更新しました')
             router.refresh()
         } catch (error) {
@@ -98,10 +100,13 @@ export function CardEditForm({ card }: { card: CardData }) {
                     </div>
                     {/* Status Toggle / Badge */}
                     <div className="flex items-center gap-2">
+                        {/* Hidden input to sync state with FormData */}
+                        <input type="hidden" name="is_published" value={formData.is_published ? 'true' : 'false'} />
+
                         <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-lg border border-stone-200 shadow-sm hover:bg-stone-50 transition-colors">
                             <input
                                 type="checkbox"
-                                name="is_published"
+                                // name="is_published" // Removed name from checkbox to avoid double submission or 'on' value if checked
                                 checked={formData.is_published}
                                 onChange={handleChange}
                                 className="w-5 h-5 rounded border-stone-300 text-stone-800 focus:ring-stone-500"

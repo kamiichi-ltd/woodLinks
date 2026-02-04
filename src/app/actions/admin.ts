@@ -281,16 +281,7 @@ export async function getAdminCard(id: string) {
 
 export async function updateAdminCard(
     id: string,
-    data: {
-        title: string
-        description: string
-        slug: string
-        material_type: string
-        wood_origin: string
-        wood_age: string
-        wood_story?: string
-        is_published: boolean
-    }
+    formData: FormData
 ) {
     const supabase = await createServerClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -314,14 +305,24 @@ export async function updateAdminCard(
         throw new Error('Unauthorized: You do not own this card')
     }
 
-    console.log(`[Admin] Updating card ${id}`, { ...data, is_published: data.is_published });
+    // Parse FormData
+    const data = {
+        title: formData.get('title') as string,
+        description: formData.get('description') as string,
+        slug: formData.get('slug') as string,
+        material_type: formData.get('material_type') as string,
+        wood_origin: formData.get('wood_origin') as string,
+        wood_age: formData.get('wood_age') as string,
+        wood_story: formData.get('wood_story') as string, // Optional field
+        is_published: formData.get('is_published') === 'true' // Robust boolean check
+    }
+
+    console.log(`[Admin] Updating card ${id}`, { ...data });
 
     const { error } = await (adminDbClient as any)
         .from('cards')
         .update({
             ...data,
-            // Explicitly ensure boolean is passed if needed, though data.is_published is already typed boolean
-            is_published: data.is_published,
             updated_at: new Date().toISOString()
         })
         .eq('id', id);
