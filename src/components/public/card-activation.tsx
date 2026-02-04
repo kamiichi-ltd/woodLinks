@@ -37,12 +37,13 @@ export default function CardActivation({ card, isLoggedIn }: { card: Card, isLog
                 </div>
 
                 <h1 className="text-2xl font-serif font-bold text-stone-800 mb-4">
-                    Welcome to WoodLinks
+                    Activate Your Card
                 </h1>
 
                 <p className="text-stone-600 mb-8 leading-relaxed">
-                    このウッドカードを有効化して、<br />
-                    あなただけの名刺を作りましょう。
+                    お手元のカードをアカウントに連携し、<br />
+                    デジタル名刺の利用を開始します。<br />
+                    下のボタンからセットアップへ進んでください。
                 </p>
 
                 {error && (
@@ -63,7 +64,7 @@ export default function CardActivation({ card, isLoggedIn }: { card: Card, isLog
                                 セットアップ中...
                             </>
                         ) : (
-                            'セットアップを開始する'
+                            'カードを有効化して開始'
                         )}
                     </button>
                 ) : (
@@ -72,7 +73,7 @@ export default function CardActivation({ card, isLoggedIn }: { card: Card, isLog
                         className="w-full bg-stone-800 text-stone-50 hover:bg-stone-700 py-4 px-6 rounded-xl font-bold transition-all shadow-md active:scale-95 flex justify-center items-center gap-2"
                     >
                         <LogIn className="w-5 h-5" />
-                        ログイン / アカウント作成して開始
+                        ログインして有効化
                     </Link>
                 )}
 
