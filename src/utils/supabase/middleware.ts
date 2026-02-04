@@ -57,8 +57,17 @@ export async function updateSession(request: NextRequest) {
                 }
             }
 
-            // Default: Redirect to /admin
-            return NextResponse.redirect(new URL('/admin', request.url))
+            // Role-based Redirect
+            // If user is admin (check email), go to /admin/orders
+            // Otherwise go to /dashboard
+            // Note: process.env might not be available in Edge Middleware in some environments, but usually OK in Next.js
+            const adminEmail = process.env.ADMIN_EMAIL
+            if (adminEmail && user.email === adminEmail) {
+                return NextResponse.redirect(new URL('/admin/orders', request.url))
+            }
+
+            // Default: Redirect to /dashboard
+            return NextResponse.redirect(new URL('/dashboard', request.url))
         }
     }
 
