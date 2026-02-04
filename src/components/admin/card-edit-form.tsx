@@ -14,6 +14,7 @@ type CardData = {
     wood_origin: string | null
     wood_age: string | null
     wood_story: string | null
+    is_published: boolean | null
 }
 
 const MATERIAL_OPTIONS = [
@@ -34,11 +35,18 @@ export function CardEditForm({ card }: { card: CardData }) {
         wood_origin: card.wood_origin || '',
         wood_age: card.wood_age || '',
         wood_story: card.wood_story || '',
+        is_published: card.is_published || false,
     })
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value } = e.target
-        setFormData(prev => ({ ...prev, [name]: value }))
+        const { name, value, type } = e.target
+        // Helper to check if it's a checkbox
+        const checked = (e.target as HTMLInputElement).checked
+
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? (checked ? true : false) : value
+        }))
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -46,7 +54,10 @@ export function CardEditForm({ card }: { card: CardData }) {
         setIsPending(true)
 
         try {
-            await updateAdminCard(card.id, formData)
+            await updateAdminCard(card.id, {
+                ...formData,
+                wood_story: formData.wood_story || '', // Ensure explicit string or handling optional
+            })
             alert('更新しました')
             router.refresh()
         } catch (error) {
@@ -59,6 +70,7 @@ export function CardEditForm({ card }: { card: CardData }) {
 
     return (
         <div className="max-w-4xl mx-auto">
+            {/* ... Header ... */}
             <div className="flex items-center justify-between mb-6">
                 <button
                     onClick={() => router.back()}
@@ -79,13 +91,31 @@ export function CardEditForm({ card }: { card: CardData }) {
             </div>
 
             <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
-                <div className="p-6 border-b border-stone-100 bg-stone-50">
-                    <h2 className="text-xl font-bold text-stone-800">カード情報編集</h2>
-                    <p className="text-sm text-stone-500 mt-1">ID: {card.id}</p>
+                <div className="p-6 border-b border-stone-100 bg-stone-50 flex justify-between items-center">
+                    <div>
+                        <h2 className="text-xl font-bold text-stone-800">カード情報編集</h2>
+                        <p className="text-sm text-stone-500 mt-1">ID: {card.id}</p>
+                    </div>
+                    {/* Status Toggle / Badge */}
+                    <div className="flex items-center gap-2">
+                        <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-lg border border-stone-200 shadow-sm hover:bg-stone-50 transition-colors">
+                            <input
+                                type="checkbox"
+                                name="is_published"
+                                checked={formData.is_published}
+                                onChange={handleChange}
+                                className="w-5 h-5 rounded border-stone-300 text-stone-800 focus:ring-stone-500"
+                            />
+                            <span className={`text-sm font-bold ${formData.is_published ? 'text-green-600' : 'text-stone-400'}`}>
+                                {formData.is_published ? '公開中' : '下書き'}
+                            </span>
+                        </label>
+                    </div>
                 </div>
 
                 <div className="p-6 space-y-8">
                     {/* Basic Info Section */}
+                    {/* ... */}
                     <div className="space-y-4">
                         <h3 className="text-sm font-bold text-stone-400 uppercase tracking-wider border-b border-stone-100 pb-2">基本情報</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
