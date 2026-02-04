@@ -33,13 +33,14 @@ export async function login(formData: FormData) {
 
     revalidatePath('/', 'layout')
 
-    // Dynamic Redirect
-    const next = formData.get('next') as string
-    if (next && next.startsWith('/')) {
-        redirect(next)
+    // 1. Dynamic Redirect (Priority)
+    // nextParam is already captured at top of function
+    if (nextParam && nextParam.startsWith('/')) {
+        redirect(nextParam)
     }
 
-    // Admin Redirect
+    // 2. Admin Check (Optional: If we want to force super-admin to orders page regardless of next? 
+    // No, user said "next gets priority". So we check next first.)
     const { data: { user } } = await supabase.auth.getUser()
     const adminEmail = process.env.ADMIN_EMAIL
 
@@ -47,7 +48,8 @@ export async function login(formData: FormData) {
         redirect('/admin/orders')
     }
 
-    redirect('/dashboard')
+    // 3. Default Redirect (User said /admin, never /)
+    redirect('/admin')
 }
 
 export async function signup(formData: FormData) {
@@ -106,13 +108,16 @@ export async function signup(formData: FormData) {
 
     revalidatePath('/', 'layout')
 
-    // Dynamic Redirect
+    // 1. Dynamic Redirect (Priority)
     const next = formData.get('next') as string
+    console.log('[Auth] SignUp Redirect Check:', next)
+
     if (next && next.startsWith('/')) {
         redirect(next)
     }
 
-    redirect('/dashboard')
+    // 2. Default Redirect
+    redirect('/admin')
 }
 
 export async function logout() {
