@@ -4,8 +4,10 @@ import { useState, useTransition } from 'react'
 import { login, signup } from '@/services/auth-service'
 import { LogIn, UserPlus, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 export default function LoginPage() {
+    const searchParams = useSearchParams()
     const [isPending, startTransition] = useTransition()
     const [isLogin, setIsLogin] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -97,6 +99,7 @@ export default function LoginPage() {
                         </div>
 
                         <div>
+                            <input type="hidden" name="next" value={searchParams.get('next') || ''} />
                             <button
                                 type="submit"
                                 disabled={isPending}

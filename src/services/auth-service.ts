@@ -36,6 +36,12 @@ export async function login(formData: FormData) {
         redirect('/admin/orders')
     }
 
+    // Dynamic Redirect
+    const next = formData.get('next') as string
+    if (next && next.startsWith('/')) {
+        redirect(next)
+    }
+
     redirect('/dashboard')
 }
 
@@ -94,6 +100,13 @@ export async function signup(formData: FormData) {
     }
 
     revalidatePath('/', 'layout')
+
+    // Dynamic Redirect
+    const next = formData.get('next') as string
+    if (next && next.startsWith('/')) {
+        redirect(next)
+    }
+
     redirect('/dashboard')
 }
 
