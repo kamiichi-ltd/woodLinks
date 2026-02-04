@@ -8,12 +8,9 @@ export async function updateSession(request: NextRequest) {
         },
     })
 
-    constsupabase = createServerClient(
+    const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!, // NOTE: Usually middleware uses ANON key, but if we just want to check session it's fine. Wait, middleware is client-side context usually? No, it's server. But safer to use ANON key if just checking auth.
-        // Actually, for updateSession we should use ANON key to be safe and consistent with client headers.
-        // But let's check .env usage in src/utils/supabase/server.ts 
-        // Usually it is NEXT_PUBLIC_SUPABASE_ANON_KEY.
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, // Use ANON key for middleware to match client perspective
         {
             cookies: {
                 getAll() {
@@ -42,12 +39,26 @@ export async function updateSession(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser()
 
+    // 1. Static/API Guard (Redundant with matcher but safe)
+    if (request.nextUrl.pathname.startsWith('/_next') ||
+        request.nextUrl.pathname.startsWith('/api') ||
+        request.nextUrl.pathname.startsWith('/static')) {
+        return response
+    }
+
     if (request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/signup')) {
         if (user) {
             // If user is already logged in, redirect them.
             // CHECK FOR NEXT PARAM
             const next = request.nextUrl.searchParams.get('next')
             if (next && next.startsWith('/')) {
+                // LOOP PREVENTION: If target is same as current, don't redirect
+                // Note: Since we are on /login, if next is /login, we should redirect to admin or dashboard to execute logout if needed, 
+                // OR just prevent redirect.
+                // If next is /login, we are in a loop if we defer to it.
+                if (next === request.nextUrl.pathname) {
+                    return response
+                }
                 return NextResponse.redirect(new URL(next, request.url))
             }
 
