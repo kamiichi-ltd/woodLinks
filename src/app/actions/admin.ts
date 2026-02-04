@@ -314,12 +314,14 @@ export async function updateAdminCard(
         throw new Error('Unauthorized: You do not own this card')
     }
 
-    console.log(`[Admin] Updating card ${id}`, data);
+    console.log(`[Admin] Updating card ${id}`, { ...data, is_published: data.is_published });
 
     const { error } = await (adminDbClient as any)
         .from('cards')
         .update({
             ...data,
+            // Explicitly ensure boolean is passed if needed, though data.is_published is already typed boolean
+            is_published: data.is_published,
             updated_at: new Date().toISOString()
         })
         .eq('id', id);
@@ -330,6 +332,7 @@ export async function updateAdminCard(
     }
 
     revalidatePath('/admin/cards')
+    revalidatePath(`/admin/cards/${id}`) // Revalidate the specific edit page
     revalidatePath(`/p/${data.slug}`) // Revalidate public page
     return { success: true };
 }
