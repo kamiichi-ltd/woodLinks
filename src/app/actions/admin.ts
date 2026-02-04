@@ -290,7 +290,6 @@ export async function updateAdminCard(
         wood_age: string
         wood_story: string
     }
-    wood_story: string
     }
 ) {
     const supabase = await createServerClient()
