@@ -288,8 +288,6 @@ export async function updateAdminCard(
         material_type: string
         wood_origin: string
         wood_age: string
-        wood_story: string
-    }
     }
 ) {
     const supabase = await createServerClient()
