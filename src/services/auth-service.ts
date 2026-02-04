@@ -10,6 +10,9 @@ export async function login(formData: FormData) {
     // Type assertion for form data entries
     const email = formData.get('email') as string
     const password = formData.get('password') as string
+    const nextParam = formData.get('next') as string
+
+    console.log('[Auth] Login attempt:', { email, next: nextParam })
 
     if (!email || !password) {
         throw new Error('Email and password are required')

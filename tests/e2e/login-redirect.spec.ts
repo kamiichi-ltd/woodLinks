@@ -23,24 +23,16 @@ test.describe('Login Redirect Flow', () => {
     const TEST_PASSWORD = 'password123';
 
     test.beforeAll(async () => {
-        // 1. Create a Test User
-        // We use signUp to create a new user to ensure we know the password
-        const { data, error } = await supabase.auth.signUp({
+        // 1. Create a Test User using Admin API
+        const { data, error } = await supabase.auth.admin.createUser({
             email: TEST_EMAIL,
-            password: TEST_PASSWORD
+            password: TEST_PASSWORD,
+            email_confirm: true
         });
 
-        // If user exists or other error, ensure we handle it
         if (error) {
-            // If "User already registered", that's fine, we might proceed if we know password.
-            // But better to use generated email.
-            console.log('User setup error (might trigger email confirm):', error.message);
-        }
-
-        // Auto-confirm if needed (Supabase local usually disables confirm, but if enabled:)
-        // We can update the user to confirmed using admin api
-        if (data.user && !data.user.email_confirmed_at) {
-            await supabase.auth.admin.updateUserById(data.user.id, { email_confirm: true });
+            console.log('User setup error:', error.message);
+            throw error;
         }
     });
 
