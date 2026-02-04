@@ -69,7 +69,7 @@ export default function CardActivation({ card, isLoggedIn }: { card: Card, isLog
                     </button>
                 ) : (
                     <Link
-                        href={`/login?next=/p/${card.slug}`}
+                        href={'/login?next=' + encodeURIComponent('/p/' + card.slug)}
                         className="w-full bg-stone-800 text-stone-50 hover:bg-stone-700 py-4 px-6 rounded-xl font-bold transition-all shadow-md active:scale-95 flex justify-center items-center gap-2"
                     >
                         <LogIn className="w-5 h-5" />
