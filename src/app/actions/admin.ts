@@ -252,17 +252,28 @@ export async function getAdminCustomers() {
 }
 
 export async function getAdminCard(id: string) {
-    await verifyAdmin();
+    const supabase = await createServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
 
+    // We use adminDbClient to fetch the card first to check ownership (bypassing RLS for the check)
     const { data, error } = await (adminDbClient as any)
         .from('cards')
         .select('*')
         .eq('id', id)
         .single();
 
-    if (error) {
+    if (error || !data) {
         console.error('[Admin] Card Fetch Error:', error);
         throw new Error('Failed to fetch card');
+    }
+
+    // Authorization Check
+    const adminEmail = process.env.ADMIN_EMAIL
+    const isOwner = user?.id === data.owner_id
+    const isAdmin = user?.email === adminEmail
+
+    if (!user || (!isOwner && !isAdmin)) {
+        throw new Error('Unauthorized: You do not own this card')
     }
 
     return data;
@@ -279,8 +290,31 @@ export async function updateAdminCard(
         wood_age: string
         wood_story: string
     }
+    wood_story: string
+    }
 ) {
-    await verifyAdmin();
+    const supabase = await createServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    // Authorization Check: Fetch card to verify owner
+    const { data: card, error: fetchError } = await (adminDbClient as any)
+        .from('cards')
+        .select('owner_id')
+        .eq('id', id)
+        .single()
+
+    if (fetchError || !card) {
+        throw new Error('Card not found')
+    }
+
+    const adminEmail = process.env.ADMIN_EMAIL
+    const isOwner = user?.id === card.owner_id
+    const isAdmin = user?.email === adminEmail
+
+    if (!user || (!isOwner && !isAdmin)) {
+        throw new Error('Unauthorized: You do not own this card')
+    }
+
     console.log(`[Admin] Updating card ${id}`, data);
 
     const { error } = await (adminDbClient as any)
