@@ -111,7 +111,8 @@ export async function getCardBySlug(slug: string) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .select('*' as any)
         .eq('slug', slug)
-        .eq('status', 'published')
+        // .eq('status', 'published') // Wrong column
+        .eq('is_published', true) // Correct column from init_database.sql
         .single()
 
     if (cardError || !card) {
@@ -171,7 +172,7 @@ export async function createCard(formData: FormData) {
         user_id: user.id,
         title,
         slug,
-        status: 'draft',
+        is_published: false, // Default to draft (false)
     }
 
     const { data, error } = await (supabase as any)
@@ -199,7 +200,20 @@ export async function updateCard(id: string, updates: { title?: string; descript
         throw new Error('Unauthorized')
     }
 
-    const updatePayload: { title?: string; description?: string; status?: 'draft' | 'published' | 'lost_reissued' | 'disabled' | 'transferred'; slug?: string; material_type?: 'sugi' | 'hinoki' | 'walnut' } = { ...updates }
+    // Map 'status' to 'is_published' if it exists in updates
+    // The signature uses 'status' string, but DB has 'is_published' boolean.
+    // We need to transform it.
+    const { status, ...rest } = updates
+    const updatePayload: any = { ...rest }
+
+    if (status) {
+        if (status === 'published') {
+            updatePayload.is_published = true
+        } else {
+            // draft, disabled, etc map to false for now, or we need a status column if we want to differentiate
+            updatePayload.is_published = false
+        }
+    }
 
     // Logic to ensure slug exists if not already, or if title changes and slug is empty (though slug is usually persistent)
     // For now, if we are updating title, let's check if we want to regenerate slug? 

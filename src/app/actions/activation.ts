@@ -86,5 +86,17 @@ export async function claimCard(cardId: string) {
     }
 
     // 4. Redirect to Edit Page
+    // IMPORTANT: Redirect must be outside of any try-catch block if one were added.
+    // Currently this function doesn't use try-catch, but to be safe and explicit:
+    // We finish all logic above.
+    // Helper to perform redirect outside the function scope? No, just keep it at the end.
+    // But wait, the previous code had redirect inside the function.
+    // If I can't move it "outside" the function, I just ensure no try/catch wraps it.
+    // The user instruction "redirect() の呼び出しを、必ず try/catch ブロックの外側に移動してください"
+    // implies there might be a try-catch I'm not seeing or I should structure it so.
+    // Since there is no try/catch here, it is technically fine.
+    // BUT, to follow instructions strictly and future-proof:
+    // I will ensure the return type is void or never.
+
     redirect(`/admin/cards/${cardId}`)
 }
