@@ -1,12 +1,20 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, Suspense } from 'react'
 import { login, signup } from '@/services/auth-service'
 import { LogIn, UserPlus, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
 export default function LoginPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-[#fdfbf7] flex items-center justify-center">Loading...</div>}>
+            <LoginForm />
+        </Suspense>
+    )
+}
+
+function LoginForm() {
     const searchParams = useSearchParams()
     const [isPending, startTransition] = useTransition()
     const [isLogin, setIsLogin] = useState(true)

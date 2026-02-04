@@ -28,18 +28,20 @@ export async function login(formData: FormData) {
 
     revalidatePath('/', 'layout')
 
+    revalidatePath('/', 'layout')
+
+    // Dynamic Redirect
+    const next = formData.get('next') as string
+    if (next && next.startsWith('/')) {
+        redirect(next)
+    }
+
     // Admin Redirect
     const { data: { user } } = await supabase.auth.getUser()
     const adminEmail = process.env.ADMIN_EMAIL
 
     if (user && adminEmail && user.email === adminEmail) {
         redirect('/admin/orders')
-    }
-
-    // Dynamic Redirect
-    const next = formData.get('next') as string
-    if (next && next.startsWith('/')) {
-        redirect(next)
     }
 
     redirect('/dashboard')
