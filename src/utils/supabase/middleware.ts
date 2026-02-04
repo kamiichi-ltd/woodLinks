@@ -48,21 +48,16 @@ export async function updateSession(request: NextRequest) {
 
     if (request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/signup')) {
         if (user) {
-            // If user is already logged in, redirect them.
-            // CHECK FOR NEXT PARAM
+            // Priority: Check 'next' parameter
             const next = request.nextUrl.searchParams.get('next')
-            if (next && next.startsWith('/')) {
-                // LOOP PREVENTION: If target is same as current, don't redirect
-                // Note: Since we are on /login, if next is /login, we should redirect to admin or dashboard to execute logout if needed, 
-                // OR just prevent redirect.
-                // If next is /login, we are in a loop if we defer to it.
-                if (next === request.nextUrl.pathname) {
-                    return response
+            if (next) {
+                // Ensure absolute path or safe relative path
+                if (next.startsWith('/') && next !== request.nextUrl.pathname) {
+                    return NextResponse.redirect(new URL(next, request.url))
                 }
-                return NextResponse.redirect(new URL(next, request.url))
             }
 
-            // Default redirect
+            // Default: Redirect to /admin
             return NextResponse.redirect(new URL('/admin', request.url))
         }
     }
