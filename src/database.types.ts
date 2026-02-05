@@ -117,9 +117,11 @@ export interface Database {
                     slug: string
                     title: string | null
                     description: string | null
+                    status: string | null // Manually added
                     avatar_url: string | null
                     material_type: string | null
                     is_public: boolean
+                    is_published: boolean // Manually added
                     wood_origin: string | null // NEW
                     wood_age: string | null // NEW
                     wood_story: string | null // NEW
@@ -133,9 +135,11 @@ export interface Database {
                     slug: string
                     title?: string | null
                     description?: string | null
+                    status?: string | null // Manually added
                     avatar_url?: string | null
                     material_type?: string | null
                     is_public?: boolean
+                    is_published?: boolean // Manually added
                     wood_origin?: string | null
                     wood_age?: string | null
                     wood_story?: string | null
@@ -149,9 +153,11 @@ export interface Database {
                     slug?: string
                     title?: string | null
                     description?: string | null
+                    status?: string | null // Manually added
                     avatar_url?: string | null
                     material_type?: string | null
                     is_public?: boolean
+                    is_published?: boolean // Manually added to match schema
                     wood_origin?: string | null
                     wood_age?: string | null
                     wood_story?: string | null
