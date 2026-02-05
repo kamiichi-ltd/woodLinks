@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateAdminCard } from '@/app/actions/admin'
+import { toggleCardStatus } from '@/app/actions/card-status'
 import { Loader2, Save, ArrowLeft, ExternalLink } from 'lucide-react'
 
 type CardData = {
@@ -40,13 +41,31 @@ export function CardEditForm({ card }: { card: CardData }) {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target
-        // Helper to check if it's a checkbox - though for the switch we might use onChange directly
-        const checked = (e.target as HTMLInputElement).checked
+        // Exclude checkbox from here if handled separately, but let's keep it safe
+        if (type !== 'checkbox') {
+            setFormData(prev => ({ ...prev, [name]: value }))
+        }
+    }
 
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? (checked ? true : false) : value
-        }))
+    // Dedicated handler for status toggle
+    const handleStatusToggle = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const checked = e.target.checked
+
+        // 1. Optimistic UI update
+        setFormData(prev => ({ ...prev, is_published: checked }))
+
+        try {
+            console.log('🔘 Toggle Action Triggered:', checked)
+            // 2. Call specialized Server Action
+            await toggleCardStatus(card.id, checked)
+            console.log('✅ Toggle Saved')
+            // Optional: Toast here
+        } catch (error) {
+            console.error('❌ Toggle Failed:', error)
+            alert('ステータスの変更に失敗しました')
+            // Revert UI on failure
+            setFormData(prev => ({ ...prev, is_published: !checked }))
+        }
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
