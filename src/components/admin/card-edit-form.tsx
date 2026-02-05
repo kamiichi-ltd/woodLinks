@@ -55,11 +55,8 @@ export function CardEditForm({ card }: { card: CardData }) {
         setFormData(prev => ({ ...prev, is_published: checked }))
 
         try {
-            console.log('🔘 Toggle Action Triggered:', checked)
             // 2. Call specialized Server Action
             await toggleCardStatus(card.id, checked)
-            console.log('✅ Toggle Saved')
-            // Optional: Toast here
         } catch (error) {
             console.error('❌ Toggle Failed:', error)
             alert('ステータスの変更に失敗しました')
@@ -71,8 +68,6 @@ export function CardEditForm({ card }: { card: CardData }) {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         // 1. Stop default reload immediately (CRITICAL)
         e.preventDefault()
-        console.log("🛑 STOP: Default submission prevented.")
-
         setIsPending(true)
 
         try {
@@ -84,12 +79,9 @@ export function CardEditForm({ card }: { card: CardData }) {
             // Ensure ID is set
             payload.set('id', card.id)
 
-            console.log('🚀 ACTION: Calling updateAdminCard...', Object.fromEntries(payload))
-
             // 3. Call Server Action
             await updateAdminCard(payload)
 
-            console.log('✅ SUCCESS: Server Action finished.')
             alert('保存が完了しました！')
             router.refresh()
         } catch (error) {

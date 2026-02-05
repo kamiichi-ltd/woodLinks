@@ -9,6 +9,8 @@ import { createClient } from '@/utils/supabase/server'
 import { OrderSection } from '@/components/orders/order-section'
 import { Database } from '@/database.types'
 import { DeleteProjectButton } from '@/components/dashboard/delete-project-button'
+import { getCardAnalytics } from '@/app/actions/analytics'
+import { AnalyticsDashboard } from '@/components/admin/analytics-dashboard'
 
 type Order = Database['public']['Tables']['orders']['Row']
 
@@ -23,6 +25,9 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
         .select('*')
         .eq('card_id', resolvedParams.id)
         .order('created_at', { ascending: false })
+
+    // Fetch Analytics
+    const analyticsData = await getCardAnalytics(resolvedParams.id)
 
     if (!card) {
         notFound()
@@ -96,6 +101,10 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
                         <h2 className="text-2xl font-serif font-bold text-[#2c3e50] leading-none">コンテンツ編集</h2>
                     </div>
                     <ContentEditor cardId={card.id} initialContents={card.contents as unknown as ContentItem[]} />
+
+                    <div className="pt-8 border-t border-stone-200">
+                        <AnalyticsDashboard data={analyticsData} />
+                    </div>
                 </div>
 
                 <div className="lg:col-span-5 xl:col-span-4 space-y-6 lg:sticky lg:top-8">
