@@ -32,7 +32,6 @@ export async function toggleCardStatus(cardId: string, isPublished: boolean) {
         throw new Error(error.message)
     }
 
-    console.log('✅ Toggle Success:', data)
     revalidatePath('/dashboard')
     revalidatePath(`/dashboard/cards/${cardId}`)
     return { success: true, data }

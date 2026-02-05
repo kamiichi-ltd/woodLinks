@@ -47,15 +47,7 @@ async function verifyAdmin() {
 export async function getAdminOrders() {
     await verifyAdmin();
 
-    // Debug: Check total count without joins first
-    const { count, error: countError } = await (adminDbClient as any)
-        .from('orders')
-        .select('*', { count: 'exact', head: true });
-
-    console.log('[Admin] 注文総数 (Raw Count):', count);
-    if (countError) console.error('[Admin] カウント取得エラー:', countError);
-
-    const { data, error } = await (adminDbClient as any)
+    const { data, error } = await adminDbClient
         .from('orders')
         .select(`
             *,
@@ -77,7 +69,6 @@ export async function getAdminOrders() {
         throw new Error(`Join Failed: ${error.message}`);
     }
 
-    console.log('[Admin] 結合後の取得件数:', data?.length);
     return data;
 }
 
@@ -87,9 +78,7 @@ export async function updateOrderStatus(
     trackingNumber?: string | null
 ) {
     await verifyAdmin() // Security Guard
-    console.log(`[Admin] Updating order ${orderId} to ${newStatus}`)
 
-    // Direct Update via Service Role (Bypassing RLS)
     const updateData: Database['public']['Tables']['orders']['Update'] = {
         status: newStatus,
         updated_at: new Date().toISOString()
@@ -105,15 +94,12 @@ export async function updateOrderStatus(
 
     // Auto-fill paid_at if manual status change to paid
     if (newStatus === 'paid') {
-        // Keep existing paid_at if possible? For simplicity, we just update it.
-        // If stricter logic needed, we'd fetch first.
         updateData.paid_at = new Date().toISOString()
     }
 
-    // Explicitly cast to any to bypass strict type checks if needed
-    const { error } = await (adminDbClient as any)
+    const { error } = await adminDbClient
         .from('orders')
-        .update(updateData as any)
+        .update(updateData)
         .eq('id', orderId)
 
     if (error) {
@@ -121,7 +107,6 @@ export async function updateOrderStatus(
         throw new Error(error.message)
     }
 
-    revalidatePath('/admin/orders')
     revalidatePath('/admin/orders')
     return { success: true }
 }
@@ -282,25 +267,13 @@ export async function getAdminCard(id: string) {
 export async function updateAdminCard(
     formData: FormData
 ) {
-    console.log('🔥 SERVER ACTION TRIGGERED 🔥');
-    // We expect 'id' to be in formData if passed, OR we validly might need to change signature 
-    // BUT the current call in Client Component is `updateAdminCard(card.id, payload)`.
-    // Wait, the client component calls `updateAdminCard(card.id, payload)`.
-    // The signature `updateAdminCard(id, formData)` is what we defined previously.
-    // The user instruction says: `export async function updateAdminCard(formData: FormData) { ... }` (removing `id` arg)
-    // AND `const id = formData.get('id') as string`
-    // So I must change the signature clearly.
-
-    // HOWEVER, I must also update the client component to pass `id` in formData or as argument.
-    // Let's stick to the User Request: `export async function updateAdminCard(formData: FormData)`
-
     const id = formData.get('id') as string;
 
     const supabase = await createServerClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     // Authorization Check: Fetch card to verify owner
-    const { data: card, error: fetchError } = await (adminDbClient as any)
+    const { data: card, error: fetchError } = await adminDbClient
         .from('cards')
         .select('owner_id')
         .eq('id', id)
@@ -318,15 +291,10 @@ export async function updateAdminCard(
         throw new Error('Unauthorized: You do not own this card')
     }
 
-    // 1. Raw Value Log
-    const rawPublished = formData.get('is_published');
-    console.log('📦 Received Data:', { id, is_published_raw: rawPublished });
-
     // Parse FormData
-    const is_published = rawPublished === 'true';
-    console.log('🔍 Debug: Parsed boolean:', is_published);
+    const is_published = formData.get('is_published') === 'true';
 
-    const data = {
+    const data: Database['public']['Tables']['cards']['Update'] = {
         title: formData.get('title') as string,
         description: formData.get('description') as string,
         slug: formData.get('slug') as string,
@@ -334,24 +302,19 @@ export async function updateAdminCard(
         wood_origin: formData.get('wood_origin') as string,
         wood_age: formData.get('wood_age') as string,
         wood_story: formData.get('wood_story') as string, // Optional field
-        is_published: is_published
+        is_published: is_published,
+        status: is_published ? 'published' : 'draft', // Sync status
+        updated_at: new Date().toISOString()
     }
 
-    // 2. Pre-DB Update Log
-    console.log('🚀 Debug: Updating DB with:', { id, ...data });
-
-    const { count, error } = await (adminDbClient as any)
+    const { count, error } = await adminDbClient
         .from('cards')
-        .update({
-            ...data,
-            updated_at: new Date().toISOString()
-        })
+        .update(data)
         .eq('id', id)
         .select('*', { count: 'exact', head: true }); // We only need count to verify existence/permission
 
-    // 3. Result Check
+    // Result Check
     if (error) {
-        console.error('❌ Debug: DB Error:', error);
         console.error('[Admin] Card Update Error:', error);
         throw new Error('Failed to update card: ' + error.message);
     }
@@ -360,8 +323,6 @@ export async function updateAdminCard(
         console.error('😱 CRITICAL: Update Success but 0 rows changed (RLS Blocking)');
         throw new Error('更新権限がないか、データが見つかりません (RLS Error)');
     }
-
-    console.log('✅ Debug: DB Update Success (Rows affected:', count, ')');
 
     revalidatePath('/admin/cards')
     revalidatePath(`/admin/cards/${id}`) // Revalidate the specific edit page
