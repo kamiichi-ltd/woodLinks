@@ -87,7 +87,7 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                             onChange={(e) => setSlug(e.target.value)}
                             className="block flex-1 border-0 bg-transparent py-3 pl-3 text-[#2c3e50] placeholder:text-[#a4998e] focus:ring-0 sm:text-sm sm:leading-6 font-mono"
                             placeholder="your-custom-url"
-                            pattern="^[a-z0-9-]+$"
+                            // pattern attribute removed to prevent invalid regex errors
                             title="半角英数字とハイフンのみ使用可能です"
                             required
                         />
