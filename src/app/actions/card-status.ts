@@ -20,6 +20,7 @@ export async function toggleCardStatus(cardId: string, isPublished: boolean) {
         .from('cards')
         .update({
             is_published: isPublished,
+            status: isPublished ? 'published' : 'draft', // Sync status column
             updated_at: new Date().toISOString()
         })
         .eq('id', cardId)
