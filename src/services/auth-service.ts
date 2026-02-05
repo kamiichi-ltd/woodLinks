@@ -48,8 +48,8 @@ export async function login(formData: FormData) {
         redirect('/admin/orders')
     }
 
-    // 3. Default Redirect (User said /admin, never /)
-    redirect('/admin')
+    // 3. Default Redirect
+    redirect('/dashboard')
 }
 
 export async function signup(formData: FormData) {
@@ -117,7 +117,7 @@ export async function signup(formData: FormData) {
     }
 
     // 2. Default Redirect
-    redirect('/admin')
+    redirect('/dashboard')
 }
 
 export async function logout() {
