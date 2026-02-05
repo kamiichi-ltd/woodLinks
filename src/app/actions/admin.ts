@@ -307,7 +307,7 @@ export async function updateAdminCard(
         updated_at: new Date().toISOString()
     }
 
-    const { count, error } = await adminDbClient
+    const { count, error } = await (adminDbClient as any)
         .from('cards')
         .update(data)
         .eq('id', id)
