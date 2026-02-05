@@ -280,9 +280,22 @@ export async function getAdminCard(id: string) {
 }
 
 export async function updateAdminCard(
-    id: string,
     formData: FormData
 ) {
+    console.log('🔥 SERVER ACTION TRIGGERED 🔥');
+    // We expect 'id' to be in formData if passed, OR we validly might need to change signature 
+    // BUT the current call in Client Component is `updateAdminCard(card.id, payload)`.
+    // Wait, the client component calls `updateAdminCard(card.id, payload)`.
+    // The signature `updateAdminCard(id, formData)` is what we defined previously.
+    // The user instruction says: `export async function updateAdminCard(formData: FormData) { ... }` (removing `id` arg)
+    // AND `const id = formData.get('id') as string`
+    // So I must change the signature clearly.
+
+    // HOWEVER, I must also update the client component to pass `id` in formData or as argument.
+    // Let's stick to the User Request: `export async function updateAdminCard(formData: FormData)`
+
+    const id = formData.get('id') as string;
+
     const supabase = await createServerClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -307,7 +320,7 @@ export async function updateAdminCard(
 
     // 1. Raw Value Log
     const rawPublished = formData.get('is_published');
-    console.log('🔍 Debug: Raw is_published value:', rawPublished);
+    console.log('📦 Received Data:', { id, is_published_raw: rawPublished });
 
     // Parse FormData
     const is_published = rawPublished === 'true';

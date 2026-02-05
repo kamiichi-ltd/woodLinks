@@ -54,12 +54,16 @@ export function CardEditForm({ card }: { card: CardData }) {
         setIsPending(true)
 
         const payload = new FormData(e.currentTarget)
+        // Ensure ID is included (User Request implies getting ID from formData in server action)
+        payload.append('id', card.id);
+
         // Ensure is_published is set (though hidden input handles this, manual append doubles safety if needed, 
         // but hidden input with correct value is enough)
         // console.log([...payload.entries()]) // Debug if needed
 
         try {
-            await updateAdminCard(card.id, payload)
+            // User requested: `updateAdminCard(formData)` signature
+            await updateAdminCard(payload)
             alert('更新しました')
             router.refresh()
         } catch (error) {
