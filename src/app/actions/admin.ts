@@ -340,28 +340,28 @@ export async function updateAdminCard(
     // 2. Pre-DB Update Log
     console.log('🚀 Debug: Updating DB with:', { id, ...data });
 
-    const { data: updatedData, error } = await (adminDbClient as any)
+    const { count, error } = await (adminDbClient as any)
         .from('cards')
         .update({
             ...data,
             updated_at: new Date().toISOString()
         })
         .eq('id', id)
-        .select()
-        .single();
-
-    console.log('📊 Update Result:', { success: !error, updated_data: updatedData, error_details: error });
+        .select('*', { count: 'exact', head: true }); // We only need count to verify existence/permission
 
     // 3. Result Check
     if (error) {
         console.error('❌ Debug: DB Error:', error);
         console.error('[Admin] Card Update Error:', error);
         throw new Error('Failed to update card: ' + error.message);
-    } else if (!updatedData) {
-        console.error('😱 CRITICAL: Update ran but NO rows changed. Check RLS policies!');
-    } else {
-        console.log('✅ Debug: DB Update Success');
     }
+
+    if (count === 0) {
+        console.error('😱 CRITICAL: Update Success but 0 rows changed (RLS Blocking)');
+        throw new Error('更新権限がないか、データが見つかりません (RLS Error)');
+    }
+
+    console.log('✅ Debug: DB Update Success (Rows affected:', count, ')');
 
     revalidatePath('/admin/cards')
     revalidatePath(`/admin/cards/${id}`) // Revalidate the specific edit page
