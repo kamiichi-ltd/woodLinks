@@ -50,25 +50,28 @@ export function CardEditForm({ card }: { card: CardData }) {
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        // 1. Stop default reload immediately
         e.preventDefault()
-        console.log("🛑 Prevented default submission");
+        console.log("👆 Client: Submit button clicked. Stopping default reload.");
+
         setIsPending(true)
 
         const payload = new FormData(e.currentTarget)
-        // Ensure ID is included (User Request implies getting ID from formData in server action)
+        // Ensure ID is included
         payload.append('id', card.id);
 
-        // Ensure is_published is set (though hidden input handles this, manual append doubles safety if needed, 
-        // but hidden input with correct value is enough)
-        // console.log([...payload.entries()]) // Debug if needed
+        // Explicitly set boolean string for safety
+        payload.set('is_published', formData.is_published ? 'true' : 'false')
 
         try {
+            console.log('🚀 Client: Calling server action...');
             // User requested: `updateAdminCard(formData)` signature
             await updateAdminCard(payload)
+            console.log('✅ Client: Server action finished.');
             alert('更新しました')
             router.refresh()
         } catch (error) {
-            console.error(error)
+            console.error('❌ Client: Error calling action:', error);
             alert('更新に失敗しました')
         } finally {
             setIsPending(false)
