@@ -121,7 +121,7 @@ export function CardEditForm({ card }: { card: CardData }) {
                                 type="checkbox"
                                 // name="is_published" // Removed to avoid duplicate/confusing values in FormData (handled manually)
                                 checked={formData.is_published}
-                                onChange={handleChange}
+                                onChange={handleStatusToggle} // Use specialized handler
                                 name="is_published_checkbox" // dummy name
                                 className="w-5 h-5 rounded border-stone-300 text-stone-800 focus:ring-stone-500"
                             />
