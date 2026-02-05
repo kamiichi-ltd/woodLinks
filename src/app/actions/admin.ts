@@ -340,19 +340,25 @@ export async function updateAdminCard(
     // 2. Pre-DB Update Log
     console.log('🚀 Debug: Updating DB with:', { id, ...data });
 
-    const { error } = await (adminDbClient as any)
+    const { data: updatedData, error } = await (adminDbClient as any)
         .from('cards')
         .update({
             ...data,
             updated_at: new Date().toISOString()
         })
-        .eq('id', id);
+        .eq('id', id)
+        .select()
+        .single();
+
+    console.log('📊 Update Result:', { success: !error, updated_data: updatedData, error_details: error });
 
     // 3. Result Check
     if (error) {
         console.error('❌ Debug: DB Error:', error);
         console.error('[Admin] Card Update Error:', error);
         throw new Error('Failed to update card: ' + error.message);
+    } else if (!updatedData) {
+        console.error('😱 CRITICAL: Update ran but NO rows changed. Check RLS policies!');
     } else {
         console.log('✅ Debug: DB Update Success');
     }
