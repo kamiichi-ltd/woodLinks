@@ -7,7 +7,7 @@ import { Database } from '@/database.types'
 export async function toggleCardStatus(cardId: string, isPublished: boolean) {
     console.log('🔘 Toggle Action Called:', { cardId, isPublished })
 
-    const supabase = await createClient<Database>()
+    const supabase = await createClient()
 
     // Assuming we want to bypass RLS here too? 
     // The user didn't explicitly say "Admin Action" but implied it's for the admin form.
