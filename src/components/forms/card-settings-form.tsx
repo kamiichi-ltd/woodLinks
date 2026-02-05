@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { updateCard } from '@/services/card-service'
 import { useRouter } from 'next/navigation'
+import { toggleCardStatus } from '@/app/actions/card-status'
 
 interface CardSettingsFormProps {
     cardId: string
@@ -43,6 +44,26 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
             console.error(error)
         } finally {
             setIsLoading(false)
+        }
+    }
+
+    const handleStatusToggle = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const isChecked = e.target.checked
+        const newStatus = isChecked ? 'published' : 'draft'
+
+        // Optimistic update
+        setStatus(newStatus)
+        setMessage(null)
+
+        try {
+            await toggleCardStatus(cardId, isChecked)
+            setMessage({ type: 'success', text: isChecked ? '名刺を公開しました' : '名刺を非公開にしました' })
+            router.refresh()
+        } catch (error) {
+            console.error('Status toggle failed:', error)
+            // Revert
+            setStatus(isChecked ? 'draft' : 'published')
+            setMessage({ type: 'error', text: 'ステータスの変更に失敗しました' })
         }
     }
 
@@ -201,7 +222,7 @@ export default function CardSettingsForm({ cardId, initialTitle, initialSlug, in
                             name="status"
                             type="checkbox"
                             checked={status === 'published'}
-                            onChange={(e) => setStatus(e.target.checked ? 'published' : 'draft')}
+                            onChange={handleStatusToggle}
                             disabled={['lost_reissued', 'disabled', 'transferred'].includes(status)}
                             className="h-5 w-5 rounded border-[#d4c5ae] text-[#2c3e50] focus:ring-[#2c3e50] cursor-pointer disabled:opacity-50"
                         />
