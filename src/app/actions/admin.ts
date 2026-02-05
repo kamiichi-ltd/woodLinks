@@ -305,7 +305,14 @@ export async function updateAdminCard(
         throw new Error('Unauthorized: You do not own this card')
     }
 
+    // 1. Raw Value Log
+    const rawPublished = formData.get('is_published');
+    console.log('🔍 Debug: Raw is_published value:', rawPublished);
+
     // Parse FormData
+    const is_published = rawPublished === 'true';
+    console.log('🔍 Debug: Parsed boolean:', is_published);
+
     const data = {
         title: formData.get('title') as string,
         description: formData.get('description') as string,
@@ -314,10 +321,11 @@ export async function updateAdminCard(
         wood_origin: formData.get('wood_origin') as string,
         wood_age: formData.get('wood_age') as string,
         wood_story: formData.get('wood_story') as string, // Optional field
-        is_published: formData.get('is_published') === 'true' // Robust boolean check
+        is_published: is_published
     }
 
-    console.log(`[Admin] Updating card ${id}`, { ...data });
+    // 2. Pre-DB Update Log
+    console.log('🚀 Debug: Updating DB with:', { id, ...data });
 
     const { error } = await (adminDbClient as any)
         .from('cards')
@@ -327,9 +335,13 @@ export async function updateAdminCard(
         })
         .eq('id', id);
 
+    // 3. Result Check
     if (error) {
+        console.error('❌ Debug: DB Error:', error);
         console.error('[Admin] Card Update Error:', error);
         throw new Error('Failed to update card: ' + error.message);
+    } else {
+        console.log('✅ Debug: DB Update Success');
     }
 
     revalidatePath('/admin/cards')
