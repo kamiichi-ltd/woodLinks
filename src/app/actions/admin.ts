@@ -97,7 +97,7 @@ export async function updateOrderStatus(
         updateData.paid_at = new Date().toISOString()
     }
 
-    const { error } = await adminDbClient
+    const { error } = await (adminDbClient as any)
         .from('orders')
         .update(updateData)
         .eq('id', orderId)
