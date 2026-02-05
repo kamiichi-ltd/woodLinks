@@ -51,6 +51,7 @@ export function CardEditForm({ card }: { card: CardData }) {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        console.log("🛑 Prevented default submission");
         setIsPending(true)
 
         const payload = new FormData(e.currentTarget)
