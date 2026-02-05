@@ -1,6 +1,6 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card' // Assuming we have these or standard divs
+
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { Eye, MousePointerClick, UserPlus, TrendingUp } from 'lucide-react'
 
