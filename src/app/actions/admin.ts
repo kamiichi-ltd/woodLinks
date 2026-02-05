@@ -284,7 +284,7 @@ export async function updateAdminCard(
     }
 
     const adminEmail = process.env.ADMIN_EMAIL
-    const isOwner = user?.id === card.owner_id
+    const isOwner = user?.id === (card as any).owner_id
     const isAdmin = user?.email === adminEmail
 
     if (!user || (!isOwner && !isAdmin)) {
