@@ -40,7 +40,7 @@ export function CardEditForm({ card }: { card: CardData }) {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target
-        // Helper to check if it's a checkbox
+        // Helper to check if it's a checkbox - though for the switch we might use onChange directly
         const checked = (e.target as HTMLInputElement).checked
 
         setFormData(prev => ({
@@ -50,29 +50,32 @@ export function CardEditForm({ card }: { card: CardData }) {
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        // 1. Stop default reload immediately
+        // 1. Stop default reload immediately (CRITICAL)
         e.preventDefault()
-        console.log("👆 Client: Submit button clicked. Stopping default reload.");
+        console.log("🛑 STOP: Default submission prevented.")
 
         setIsPending(true)
 
-        const payload = new FormData(e.currentTarget)
-        // Ensure ID is included
-        payload.append('id', card.id);
-
-        // Explicitly set boolean string for safety
-        payload.set('is_published', formData.is_published ? 'true' : 'false')
-
         try {
-            console.log('🚀 Client: Calling server action...');
-            // User requested: `updateAdminCard(formData)` signature
+            // 2. Prepare data manually
+            const payload = new FormData(e.currentTarget)
+
+            // Explicitly overwrite switch value match the state
+            payload.set('is_published', formData.is_published ? 'true' : 'false')
+            // Ensure ID is set
+            payload.set('id', card.id)
+
+            console.log('🚀 ACTION: Calling updateAdminCard...', Object.fromEntries(payload))
+
+            // 3. Call Server Action
             await updateAdminCard(payload)
-            console.log('✅ Client: Server action finished.');
-            alert('更新しました')
+
+            console.log('✅ SUCCESS: Server Action finished.')
+            alert('保存が完了しました！')
             router.refresh()
         } catch (error) {
-            console.error('❌ Client: Error calling action:', error);
-            alert('更新に失敗しました')
+            console.error('❌ ERROR:', error)
+            alert('エラーが発生しました')
         } finally {
             setIsPending(false)
         }
@@ -80,10 +83,11 @@ export function CardEditForm({ card }: { card: CardData }) {
 
     return (
         <div className="max-w-4xl mx-auto">
-            {/* ... Header ... */}
+            {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <button
                     onClick={() => router.back()}
+                    type="button"
                     className="flex items-center text-stone-500 hover:text-stone-800 transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4 mr-1" />
@@ -100,6 +104,7 @@ export function CardEditForm({ card }: { card: CardData }) {
                 </a>
             </div>
 
+            {/* Note: No action attribute on form to prevent conflict */}
             <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
                 <div className="p-6 border-b border-stone-100 bg-stone-50 flex justify-between items-center">
                     <div>
@@ -108,15 +113,16 @@ export function CardEditForm({ card }: { card: CardData }) {
                     </div>
                     {/* Status Toggle / Badge */}
                     <div className="flex items-center gap-2">
-                        {/* Hidden input to sync state with FormData */}
+                        {/* Hidden input to ensure value exists in FormData if needed, but we override it in onSubmit anyway. Keeping it doesn't hurt. */}
                         <input type="hidden" name="is_published" value={formData.is_published ? 'true' : 'false'} />
 
                         <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-lg border border-stone-200 shadow-sm hover:bg-stone-50 transition-colors">
                             <input
                                 type="checkbox"
-                                // name="is_published" // Removed name from checkbox to avoid double submission or 'on' value if checked
+                                // name="is_published" // Removed to avoid duplicate/confusing values in FormData (handled manually)
                                 checked={formData.is_published}
                                 onChange={handleChange}
+                                name="is_published_checkbox" // dummy name
                                 className="w-5 h-5 rounded border-stone-300 text-stone-800 focus:ring-stone-500"
                             />
                             <span className={`text-sm font-bold ${formData.is_published ? 'text-green-600' : 'text-stone-400'}`}>
@@ -128,7 +134,6 @@ export function CardEditForm({ card }: { card: CardData }) {
 
                 <div className="p-6 space-y-8">
                     {/* Basic Info Section */}
-                    {/* ... */}
                     <div className="space-y-4">
                         <h3 className="text-sm font-bold text-stone-400 uppercase tracking-wider border-b border-stone-100 pb-2">基本情報</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
