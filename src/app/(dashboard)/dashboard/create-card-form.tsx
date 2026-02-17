@@ -5,8 +5,16 @@ import { useRef, useState } from 'react'
 import { Plus, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-export default function CreateCardForm() {
-    const [isOpen, setIsOpen] = useState(false)
+interface CreateCardFormProps {
+    initialWood?: {
+        name: string
+        slug: string
+        species: string
+    }
+}
+
+export default function CreateCardForm({ initialWood }: CreateCardFormProps) {
+    const [isOpen, setIsOpen] = useState(!!initialWood)
     const ref = useRef<HTMLFormElement>(null)
 
     return (
@@ -56,7 +64,18 @@ export default function CreateCardForm() {
 
                                 <div className="p-8 sm:p-10 relative z-10">
                                     <h3 className="text-2xl font-serif font-bold text-[#2c3e50] mb-2">新しい名刺を作成</h3>
-                                    <p className="text-[#8c7b6c] text-sm mb-8">プロジェクトの名前を入力してください。</p>
+
+                                    {initialWood ? (
+                                        <div className="mb-6 p-4 bg-stone-100 rounded-xl border border-stone-200">
+                                            <span className="text-xs font-bold uppercase tracking-wider text-[#8c7b6c] block mb-1">Based on</span>
+                                            <div className="font-bold text-[#3d3126] flex items-center gap-2">
+                                                <span>{initialWood.name}</span>
+                                                <span className="text-xs font-normal text-stone-500 bg-white px-2 py-0.5 rounded-full border border-stone-200">{initialWood.species}</span>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <p className="text-[#8c7b6c] text-sm mb-8">プロジェクトの名前を入力してください。</p>
+                                    )}
 
                                     <form
                                         ref={ref}
@@ -73,6 +92,7 @@ export default function CreateCardForm() {
                                                 type="text"
                                                 name="title"
                                                 id="title"
+                                                defaultValue={initialWood ? `${initialWood.name}` : ''}
                                                 className="block w-full rounded-2xl border-0 py-4 px-6 text-[#2c3e50] shadow-sm ring-1 ring-inset ring-[#d4c5ae] placeholder:text-[#a4998e] focus:ring-2 focus:ring-inset focus:ring-[#8c7b6c] text-lg bg-white/80 backdrop-blur-sm transition-all hover:bg-white"
                                                 placeholder="例：株式会社上一木材"
                                                 required

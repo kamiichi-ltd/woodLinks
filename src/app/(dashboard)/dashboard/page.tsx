@@ -9,9 +9,10 @@ import { Eye, UserCheck } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ create_from?: string }> }) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
+    const params = await searchParams
 
     if (!user) {
         return <div>Please log in.</div>
@@ -19,6 +20,20 @@ export default async function DashboardPage() {
 
     const cards = await getCards()
     const analytics = await getDashboardAnalytics(user.id)
+
+    // Handle "create_from" baton pass
+    let initialWood = undefined
+    if (params.create_from) {
+        const { getWoodBySlug } = await import('@/app/actions/inventory')
+        const wood = await getWoodBySlug(params.create_from)
+        if (wood) {
+            initialWood = {
+                name: wood.name,
+                slug: wood.nfc_slug,
+                species: wood.species
+            }
+        }
+    }
 
     return (
         <div className="relative min-h-screen pb-20">
@@ -86,7 +101,7 @@ export default async function DashboardPage() {
                     <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                         {/* 1. Create New Card (Trigger) */}
                         <div className="h-64">
-                            <CreateCardForm />
+                            <CreateCardForm initialWood={initialWood} />
                         </div>
 
                         {/* Existing Cards */}

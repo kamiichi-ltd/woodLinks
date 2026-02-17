@@ -138,8 +138,8 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
                         initialTitle={card.title || ''}
                         initialSlug={card.slug || ''}
                         initialDescription={card.description}
-                        initialStatus={card.status}
-                        initialMaterialType={card.material_type || 'sugi'}
+                        initialStatus={card.status as 'draft' | 'published' | 'lost_reissued' | 'disabled' | 'transferred'}
+                        initialMaterialType={(card.material_type as 'sugi' | 'hinoki' | 'walnut') || 'sugi'}
                     />
 
                     {/* Danger Zone */}

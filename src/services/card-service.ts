@@ -4,8 +4,18 @@ import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { Database, Json } from '@/database.types'
 
-type Card = any
-type CardContent = any
+type CardRow = Database['public']['Tables']['cards']['Row']
+type CardContentRow = Database['public']['Tables']['card_contents']['Row']
+
+// Extend CardRow to include properties used in UI but potentially missing or joined
+export type Card = Omit<CardRow, 'status' | 'material_type'> & {
+    status: 'published' | 'draft' | 'lost_reissued' | 'disabled' | 'transferred'
+    material_type: 'sugi' | 'hinoki' | 'walnut' | null
+    view_count?: number
+    contents?: CardContent[] // Used in getCard
+    avatar_url?: string | null // Used in getCardBySlug
+}
+export type CardContent = CardContentRow
 
 // Helper to generate unique slug
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -20,7 +30,7 @@ async function generateUniqueSlug(supabase: any, title: string): Promise<string>
     }
 
     // Check if baseSlug exists
-    const { count } = await supabase
+    const { count } = await (supabase as any)
         .from('cards')
         .select('*', { count: 'exact', head: true })
         .eq('slug', baseSlug)
@@ -54,7 +64,13 @@ export async function getCards(): Promise<Card[]> {
         throw new Error('Failed to fetch cards')
     }
 
-    return (data as unknown as Card[]) ?? []
+    // Map is_published to status for UI compatibility
+    return (data as CardRow[]).map(card => ({
+        ...card,
+        status: card.is_published ? 'published' : 'draft',
+        material_type: card.material_type as Card['material_type'],
+        view_count: 0 // Default to 0 as it's not in the table yet
+    }))
 }
 
 export async function getCard(id: string) {
@@ -69,8 +85,7 @@ export async function getCard(id: string) {
 
     const { data: card, error: cardError } = await (supabase as any)
         .from('cards')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .select('*' as any)
+        .select('*')
         .eq('id', id)
         .eq('user_id', user.id)
         .single()
@@ -80,10 +95,9 @@ export async function getCard(id: string) {
         return null
     }
 
-    const { data: contents, error: contentError } = await (supabase as any)
+    const { data: contents, error: contentError } = await supabase
         .from('card_contents')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .select('*' as any)
+        .select('*')
         .eq('card_id', id)
         .order('order_index', { ascending: true })
 
@@ -92,9 +106,11 @@ export async function getCard(id: string) {
         // defaulting to empty contents if fetch fails
     }
 
+    const cardRow = card as CardRow
     return {
-        ...(card as unknown as Card),
-        contents: (contents as unknown as CardContent[]) || []
+        ...cardRow,
+        status: cardRow.is_published ? 'published' : 'draft', // Polyfill status
+        contents: (contents as CardContent[]) || []
     }
 }
 
@@ -108,8 +124,7 @@ export async function getCardBySlug(slug: string) {
 
     const { data: card, error: cardError } = await (supabase as any)
         .from('cards')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .select('*' as any)
+        .select('*')
         .eq('slug', slug)
         // .eq('status', 'published') // Wrong column
         .eq('is_published', true) // Correct column from init_database.sql
@@ -120,12 +135,10 @@ export async function getCardBySlug(slug: string) {
         return null
     }
 
-    const { data: contents, error: contentError } = await (supabase as any)
+    const { data: contents, error: contentError } = await supabase
         .from('card_contents')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .select('*' as any)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .eq('card_id', (card as any).id)
+        .select('*')
+        .eq('card_id', card.id)
         .order('order_index', { ascending: true })
 
     if (contentError) {
@@ -134,17 +147,20 @@ export async function getCardBySlug(slug: string) {
 
     // Fetch profile avatar
     // Ensure we access user_id safely. card is typed as any in select but we know it matches Card structure partially.
-    const userId = (card as unknown as Card).user_id
+    const userId = (card as CardRow).user_id
 
-    const { data: profile } = await supabase
+    const { data: profile } = await (supabase as any)
         .from('profiles')
         .select('avatar_url')
         .eq('id', userId)
-        .single() as { data: { avatar_url: string | null } | null, error: unknown }
+        .single()
+
+    const cardRow = card as CardRow
 
     return {
-        ...(card as unknown as Card),
-        contents: (contents as unknown as CardContent[]) || [],
+        ...cardRow,
+        status: cardRow.is_published ? 'published' : 'draft', // Polyfill status
+        contents: (contents as CardContent[]) || [],
         avatar_url: profile?.avatar_url || null
     }
 }
@@ -167,8 +183,7 @@ export async function createCard(formData: FormData) {
 
     const slug = await generateUniqueSlug(supabase, title)
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const insertPayload: any = {
+    const insertPayload: Database['public']['Tables']['cards']['Insert'] = {
         user_id: user.id,
         title,
         slug,
@@ -204,7 +219,9 @@ export async function updateCard(id: string, updates: { title?: string; descript
     // The signature uses 'status' string, but DB has 'is_published' boolean.
     // We need to transform it.
     const { status, ...rest } = updates
-    const updatePayload: any = { ...rest }
+
+    // We strictly type payload using the DB update type
+    const updatePayload: Database['public']['Tables']['cards']['Update'] = { ...rest }
 
     if (status) {
         if (status === 'published') {
@@ -225,7 +242,7 @@ export async function updateCard(id: string, updates: { title?: string; descript
         }
 
         // Check uniqueness if slug changed
-        const { count } = await (supabase as any).from('cards').select('*', { count: 'exact', head: true }).eq('slug', updates.slug).neq('id', id)
+        const { count } = await supabase.from('cards').select('*', { count: 'exact', head: true }).eq('slug', updates.slug).neq('id', id)
         if (count) {
             throw new Error('Slug already exists')
         }
@@ -234,15 +251,13 @@ export async function updateCard(id: string, updates: { title?: string; descript
     // Auto-generate if title changed and no slug exists (fallback logic)
     if (updates.title) {
         const { data: currentCard } = await (supabase as any).from('cards').select('slug').eq('id', id).single()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if (currentCard && !(currentCard as any).slug && !updates.slug) {
+        if (currentCard && !currentCard.slug && !updates.slug) {
             updatePayload.slug = await generateUniqueSlug(supabase, updates.title)
         }
     }
 
     const { data, error } = await (supabase as any)
         .from('cards')
-
         .update(updatePayload)
         .eq('id', id)
         .eq('user_id', user.id)
@@ -268,7 +283,7 @@ export async function deleteCard(id: string) {
         throw new Error('Unauthorized')
     }
 
-    const { error } = await (supabase as any)
+    const { error } = await supabase
         .from('cards')
         .delete()
         .eq('id', id)
@@ -293,7 +308,7 @@ export async function addCardContent(cardId: string, type: 'sns_link' | 'text', 
     }
 
     // Checking ownership
-    const { count } = await (supabase as any).from('cards').select('*', { count: 'exact', head: true }).eq('id', cardId).eq('user_id', user.id)
+    const { count } = await supabase.from('cards').select('*', { count: 'exact', head: true }).eq('id', cardId).eq('user_id', user.id)
     if (!count) {
         throw new Error('Card not found or access denied')
     }
@@ -306,11 +321,9 @@ export async function addCardContent(cardId: string, type: 'sns_link' | 'text', 
         .order('order_index', { ascending: false })
         .limit(1)
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const nextOrder = ((maxOrderData?.[0] as any)?.order_index ?? -1) + 1
+    const nextOrder = (maxOrderData?.[0]?.order_index ?? -1) + 1
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const contentPayload: any = {
+    const contentPayload: Database['public']['Tables']['card_contents']['Insert'] = {
         card_id: cardId,
         type,
         content,
@@ -345,13 +358,13 @@ export async function deleteCardContent(contentId: string, cardId: string) {
     // Verify ownership of the card via the content relation is tricky without a join or multiple queries 
     // or RLS (which should handle it, but we are in server action)
     // Let's verify card ownership first
-    const { count } = await (supabase as any).from('cards').select('*', { count: 'exact', head: true }).eq('id', cardId).eq('user_id', user.id)
+    const { count } = await supabase.from('cards').select('*', { count: 'exact', head: true }).eq('id', cardId).eq('user_id', user.id)
 
     if (!count) {
         throw new Error('Card not found or access denied')
     }
 
-    const { error } = await (supabase as any)
+    const { error } = await supabase
         .from('card_contents')
         .delete()
         .eq('id', contentId)
@@ -370,8 +383,7 @@ export async function getPublicCardById(id: string) {
 
     const { data: card, error: cardError } = await (supabase as any)
         .from('cards')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .select('*' as any)
+        .select('*')
         .eq('id', id)
         .single()
 
@@ -380,12 +392,10 @@ export async function getPublicCardById(id: string) {
         return null
     }
 
-    const { data: contents, error: contentError } = await (supabase as any)
+    const { data: contents, error: contentError } = await supabase
         .from('card_contents')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .select('*' as any)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .eq('card_id', (card as any).id)
+        .select('*')
+        .eq('card_id', card.id)
         .order('order_index', { ascending: true })
 
     if (contentError) {
@@ -394,17 +404,20 @@ export async function getPublicCardById(id: string) {
 
     // Fetch profile avatar
     // Ensure we access user_id safely. card is typed as any in select but we know it matches Card structure partially.
-    const userId = (card as unknown as Card).user_id
+    const userId = (card as CardRow).user_id
 
-    const { data: profile } = await supabase
+    const { data: profile } = await (supabase as any)
         .from('profiles')
         .select('avatar_url')
         .eq('id', userId)
-        .single() as { data: { avatar_url: string | null } | null, error: unknown }
+        .single()
+
+    const cardRow = card as CardRow
 
     return {
-        ...(card as unknown as Card),
-        contents: (contents as unknown as CardContent[]) || [],
+        ...cardRow,
+        status: cardRow.is_published ? 'published' : 'draft', // Polyfill statuses
+        contents: (contents as CardContent[]) || [],
         avatar_url: profile?.avatar_url || null
     }
 }
@@ -434,7 +447,7 @@ export async function reorderCardContents(cardId: string, items: { id: string; o
     }
 
     // Verify ownership
-    const { count } = await (supabase as any).from('cards').select('*', { count: 'exact', head: true }).eq('id', cardId).eq('user_id', user.id)
+    const { count } = await supabase.from('cards').select('*', { count: 'exact', head: true }).eq('id', cardId).eq('user_id', user.id)
     if (!count) {
         throw new Error('Card not found or access denied')
     }
@@ -446,8 +459,7 @@ export async function reorderCardContents(cardId: string, items: { id: string; o
                 id: item.id,
                 card_id: cardId, // Required for composite key or constraint if any, though ID alone usually enough? Supabase usually needs all PKs or valid update columns
                 order_index: item.order_index,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            })) as any
+            })) as Database['public']['Tables']['card_contents']['Insert'][]
         )
         .select()
 

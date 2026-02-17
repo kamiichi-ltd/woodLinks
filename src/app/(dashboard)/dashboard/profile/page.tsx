@@ -43,7 +43,7 @@ export default async function SettingsPage() {
                             initialSlug={primaryCard.slug || ''}
                             initialDescription={primaryCard.description}
                             initialStatus={primaryCard.status}
-                            initialMaterialType={primaryCard.material_type || 'sugi'}
+                            initialMaterialType={(primaryCard.material_type as 'sugi' | 'hinoki' | 'walnut') || 'sugi'}
                         />
                     ) : (
                         <div className="rounded-md bg-yellow-50 p-4">
