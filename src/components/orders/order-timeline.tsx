@@ -1,8 +1,8 @@
 import { Database } from '@/database.types';
-import { cn } from '@/lib/utils';
 
 
-import { Check, Circle, Clock, Truck, Hammer, CreditCard, FileText } from 'lucide-react';
+
+import { Check, Truck, Hammer, CreditCard, FileText } from 'lucide-react';
 
 type OrderStatus = Database['public']['Tables']['orders']['Row']['status'];
 

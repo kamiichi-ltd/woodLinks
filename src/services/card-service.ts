@@ -3,23 +3,14 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { Database, Json } from '@/database.types'
+import type { Card, CardRow, CardContent } from '@/types/domain'
 
-type CardRow = Database['public']['Tables']['cards']['Row']
-type CardContentRow = Database['public']['Tables']['card_contents']['Row']
+export type { Card, CardContent }
 
-// Extend CardRow to include properties used in UI but potentially missing or joined
-export type Card = Omit<CardRow, 'status' | 'material_type'> & {
-    status: 'published' | 'draft' | 'lost_reissued' | 'disabled' | 'transferred'
-    material_type: 'sugi' | 'hinoki' | 'walnut' | null
-    view_count?: number
-    contents?: CardContent[] // Used in getCard
-    avatar_url?: string | null // Used in getCardBySlug
-}
-export type CardContent = CardContentRow
+type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>
 
 // Helper to generate unique slug
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function generateUniqueSlug(supabase: any, title: string): Promise<string> {
+async function generateUniqueSlug(supabase: SupabaseServerClient, title: string): Promise<string> {
     const baseSlug = title
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
@@ -30,7 +21,7 @@ async function generateUniqueSlug(supabase: any, title: string): Promise<string>
     }
 
     // Check if baseSlug exists
-    const { count } = await (supabase as any)
+    const { count } = await supabase
         .from('cards')
         .select('*', { count: 'exact', head: true })
         .eq('slug', baseSlug)
@@ -53,7 +44,7 @@ export async function getCards(): Promise<Card[]> {
         return []
     }
 
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
         .from('cards')
         .select('*')
         .eq('user_id', user.id)
@@ -64,10 +55,12 @@ export async function getCards(): Promise<Card[]> {
         throw new Error('Failed to fetch cards')
     }
 
+    const rows = data as CardRow[]
+
     // Map is_published to status for UI compatibility
-    return (data as CardRow[]).map(card => ({
+    return rows.map(card => ({
         ...card,
-        status: card.is_published ? 'published' : 'draft',
+        status: (card.is_published ? 'published' : 'draft') as Card['status'],
         material_type: card.material_type as Card['material_type'],
         view_count: 0 // Default to 0 as it's not in the table yet
     }))
@@ -83,17 +76,19 @@ export async function getCard(id: string) {
         return null
     }
 
-    const { data: card, error: cardError } = await (supabase as any)
+    const result = await supabase
         .from('cards')
         .select('*')
         .eq('id', id)
         .eq('user_id', user.id)
         .single()
 
-    if (cardError) {
-        console.error('Error fetching card:', cardError)
+    if (result.error) {
+        console.error('Error fetching card:', result.error)
         return null
     }
+
+    const cardRow = result.data as CardRow
 
     const { data: contents, error: contentError } = await supabase
         .from('card_contents')
@@ -106,10 +101,9 @@ export async function getCard(id: string) {
         // defaulting to empty contents if fetch fails
     }
 
-    const cardRow = card as CardRow
     return {
         ...cardRow,
-        status: cardRow.is_published ? 'published' : 'draft', // Polyfill status
+        status: (cardRow.is_published ? 'published' : 'draft') as Card['status'], // Polyfill status
         contents: (contents as CardContent[]) || []
     }
 }
@@ -122,7 +116,7 @@ export async function getCardBySlug(slug: string) {
     // But for public access using anon key, RLS for 'select' on 'cards' should allow if is_published is true.
     // However, since we are using the service role or anon key server-side, it's best to be explicit in the query too.
 
-    const { data: card, error: cardError } = await (supabase as any)
+    const cardResult = await supabase
         .from('cards')
         .select('*')
         .eq('slug', slug)
@@ -130,15 +124,17 @@ export async function getCardBySlug(slug: string) {
         .eq('is_published', true) // Correct column from init_database.sql
         .single()
 
-    if (cardError || !card) {
-        if (cardError) console.error('Error fetching public card:', cardError)
+    if (cardResult.error || !cardResult.data) {
+        if (cardResult.error) console.error('Error fetching public card:', cardResult.error)
         return null
     }
+
+    const cardRow = cardResult.data as CardRow
 
     const { data: contents, error: contentError } = await supabase
         .from('card_contents')
         .select('*')
-        .eq('card_id', card.id)
+        .eq('card_id', cardRow.id)
         .order('order_index', { ascending: true })
 
     if (contentError) {
@@ -146,22 +142,17 @@ export async function getCardBySlug(slug: string) {
     }
 
     // Fetch profile avatar
-    // Ensure we access user_id safely. card is typed as any in select but we know it matches Card structure partially.
-    const userId = (card as CardRow).user_id
-
-    const { data: profile } = await (supabase as any)
+    const profileResult = await supabase
         .from('profiles')
         .select('avatar_url')
-        .eq('id', userId)
+        .eq('id', cardRow.user_id)
         .single()
-
-    const cardRow = card as CardRow
 
     return {
         ...cardRow,
-        status: cardRow.is_published ? 'published' : 'draft', // Polyfill status
+        status: (cardRow.is_published ? 'published' : 'draft') as Card['status'], // Polyfill status
         contents: (contents as CardContent[]) || [],
-        avatar_url: profile?.avatar_url || null
+        avatar_url: profileResult.data?.avatar_url || null
     }
 }
 
@@ -190,7 +181,7 @@ export async function createCard(formData: FormData) {
         is_published: false, // Default to draft (false)
     }
 
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
         .from('cards')
         .insert(insertPayload)
         .select()
@@ -250,13 +241,14 @@ export async function updateCard(id: string, updates: { title?: string; descript
 
     // Auto-generate if title changed and no slug exists (fallback logic)
     if (updates.title) {
-        const { data: currentCard } = await (supabase as any).from('cards').select('slug').eq('id', id).single()
+        const slugResult = await supabase.from('cards').select('slug').eq('id', id).single()
+        const currentCard = slugResult.data as CardRow | null
         if (currentCard && !currentCard.slug && !updates.slug) {
             updatePayload.slug = await generateUniqueSlug(supabase, updates.title)
         }
     }
 
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
         .from('cards')
         .update(updatePayload)
         .eq('id', id)
@@ -314,14 +306,15 @@ export async function addCardContent(cardId: string, type: 'sns_link' | 'text', 
     }
 
     // Get current max order
-    const { data: maxOrderData } = await (supabase as any)
+    const { data: maxOrderData } = await supabase
         .from('card_contents')
         .select('order_index')
         .eq('card_id', cardId)
         .order('order_index', { ascending: false })
         .limit(1)
 
-    const nextOrder = (maxOrderData?.[0]?.order_index ?? -1) + 1
+    const maxOrderRows = maxOrderData as CardContent[] | null
+    const nextOrder = (maxOrderRows?.[0]?.order_index ?? -1) + 1
 
     const contentPayload: Database['public']['Tables']['card_contents']['Insert'] = {
         card_id: cardId,
@@ -330,7 +323,7 @@ export async function addCardContent(cardId: string, type: 'sns_link' | 'text', 
         order_index: nextOrder,
     }
 
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
         .from('card_contents')
         .insert(contentPayload)
         .select()
@@ -381,21 +374,23 @@ export async function deleteCardContent(contentId: string, cardId: string) {
 export async function getPublicCardById(id: string) {
     const supabase = await createClient()
 
-    const { data: card, error: cardError } = await (supabase as any)
+    const cardResult = await supabase
         .from('cards')
         .select('*')
         .eq('id', id)
         .single()
 
-    if (cardError || !card) {
-        if (cardError) console.error('Error fetching public card by ID:', cardError)
+    if (cardResult.error || !cardResult.data) {
+        if (cardResult.error) console.error('Error fetching public card by ID:', cardResult.error)
         return null
     }
+
+    const cardRow = cardResult.data as CardRow
 
     const { data: contents, error: contentError } = await supabase
         .from('card_contents')
         .select('*')
-        .eq('card_id', card.id)
+        .eq('card_id', cardRow.id)
         .order('order_index', { ascending: true })
 
     if (contentError) {
@@ -403,22 +398,17 @@ export async function getPublicCardById(id: string) {
     }
 
     // Fetch profile avatar
-    // Ensure we access user_id safely. card is typed as any in select but we know it matches Card structure partially.
-    const userId = (card as CardRow).user_id
-
-    const { data: profile } = await (supabase as any)
+    const profileResult = await supabase
         .from('profiles')
         .select('avatar_url')
-        .eq('id', userId)
+        .eq('id', cardRow.user_id)
         .single()
-
-    const cardRow = card as CardRow
 
     return {
         ...cardRow,
-        status: cardRow.is_published ? 'published' : 'draft', // Polyfill statuses
+        status: (cardRow.is_published ? 'published' : 'draft') as Card['status'], // Polyfill statuses
         contents: (contents as CardContent[]) || [],
-        avatar_url: profile?.avatar_url || null
+        avatar_url: profileResult.data?.avatar_url || null
     }
 }
 
@@ -426,10 +416,7 @@ export async function incrementViewCount(id: string) {
     const supabase = await createClient()
 
     // RPC now accepts card_id directly (after running refine_infrastructure_safety.sql)
-    // The RPC function signature expected is increment_view_count(card_id uuid)
-    // We cast to any because Types might not be updated yet
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await supabase.rpc('increment_view_count', { card_id: id } as any)
+    const { error } = await supabase.rpc('increment_view_count', { card_id: id })
 
     if (error) {
         console.error('Error incrementing view count:', error)
@@ -452,15 +439,17 @@ export async function reorderCardContents(cardId: string, items: { id: string; o
         throw new Error('Card not found or access denied')
     }
 
-    const { error } = await (supabase as any)
+    const upsertPayload: Database['public']['Tables']['card_contents']['Insert'][] = items.map((item) => ({
+        id: item.id,
+        card_id: cardId,
+        type: '', // Required by Insert type but won't be overwritten on upsert conflict
+        content: '' as Json, // Required by Insert type but won't be overwritten on upsert conflict
+        order_index: item.order_index,
+    }))
+
+    const { error } = await supabase
         .from('card_contents')
-        .upsert(
-            items.map((item) => ({
-                id: item.id,
-                card_id: cardId, // Required for composite key or constraint if any, though ID alone usually enough? Supabase usually needs all PKs or valid update columns
-                order_index: item.order_index,
-            })) as Database['public']['Tables']['card_contents']['Insert'][]
-        )
+        .upsert(upsertPayload)
         .select()
 
     if (error) {

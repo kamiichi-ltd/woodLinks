@@ -3,14 +3,15 @@
 import { createClient } from '@/utils/supabase/server'
 import { UAParser } from 'ua-parser-js'
 import { headers } from 'next/headers'
+import type { AnalyticsRecord } from '@/types/domain'
 
 export type AnalyticsEvent = {
     cardId: string
     eventType: 'view' | 'contact_save' | 'link_click'
-    metaData?: Record<string, any>
+    metaData?: Record<string, string | number | boolean>
 }
 
-export async function logEvent(cardId: string, eventType: 'view' | 'contact_save' | 'link_click', metaData?: Record<string, any>) {
+export async function logEvent(cardId: string, eventType: 'view' | 'contact_save' | 'link_click' /*, metaData?: Record<string, string | number | boolean> */) {
     const supabase = await createClient()
     const headersList = await headers()
     const userAgent = headersList.get('user-agent') || ''
@@ -30,7 +31,7 @@ export async function logEvent(cardId: string, eventType: 'view' | 'contact_save
         osName = os.name || 'unknown'
     }
 
-    const { error } = await (supabase as any).from('analytics').insert({
+    const { error } = await supabase.from('analytics').insert({
         card_id: cardId,
         event_type: eventType,
         device_type: deviceType,
@@ -52,26 +53,29 @@ export async function getCardAnalytics(cardId: string) {
     const thirtyDaysAgo = new Date()
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-    const { data: analytics, error } = await (supabase as any)
+    const result = await supabase
         .from('analytics')
         .select('*')
         .eq('card_id', cardId)
         .gte('created_at', thirtyDaysAgo.toISOString())
         .order('created_at', { ascending: true })
 
-    if (error) {
-        console.error('Error fetching analytics:', error)
+    if (result.error) {
+        console.error('Error fetching analytics:', result.error)
         return null
     }
 
+    // Cast once at the boundary
+    const analytics = result.data as AnalyticsRecord[]
+
     // 2. Process Data
-    const totalViews = analytics.filter((a: any) => a.event_type === 'view').length
-    const totalSaves = analytics.filter((a: any) => a.event_type === 'contact_save').length
-    const totalkliks = analytics.filter((a: any) => a.event_type === 'link_click').length
+    const totalViews = analytics.filter((a) => a.event_type === 'view').length
+    const totalSaves = analytics.filter((a) => a.event_type === 'contact_save').length
+    const totalkliks = analytics.filter((a) => a.event_type === 'link_click').length
 
     // Today's Stats
     const today = new Date().toISOString().split('T')[0]
-    const todayViews = analytics.filter((a: any) =>
+    const todayViews = analytics.filter((a) =>
         a.event_type === 'view' && a.created_at.startsWith(today)
     ).length
 
@@ -87,7 +91,7 @@ export async function getCardAnalytics(cardId: string) {
         dailyViewsMap.set(dateStr, 0)
     }
 
-    analytics.forEach((record: any) => {
+    analytics.forEach((record) => {
         if (record.event_type === 'view') {
             const dateStr = record.created_at.split('T')[0]
             if (dailyViewsMap.has(dateStr)) {
@@ -110,7 +114,7 @@ export async function getCardAnalytics(cardId: string) {
         other: 0
     }
 
-    analytics.forEach((record: any) => {
+    analytics.forEach((record) => {
         if (record.event_type === 'view') {
             const type = record.device_type || 'other'
             if (type === 'mobile') deviceCounts.mobile++

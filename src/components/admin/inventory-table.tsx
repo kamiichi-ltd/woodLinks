@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { MoreHorizontal, FileEdit, Trash2, QrCode, ExternalLink, Filter } from 'lucide-react'
-import Link from 'next/link'
+
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { deleteWood } from '@/app/admin/inventory/actions'
@@ -163,7 +163,7 @@ export default function InventoryTable({ initialData, initialStatus }: Inventory
                                         <div className="text-sm text-gray-500">{wood.species}</div>
                                     </TableCell>
                                     <TableCell className="hidden md:table-cell text-sm text-gray-600">
-                                        {/* @ts-ignore: dims might be json */}
+                                        {/* @ts-expect-error: dims might be json */}
                                         {wood.dimensions?.length} x {wood.dimensions?.width} x {wood.dimensions?.thickness} mm
                                     </TableCell>
                                     <TableCell>

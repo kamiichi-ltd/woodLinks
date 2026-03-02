@@ -94,7 +94,7 @@ test.describe('Debug Toggle Functionality', () => {
                 try {
                     const body = await response.json();
                     console.log('<< Response Body:', JSON.stringify(body, null, 2));
-                } catch (e) {
+                } catch {
                     console.log('<< Response Body: (Not JSON)');
                 }
             }

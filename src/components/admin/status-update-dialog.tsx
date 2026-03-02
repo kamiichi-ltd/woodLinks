@@ -49,9 +49,13 @@ export function StatusUpdateDialog({ orderId, currentStatus, onUpdate }: StatusU
             await updateOrderStatus(orderId, newStatus, trackingNumber || null)
             setIsOpen(false)
             if (onUpdate) onUpdate()
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (err: any) {
-            setError(err.message || 'Failed to update')
+
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message || 'Failed to update')
+            } else {
+                setError('Failed to update')
+            }
         } finally {
             setIsPending(false)
         }

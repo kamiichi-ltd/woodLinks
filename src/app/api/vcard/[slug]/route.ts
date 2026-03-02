@@ -1,5 +1,6 @@
 import { getCardBySlug } from '@/services/card-service'
 import { NextResponse } from 'next/server'
+import { CardContent } from '@/types/domain'
 
 export async function GET(
     request: Request,
@@ -34,11 +35,12 @@ export async function GET(
 
     // Build URLs
     const urls: string[] = []
-    const socialLinks = card.contents?.filter((c: any) => c.type === 'sns_link') || []
-    socialLinks.forEach((link: any) => {
-        if (link.content && link.content.url) {
+    const socialLinks = card.contents?.filter((c: CardContent) => c.type === 'sns_link') || []
+    socialLinks.forEach((link: CardContent) => {
+        const content = link.content as { url?: string; platform?: string } | null;
+        if (content && content.url) {
             // vCard 3.0: URL;TYPE=Instagram:https://...
-            urls.push(`URL;type=${link.content.platform}:${link.content.url}`)
+            urls.push(`URL;type=${content.platform}:${content.url}`)
         }
     })
 

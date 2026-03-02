@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { createOrder, startCheckout } from '@/services/order-service';
 import { Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+
 import { MATERIAL_PRICES, MaterialType } from '@/constants/prices';
 
 interface OrderFormProps {
@@ -14,7 +14,6 @@ interface OrderFormProps {
 export function OrderForm({ cardId, onOrderCreated }: OrderFormProps) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const router = useRouter();
 
     // Form States
     const [material, setMaterial] = useState<'sugi' | 'hinoki' | 'walnut'>('sugi');
@@ -64,7 +63,7 @@ export function OrderForm({ cardId, onOrderCreated }: OrderFormProps) {
             }
 
             onOrderCreated(); // Optional: Refresh parent state (background)
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('[OrderForm] Error:', err);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             setError((err as any).message || '注文の作成に失敗しました。');

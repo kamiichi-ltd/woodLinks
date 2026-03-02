@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Database } from '@/database.types'
 import { StatusUpdateDialog } from './status-update-dialog'
-import { ClipboardCopy, Check, ExternalLink, Pencil } from 'lucide-react'
+import { ClipboardCopy, Check, Pencil } from 'lucide-react'
 import Link from 'next/link'
+import type { Order as DomainOrder, Profile } from '@/types/domain'
 
 const STATUS_MAP: Record<string, string> = {
     pending_payment: '支払い待ち',
@@ -16,11 +16,8 @@ const STATUS_MAP: Record<string, string> = {
     refunded: '返金済み',
 }
 
-type Order = Database['public']['Tables']['orders']['Row'] & {
-    profiles: {
-        email: string | null
-        full_name: string | null
-    } | null
+export type AdminOrder = DomainOrder & {
+    profiles: Pick<Profile, 'email' | 'full_name'> | null
     cards: {
         id: string
         title: string | null
@@ -28,7 +25,7 @@ type Order = Database['public']['Tables']['orders']['Row'] & {
     } | null
 }
 
-export function AdminOrderTable({ orders }: { orders: Order[] }) {
+export function AdminOrderTable({ orders }: { orders: AdminOrder[] }) {
     const [copiedId, setCopiedId] = useState<string | null>(null)
 
     const handleCopyUrl = async (slug: string, orderId: string) => {
@@ -61,7 +58,7 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-stone-100">
-                        {orders.map((order: any) => (
+                        {orders.map((order: AdminOrder) => (
                             <tr key={order.id} className="hover:bg-stone-50/50 transition-colors">
                                 <td className="px-6 py-4 align-top">
                                     <div className="font-mono text-xs text-stone-400 mb-1">
@@ -76,7 +73,7 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                                 </td>
                                 <td className="px-6 py-4 align-top">
                                     <div className="font-bold text-stone-800">
-                                        {order.profiles?.full_name || (order as any).shipping_name || order.profiles?.email || 'Unknown'}
+                                        {order.profiles?.full_name || order.shipping_name || order.profiles?.email || 'Unknown'}
                                     </div>
                                     <div className="text-stone-500 text-xs">
                                         {order.profiles?.email}
@@ -119,11 +116,11 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 align-top text-stone-600 max-w-xs min-w-[200px]">
-                                    <div className="font-bold">{(order as any).shipping_name}</div>
-                                    <div>〒{(order as any).shipping_postal}</div>
-                                    <div>{(order as any).shipping_address1}</div>
-                                    {(order as any).shipping_address2 && <div>{(order as any).shipping_address2}</div>}
-                                    <div className="text-xs text-stone-400 mt-1">📞 {(order as any).shipping_phone}</div>
+                                    <div className="font-bold">{order.shipping_name}</div>
+                                    <div>〒{order.shipping_postal}</div>
+                                    <div>{order.shipping_address1}</div>
+                                    {order.shipping_address2 && <div>{order.shipping_address2}</div>}
+                                    <div className="text-xs text-stone-400 mt-1">📞 {order.shipping_phone}</div>
                                 </td>
                                 <td className="px-6 py-4 align-top">
                                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${order.status === 'paid' ? 'bg-green-100 text-green-800' :
@@ -152,7 +149,7 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
 
             {/* Mobile Card View */}
             <div className="block md:hidden p-4 space-y-4">
-                {orders.map((order: any) => (
+                {orders.map((order: AdminOrder) => (
                     <div key={order.id} className="border border-stone-200 rounded-lg p-4 bg-white shadow-sm flex flex-col gap-3">
                         {/* Header: ID and Date */}
                         <div className="flex justify-between items-start border-b border-stone-100 pb-2">
@@ -172,7 +169,7 @@ export function AdminOrderTable({ orders }: { orders: Order[] }) {
                         {/* Customer Info */}
                         <div>
                             <div className="font-bold text-lg text-stone-800">
-                                {order.profiles?.full_name || (order as any).shipping_name || order.profiles?.email || 'Unknown'}
+                                {order.profiles?.full_name || order.shipping_name || order.profiles?.email || 'Unknown'}
                             </div>
                             <div className="text-xs text-stone-500 truncate">
                                 {order.profiles?.email}

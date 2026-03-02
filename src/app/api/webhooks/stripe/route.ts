@@ -5,8 +5,8 @@ import { createClient } from '@supabase/supabase-js'
 import { Database } from '@/database.types'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    apiVersion: '2025-01-27.acacia' as any,
+    // @ts-expect-error: Using specific Stripe API version required for compatibility
+    apiVersion: '2025-01-27.acacia',
 })
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
@@ -23,10 +23,13 @@ export async function POST(req: Request) {
             throw new Error('Missing signature or secret')
         }
         event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-        console.error(`[Stripe Webhook] Error verifying webhook signature: ${err.message}`)
-        return new Response(`Webhook Error: ${err.message}`, { status: 400 })
+
+    } catch (err: unknown) {
+        if (err instanceof Error) {
+            console.error(`[Stripe Webhook] Error verifying webhook signature: ${err.message}`)
+            return new Response(`Webhook Error: ${err.message}`, { status: 400 })
+        }
+        return new Response("Unknown error", { status: 400 })
     }
 
     if (event.type === 'checkout.session.completed') {
@@ -51,7 +54,7 @@ export async function POST(req: Request) {
 
             // Perform direct update using Service Role to ensure reliability
             // Using direct update instead of RPC to avoid signature issues and simplify debugging
-            const { error } = await (supabase as any)
+            const { error } = await supabase
                 .from('orders')
                 .update({
                     status: 'paid',

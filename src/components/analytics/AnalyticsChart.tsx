@@ -1,7 +1,7 @@
 'use client'
 
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { motion } from 'framer-motion'
+
 import { DailyViews } from '@/services/analytics-service'
 
 export default function AnalyticsChart({ data }: { data: DailyViews[] }) {
@@ -44,7 +44,7 @@ export default function AnalyticsChart({ data }: { data: DailyViews[] }) {
                             allowDecimals={false}
                         />
                         <Tooltip
-                            formatter={(value: any) => [value, '閲覧数']}
+                            formatter={(value) => [(value ?? 0), '閲覧数']}
                             contentStyle={{
                                 backgroundColor: '#2c3e50',
                                 border: 'none',

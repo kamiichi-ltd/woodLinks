@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { UAParser } from 'ua-parser-js'
+import type { AnalyticsRecord } from '@/types/domain'
 
 export type AnalyticsEvent = {
     cardId: string
@@ -27,8 +28,7 @@ export async function logAnalyticsEvent(event: AnalyticsEvent) {
         osName = os.name || 'unknown'
     }
 
-    // supabaseをanyにキャストして型チェックをスキップする
-    const { error } = await (supabase as any).from('analytics').insert({
+    const { error } = await supabase.from('analytics').insert({
         card_id: event.cardId,
         event_type: event.eventType,
         device_type: deviceType,
@@ -65,28 +65,30 @@ export async function getDashboardAnalytics(userId: string): Promise<DashboardAn
         return { totalViews: 0, totalSaves: 0, dailyViews: [] }
     }
 
-    // c を any として扱うことで id へのアクセスを許可する
-    const cardIds = cards.map((c: any) => c.id)
+    const cardIds = cards.map((c) => c.id)
 
     // 2. Fetch analytics for these cards (Last 30 days)
     const thirtyDaysAgo = new Date()
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-    const { data: analytics, error: analyticsError } = await supabase
+    const result = await supabase
         .from('analytics')
         .select('*')
         .in('card_id', cardIds)
         .gte('created_at', thirtyDaysAgo.toISOString())
         .order('created_at', { ascending: true })
 
-    if (analyticsError) {
-        console.error('Error fetching analytics:', analyticsError)
+    if (result.error) {
+        console.error('Error fetching analytics:', result.error)
         return { totalViews: 0, totalSaves: 0, dailyViews: [] }
     }
 
+    // Cast once at the boundary
+    const analytics = result.data as AnalyticsRecord[]
+
     // 3. Process Data
-    const totalViews = analytics.filter((a: any) => a.event_type === 'view').length
-    const totalSaves = analytics.filter((a: any) => a.event_type === 'contact_save').length
+    const totalViews = analytics.filter((a) => a.event_type === 'view').length
+    const totalSaves = analytics.filter((a) => a.event_type === 'contact_save').length
 
     // Group views by date
     const viewsMap = new Map<string, number>()
@@ -99,7 +101,7 @@ export async function getDashboardAnalytics(userId: string): Promise<DashboardAn
         viewsMap.set(dateStr, 0)
     }
 
-    analytics.forEach((record: any) => {
+    analytics.forEach((record) => {
         if (record.event_type === 'view') {
             const dateStr = new Date(record.created_at).toISOString().split('T')[0]
             if (viewsMap.has(dateStr)) {

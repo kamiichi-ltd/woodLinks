@@ -1,9 +1,12 @@
 import { getPublicCardById } from '@/services/card-service'
 import { NextRequest, NextResponse } from 'next/server'
-import { Database } from '@/database.types'
 
-// 変更前: Database['public']['Tables']['card_contents']['Row']
-type CardContent = any
+
+import { CardContent } from '@/types/domain'
+
+interface CardWithContents {
+    contents?: CardContent[]
+}
 
 // Helper guard
 function isSnsContent(content: unknown): content is { platform: string; url: string } {
@@ -38,12 +41,12 @@ export async function GET(
     const n = fn.split(' ').reverse().join(';') + ';;;' // Crude approximation
     const org = card.description ? card.description.replace(/\n/g, '\\n') : ''
 
-    // Phone, Email, Urls
     const tels: string[] = []
     const emails: string[] = []
     const urls: string[] = []
 
-    card.contents.forEach((item: CardContent) => {
+    const cardWithContents = card as unknown as CardWithContents
+    cardWithContents.contents?.forEach((item: CardContent) => {
         if (item.type === 'sns_link' && isSnsContent(item.content)) {
             const { platform, url } = item.content
             if (platform === 'phone') {

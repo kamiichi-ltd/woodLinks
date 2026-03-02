@@ -2,10 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { Database } from '@/database.types'
-
-type WoodInventory = Database['public']['Tables']['wood_inventory']['Row']
-type WoodInventoryInsert = Database['public']['Tables']['wood_inventory']['Insert']
+import type { WoodInventory, WoodInventoryInsert } from '@/types/domain'
 
 // Helper to generate unique slug
 async function generateUniqueSlug(baseName: string): Promise<string> {
@@ -33,27 +30,31 @@ export async function createWood(data: Omit<WoodInventoryInsert, 'id' | 'created
     // Auto-generate slug from name
     const nfc_slug = await generateUniqueSlug(data.name)
 
-    const { data: stringData, error } = await supabase
+    const insertPayload: WoodInventoryInsert = {
+        ...data,
+        nfc_slug,
+        stock: data.stock ?? 1,
+        price: data.price ?? 0,
+        status: data.status ?? 'available',
+        dimensions: data.dimensions ?? { length: 91, width: 55, thickness: 3 }
+    }
+
+    const { data: dbData, error } = await supabase
         .from('wood_inventory')
-        .insert({
-            ...data,
-            nfc_slug,
-            stock: data.stock ?? 1,
-            price: data.price ?? 0,
-            status: data.status ?? 'available',
-            dimensions: (data.dimensions as any) || { length: 91, width: 55, thickness: 3 }
-        } as any)
+        .insert(insertPayload)
         .select()
         .single()
 
-    if (error) {
+    if (error || !dbData) {
         console.error('Error creating wood:', error)
         throw new Error('Failed to create wood')
     }
 
+    const insertedWood = dbData as WoodInventory
+
     revalidatePath('/admin/inventory')
     revalidatePath('/wood')
-    return stringData
+    return insertedWood
 }
 
 export async function getWoodList() {
@@ -69,7 +70,7 @@ export async function getWoodList() {
         return []
     }
 
-    return data as WoodInventory[]
+    return (data ?? []) as WoodInventory[]
 }
 
 export async function getWoodBySlug(slug: string) {
@@ -81,7 +82,7 @@ export async function getWoodBySlug(slug: string) {
         .eq('nfc_slug', slug)
         .single()
 
-    if (error) {
+    if (error || !data) {
         console.error('Error fetching wood by slug:', error)
         return null
     }

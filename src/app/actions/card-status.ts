@@ -2,7 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { Database } from '@/database.types'
+
 
 export async function toggleCardStatus(cardId: string, isPublished: boolean) {
     console.log('🔘 Toggle Action Called:', { cardId, isPublished })
@@ -16,8 +16,8 @@ export async function toggleCardStatus(cardId: string, isPublished: boolean) {
     // If not, we might need Service Role. But let's follow the snippet provided by the user first.
     // UPDATE: The user provided snippet imports `createClient` from `@/utils/supabase/server`.
 
-    const { data, error } = await (supabase
-        .from('cards') as any)
+    const { data, error } = await supabase
+        .from('cards')
         .update({
             is_published: isPublished,
             status: isPublished ? 'published' : 'draft', // Sync status column

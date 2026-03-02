@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint . --ignore-pattern \"misc/**\" --rule \"@next/next/no-img-element:off\""
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

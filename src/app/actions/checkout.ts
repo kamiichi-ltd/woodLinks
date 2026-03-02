@@ -2,28 +2,17 @@
 
 import { createClient } from '@/utils/supabase/server'
 import Stripe from 'stripe'
-import { Database } from '@/database.types'
-
-type OrderWithCard = Database['public']['Tables']['orders']['Row'] & {
-    // cardsテーブルは廃止され、ordersテーブルに統合されました
-    cards: Pick<Database['public']['Tables']['orders']['Row'], 'id' | 'title' | 'user_id'> // 以前の修正箇所
-    material?: any; // 追加
-    card_id?: any;  // 追加
-    [key: string]: any; // 追加（これで未定義プロパティのエラーを全て防ぐ）
-}
+import { MATERIAL_PRICES, MaterialType } from '@/constants/prices'
+import type { Order } from '@/types/domain'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    apiVersion: '2025-01-27.acacia' as any, // Bypass strict type check for now to match installed SDK
+    apiVersion: '2025-01-27.acacia' as Stripe.LatestApiVersion,
 })
-
-import { MATERIAL_PRICES, MaterialType } from '@/constants/prices';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
 // Safe Input Handler
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function createStripeCheckoutSession(orderIdInput: string | { id: string } | any) {
+export async function createStripeCheckoutSession(orderIdInput: string | { id: string }) {
     // Sanitize Input: If object is passed (e.g. from RPC return), extract ID
     const orderId = typeof orderIdInput === 'object' && orderIdInput?.id
         ? orderIdInput.id
@@ -46,24 +35,30 @@ export async function createStripeCheckoutSession(orderIdInput: string | { id: s
     // 2. Fetch Order
     const { data: order, error } = await supabase
         .from('orders')
-        .select(`
-            *,
-            cards (
-                id,
-                title,
-                user_id
-            )
-        `)
+        .select('*')
         .eq('id', orderId)
         .single()
 
-    const orderData = order as unknown as OrderWithCard
+    const orderData = order as Order
 
     if (error || !orderData) {
         console.error('[Checkout] Order not found or error:', error)
         console.error('[Checkout] Requested Order ID:', orderId)
         console.error('[Checkout] Authenticated User ID:', user.id)
         throw new Error('Order not found')
+    }
+
+    // Fetch Card separately to avoid Supabase join typing errors without double assertions
+    const { data: card, error: cardError } = await supabase
+        .from('cards')
+        .select('id, title, user_id')
+        .eq('id', orderData.card_id)
+        .single()
+
+    const cardData = card as { id: string, title: string | null, user_id: string }
+
+    if (cardError || !cardData) {
+        throw new Error('Order is missing card reference')
     }
 
     // 3. Verify Ownership
@@ -81,9 +76,6 @@ export async function createStripeCheckoutSession(orderIdInput: string | { id: s
 
     // Validate material
     const material = orderData.material as MaterialType;
-
-    // Force quantity to 1 for "One Card Project" model
-    const quantity = 1;
 
     if (!MATERIAL_PRICES[material]) {
         throw new Error('Invalid material')
@@ -107,7 +99,7 @@ export async function createStripeCheckoutSession(orderIdInput: string | { id: s
                     currency: 'jpy',
                     product_data: {
                         name: `WoodLinks Device - ${orderData.material}`,
-                        description: `Digital Business Card Device (${orderData.cards.title})`,
+                        description: `Digital Business Card Device (${cardData.title || 'Untitled'})`,
                         metadata: {
                             card_id: orderData.card_id,
                         },
@@ -135,7 +127,6 @@ export async function createStripeCheckoutSession(orderIdInput: string | { id: s
     // 6. Update Order with Session ID
     const { error: updateError } = await supabase
         .from('orders')
-        // @ts-expect-error: checkout_session_id column exists in DB but might be missing in types
         .update({ checkout_session_id: session.id })
         .eq('id', orderData.id)
 

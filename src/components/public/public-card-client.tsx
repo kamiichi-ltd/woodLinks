@@ -6,6 +6,7 @@ import ContactSaveButton from '@/components/public/contact-save-button'
 import PublicNavigation from '@/components/public/public-navigation'
 import { ViewCounter } from '@/components/analytics/view-counter'
 import { logEvent } from '@/app/actions/analytics'
+import type { Card, CardContent } from '@/types/domain'
 
 // Helper guard
 function isSnsContent(content: unknown): content is { platform: string; url: string } {
@@ -74,13 +75,13 @@ const getMaterialTheme = (material: string = 'walnut') => {
 }
 
 type PublicCardClientProps = {
-    card: any
+    card: Card
     isOwner: boolean
 }
 
 export default function PublicCardClient({ card, isOwner }: PublicCardClientProps) {
     // State management for material switcher
-    const [currentMaterial, setCurrentMaterial] = useState(card.material_type || 'walnut')
+    const [currentMaterial, setCurrentMaterial] = useState<string>(card.material_type || 'walnut')
     const theme = getMaterialTheme(currentMaterial)
 
     return (
@@ -106,7 +107,6 @@ export default function PublicCardClient({ card, isOwner }: PublicCardClientProp
                     <div className="mx-auto h-32 w-32 rounded-full p-1.5 bg-white shadow-lg">
                         <div className="h-full w-full rounded-full overflow-hidden bg-stone-100 flex items-center justify-center relative">
                             {card.avatar_url ? (
-                                // eslint-disable-next-line @next/next/no-img-element
                                 <img
                                     src={card.avatar_url}
                                     alt={card.title || 'Avatar'}
@@ -148,7 +148,7 @@ export default function PublicCardClient({ card, isOwner }: PublicCardClientProp
                         </div>
                     )}
 
-                    {card.contents?.map((item: any) => {
+                    {card.contents?.map((item: CardContent) => {
                         if (item.type === 'sns_link' && isSnsContent(item.content)) {
                             const { platform, url } = item.content
                             const config = platformConfig[platform] || { icon: LinkIcon, label: platform, color: 'text-gray-600' }

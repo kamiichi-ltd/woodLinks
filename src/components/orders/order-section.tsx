@@ -31,7 +31,7 @@ export function OrderSection({ cardId, initialOrders }: OrderSectionProps) {
 
     // Implementation: Just show the latest order. If the user wants to order again, we need a button to reset "viewing mode" to form.
 
-    const [orders, setOrders] = useState<Order[]>(initialOrders);
+    const [orders] = useState<Order[]>(initialOrders);
 
     // Find the active order
     const activeOrder = orders[0]; // Assuming sorted by created_at desc from server

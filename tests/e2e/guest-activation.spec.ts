@@ -21,7 +21,7 @@ test.describe('Guest Activation Flow', () => {
         cardSlug = `guest-${uniqueSuffix}`;
 
         // Create card directly in DB with owner_id = null (Unclaimed)
-        const { data: card, error } = await supabase
+        await supabase
             .from('cards')
             .insert({
                 slug: cardSlug,

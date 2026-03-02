@@ -8,8 +8,6 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env.local') });
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const adminEmail = process.env.ADMIN_EMAIL!;
-const adminPassword = process.env.TEST_ADMIN_PASSWORD || 'password'; // Assuming we have a way to know password or create user
 
 if (!supabaseUrl || !supabaseServiceKey) {
     throw new Error('Missing Supabase credentials in .env.local');
@@ -24,7 +22,7 @@ test.describe('Login Redirect Flow', () => {
 
     test.beforeAll(async () => {
         // 1. Create a Test User using Admin API
-        const { data, error } = await supabase.auth.admin.createUser({
+        const { error } = await supabase.auth.admin.createUser({
             email: TEST_EMAIL,
             password: TEST_PASSWORD,
             email_confirm: true

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, Variants } from 'framer-motion'
 import {
   ArrowRight,
   Smartphone,
@@ -22,24 +22,12 @@ import {
   Droplets,
   Hammer,
   Award,
-  Box,
-  ChevronDown,
-  CreditCard,
-  Layout,
-  Sparkles,
-  Mail,
-  Twitter,
-  Instagram,
-  Github,
-  Linkedin,
-  MessageCircle,
-  Share2,
   Menu // Added Menu icon
 } from 'lucide-react'
 import MaterialSelection from '@/components/landing/material-selection'
 
 // --- Animation Variants ---
-const fadeIn: any = {
+const fadeIn: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,

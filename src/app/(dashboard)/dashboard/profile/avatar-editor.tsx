@@ -58,7 +58,6 @@ export default function AvatarEditor({ initialAvatarUrl, userId }: { initialAvat
     return (
         <div className="flex items-center gap-x-6 bg-white p-6 shadow sm:rounded-lg border border-gray-100">
             {avatarUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
                 <img
                     src={avatarUrl}
                     alt="Current Avatar"

@@ -13,7 +13,7 @@ export default function ViewTracker({ slug }: { slug: string }) {
         const supabase = createClient()
 
         // Fire and forget
-        supabase.rpc('increment_wood_view', { slug_input: slug } as any).then(({ error }) => {
+        supabase.rpc('increment_wood_view', { slug_input: slug }).then(({ error }) => {
             if (error) console.error('Error tracking view:', error)
         })
 
