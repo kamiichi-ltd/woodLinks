@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { Database, Json } from '@/database.types'
 import type { Card, CardRow, CardContent } from '@/types/domain'
 
-export type { Card, CardContent }
+export type { Card, CardContent } from '@/types/domain'
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>
 
@@ -104,6 +104,7 @@ export async function getCard(id: string) {
     return {
         ...cardRow,
         status: (cardRow.is_published ? 'published' : 'draft') as Card['status'], // Polyfill status
+        material_type: cardRow.material_type as Card['material_type'],
         contents: (contents as CardContent[]) || []
     }
 }
@@ -151,6 +152,7 @@ export async function getCardBySlug(slug: string) {
     return {
         ...cardRow,
         status: (cardRow.is_published ? 'published' : 'draft') as Card['status'], // Polyfill status
+        material_type: cardRow.material_type as Card['material_type'],
         contents: (contents as CardContent[]) || [],
         avatar_url: profileResult.data?.avatar_url || null
     }
@@ -407,6 +409,7 @@ export async function getPublicCardById(id: string) {
     return {
         ...cardRow,
         status: (cardRow.is_published ? 'published' : 'draft') as Card['status'], // Polyfill statuses
+        material_type: cardRow.material_type as Card['material_type'],
         contents: (contents as CardContent[]) || [],
         avatar_url: profileResult.data?.avatar_url || null
     }
