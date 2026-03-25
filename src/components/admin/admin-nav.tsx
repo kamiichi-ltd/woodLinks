@@ -2,11 +2,12 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ShieldCheck, Package, LayoutDashboard, ArrowRight, User, Menu, X } from 'lucide-react'
+import { ShieldCheck, Package, LayoutDashboard, ArrowRight, User, Menu, X, Layers3 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const NAV_ITEMS = [
     { label: 'ホーム (計器盤)', href: '/admin', icon: LayoutDashboard },
+    { label: 'カード管理', href: '/admin/cards', icon: Layers3 },
     { label: '注文管理', href: '/admin/orders', icon: Package },
     { label: '顧客リスト', href: '/admin/customers', icon: User },
     { label: 'ユーザー画面へ', href: '/dashboard', icon: ArrowRight },
