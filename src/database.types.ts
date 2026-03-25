@@ -16,6 +16,7 @@ export interface Database {
                     updated_at: string | null
                     full_name: string | null
                     avatar_url: string | null
+                    full_name: string | null
                     email: string | null
                 }
                 Insert: {
@@ -24,6 +25,7 @@ export interface Database {
                     updated_at?: string | null
                     full_name?: string | null
                     avatar_url?: string | null
+                    full_name?: string | null
                     email?: string | null
                 }
                 Update: {
@@ -32,6 +34,7 @@ export interface Database {
                     updated_at?: string | null
                     full_name?: string | null
                     avatar_url?: string | null
+                    full_name?: string | null
                     email?: string | null
                 }
                 Relationships: []

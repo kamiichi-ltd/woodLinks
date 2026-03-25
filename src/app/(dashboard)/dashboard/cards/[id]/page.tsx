@@ -11,6 +11,8 @@ import { Database } from '@/database.types'
 import { DeleteProjectButton } from '@/components/dashboard/delete-project-button'
 import { getCardAnalytics } from '@/app/actions/analytics'
 import { AnalyticsDashboard } from '@/components/admin/analytics-dashboard'
+import { getCardLeads } from '@/app/actions/connection'
+import { LeadList } from '@/components/dashboard/lead-list'
 
 type Order = Database['public']['Tables']['orders']['Row']
 
@@ -32,6 +34,8 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
     if (!card) {
         notFound()
     }
+
+    const leads = await getCardLeads(resolvedParams.id)
 
     return (
         <div>
@@ -104,6 +108,10 @@ export default async function CardEditPage({ params }: { params: Promise<{ id: s
 
                     <div className="pt-8 border-t border-stone-200">
                         <AnalyticsDashboard data={analyticsData} />
+                    </div>
+
+                    <div className="pt-8 border-t border-stone-200">
+                        <LeadList leads={leads} />
                     </div>
                 </div>
 
