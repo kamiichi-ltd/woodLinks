@@ -3,6 +3,26 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { buildSafeNextPath } from '@/lib/auth-redirect'
+
+function buildAuthCallbackUrl(next?: string | null, action?: string | null, cardId?: string | null) {
+    const callbackUrl = new URL(
+        '/auth/callback',
+        process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    )
+
+    if (next) {
+        callbackUrl.searchParams.set('next', next)
+    }
+    if (action) {
+        callbackUrl.searchParams.set('action', action)
+    }
+    if (cardId) {
+        callbackUrl.searchParams.set('cardId', cardId)
+    }
+
+    return callbackUrl.toString()
+}
 
 export async function login(formData: FormData) {
     const supabase = await createClient()
@@ -11,6 +31,8 @@ export async function login(formData: FormData) {
     const email = formData.get('email') as string
     const password = formData.get('password') as string
     const nextParam = formData.get('next') as string
+    const actionParam = formData.get('action') as string
+    const cardIdParam = formData.get('cardId') as string
 
     console.log('[Auth] Login attempt:', { email, next: nextParam })
 
@@ -34,9 +56,13 @@ export async function login(formData: FormData) {
     revalidatePath('/', 'layout')
 
     // 1. Dynamic Redirect (Priority)
-    // nextParam is already captured at top of function
-    if (nextParam && nextParam.startsWith('/')) {
-        redirect(nextParam)
+    const redirectTarget = buildSafeNextPath(nextParam, {
+        action: actionParam || undefined,
+        cardId: cardIdParam || undefined,
+    })
+
+    if (redirectTarget) {
+        redirect(redirectTarget)
     }
 
     // 2. Admin Check (Optional: If we want to force super-admin to orders page regardless of next? 
@@ -57,6 +83,9 @@ export async function signup(formData: FormData) {
 
     const email = formData.get('email') as string
     const password = formData.get('password') as string
+    const next = formData.get('next') as string
+    const action = formData.get('action') as string
+    const cardId = formData.get('cardId') as string
 
     if (!email || !password) {
         throw new Error('メールアドレスとパスワードは必須です')
@@ -66,7 +95,7 @@ export async function signup(formData: FormData) {
         email,
         password,
         options: {
-            emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/auth/callback`,
+            emailRedirectTo: buildAuthCallbackUrl(next, action, cardId),
         },
     })
 
@@ -109,11 +138,15 @@ export async function signup(formData: FormData) {
     revalidatePath('/', 'layout')
 
     // 1. Dynamic Redirect (Priority)
-    const next = formData.get('next') as string
     console.log('[Auth] SignUp Redirect Check:', next)
 
-    if (next && next.startsWith('/')) {
-        redirect(next)
+    const redirectTarget = buildSafeNextPath(next, {
+        action: action || undefined,
+        cardId: cardId || undefined,
+    })
+
+    if (redirectTarget) {
+        redirect(redirectTarget)
     }
 
     // 2. Default Redirect

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Link as LinkIcon, Phone, Mail, Instagram, Twitter, Facebook, Github, Globe, LucideIcon, Palette } from 'lucide-react'
 import ContactSaveButton from '@/components/public/contact-save-button'
+import LineSaveButton from '@/components/public/line-save-button'
 import PublicNavigation from '@/components/public/public-navigation'
 import { ViewCounter } from '@/components/analytics/view-counter'
 import { logEvent } from '@/app/actions/analytics'
@@ -77,9 +78,18 @@ const getMaterialTheme = (material: string = 'walnut') => {
 type PublicCardClientProps = {
     card: Card
     isOwner: boolean
+    isLoggedIn: boolean
+    autoSaveRequested?: boolean
+    initialConnectionSaved?: boolean
 }
 
-export default function PublicCardClient({ card, isOwner }: PublicCardClientProps) {
+export default function PublicCardClient({
+    card,
+    isOwner,
+    isLoggedIn,
+    autoSaveRequested = false,
+    initialConnectionSaved = false,
+}: PublicCardClientProps) {
     // State management for material switcher
     const [currentMaterial, setCurrentMaterial] = useState<string>(card.material_type || 'walnut')
     const theme = getMaterialTheme(currentMaterial)
@@ -133,11 +143,20 @@ export default function PublicCardClient({ card, isOwner }: PublicCardClientProp
                     </div>
 
                     {/* CTA Button */}
-                    <ContactSaveButton
-                        cardId={card.id}
-                        slug={card.slug}
-                        themeButtonClass={`${theme.buttonClass} shadow-lg flex items-center justify-center gap-2 group hover:shadow-xl transition-colors duration-500`}
-                    />
+                    <div className="grid grid-cols-2 gap-3">
+                        <LineSaveButton
+                            cardId={card.id}
+                            slug={card.slug}
+                            isLoggedIn={isLoggedIn}
+                            autoSave={autoSaveRequested}
+                            initialSaved={initialConnectionSaved}
+                        />
+                        <ContactSaveButton
+                            cardId={card.id}
+                            slug={card.slug}
+                            themeButtonClass={`${theme.buttonClass} shadow-lg flex items-center justify-center gap-2 group hover:shadow-xl transition-colors duration-500`}
+                        />
+                    </div>
                 </div>
 
                 {/* Links Section */}

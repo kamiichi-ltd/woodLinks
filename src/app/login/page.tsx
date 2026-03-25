@@ -2,9 +2,10 @@
 
 import { useState, useTransition, Suspense } from 'react'
 import { login, signup } from '@/services/auth-service'
-import { LogIn, UserPlus, AlertCircle } from 'lucide-react'
+import { LogIn, UserPlus, AlertCircle, MessageCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import { signInWithLine } from '@/utils/supabase/client'
 
 export default function LoginPage() {
     return (
@@ -19,6 +20,11 @@ function LoginForm() {
     const [isPending, startTransition] = useTransition()
     const [isLogin, setIsLogin] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [isLinePending, setIsLinePending] = useState(false)
+
+    const next = searchParams.get('next') || ''
+    const action = searchParams.get('action') || ''
+    const cardId = searchParams.get('cardId') || ''
 
     const handleSubmit = async (formData: FormData) => {
         setError(null)
@@ -39,6 +45,26 @@ function LoginForm() {
         })
     }
 
+    const handleLineSignIn = async () => {
+        setError(null)
+        setIsLinePending(true)
+
+        try {
+            await signInWithLine({
+                next,
+                action,
+                cardId,
+            })
+        } catch (err) {
+            if (err instanceof Error) {
+                setError(err.message)
+            } else {
+                setError('LINEログインの開始に失敗しました')
+            }
+            setIsLinePending(false)
+        }
+    }
+
     return (
         <div className="min-h-screen bg-[#fdfbf7] flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans text-[#2c3e50]">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -56,6 +82,33 @@ function LoginForm() {
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="bg-white py-8 px-4 shadow-xl shadow-stone-200/50 sm:rounded-2xl sm:px-10 border border-[#e6e2d3]">
                     <form action={handleSubmit} className="space-y-6">
+                        <div className="space-y-4">
+                            <button
+                                type="button"
+                                onClick={() => void handleLineSignIn()}
+                                disabled={isLinePending}
+                                className="flex w-full justify-center rounded-md bg-[#06C755] px-4 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#05b34c] disabled:opacity-70 transition-colors items-center gap-2"
+                            >
+                                {isLinePending ? (
+                                    'LINEへ移動中...'
+                                ) : (
+                                    <>
+                                        <MessageCircle className="h-4 w-4" />
+                                        LINEでログイン / 登録
+                                    </>
+                                )}
+                            </button>
+
+                            <div className="relative">
+                                <div className="absolute inset-0 flex items-center">
+                                    <div className="w-full border-t border-gray-200" />
+                                </div>
+                                <div className="relative flex justify-center text-xs">
+                                    <span className="bg-white px-2 text-gray-500">またはメールアドレスで続行</span>
+                                </div>
+                            </div>
+                        </div>
+
                         {error && (
                             <div className="rounded-md bg-red-50 p-4">
                                 <div className="flex">
@@ -107,7 +160,9 @@ function LoginForm() {
                         </div>
 
                         <div>
-                            <input type="hidden" name="next" value={searchParams.get('next') || ''} />
+                            <input type="hidden" name="next" value={next} />
+                            <input type="hidden" name="action" value={action} />
+                            <input type="hidden" name="cardId" value={cardId} />
                             <button
                                 type="submit"
                                 disabled={isPending}

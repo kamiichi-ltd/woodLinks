@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { buildSafeNextPath } from '@/lib/auth-redirect'
 
 export async function updateSession(request: NextRequest) {
     let response = NextResponse.next({
@@ -50,11 +51,15 @@ export async function updateSession(request: NextRequest) {
         if (user) {
             // Priority: Check 'next' parameter
             const next = request.nextUrl.searchParams.get('next')
-            if (next) {
-                // Ensure absolute path or safe relative path
-                if (next.startsWith('/') && next !== request.nextUrl.pathname) {
-                    return NextResponse.redirect(new URL(next, request.url))
-                }
+            const action = request.nextUrl.searchParams.get('action')
+            const cardId = request.nextUrl.searchParams.get('cardId')
+            const redirectTarget = buildSafeNextPath(next, {
+                action,
+                cardId,
+            })
+
+            if (redirectTarget && redirectTarget !== request.nextUrl.pathname) {
+                return NextResponse.redirect(new URL(redirectTarget, request.url))
             }
 
             // Role-based Redirect

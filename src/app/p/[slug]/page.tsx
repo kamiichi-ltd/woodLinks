@@ -27,8 +27,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
 }
 
-export default async function PublicCardPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function PublicCardPage({
+    params,
+    searchParams,
+}: {
+    params: Promise<{ slug: string }>
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
     const { slug } = await params
+    const resolvedSearchParams = await searchParams
     const card = await getCardBySlug(slug)
 
     if (!card) {
@@ -51,5 +58,13 @@ export default async function PublicCardPage({ params }: { params: Promise<{ slu
     // Updated isOwner check to use owner_id
     const isOwner = user?.id === card.owner_id
 
-    return <PublicCardClient card={card} isOwner={isOwner} />
+    return (
+        <PublicCardClient
+            card={card}
+            isOwner={isOwner}
+            isLoggedIn={!!user}
+            autoSaveRequested={resolvedSearchParams.action === 'save'}
+            initialConnectionSaved={resolvedSearchParams.saved === '1'}
+        />
+    )
 }

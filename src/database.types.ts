@@ -36,6 +36,26 @@ export interface Database {
                 }
                 Relationships: []
             }
+            card_connections: {
+                Row: {
+                    id: string
+                    card_id: string
+                    user_id: string
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    card_id: string
+                    user_id: string
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    card_id?: string
+                    user_id?: string
+                    created_at?: string
+                }
+            }
             orders: {
                 Row: {
                     id: string
