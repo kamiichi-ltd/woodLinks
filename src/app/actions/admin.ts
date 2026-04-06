@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
 import { createClient as createServerClient } from '@/utils/supabase/server'
 import type { Order, Profile, CardRow } from '@/types/domain'
+import { MATERIAL_PRICES, MaterialType } from '@/constants/prices'
 
 // Use Service Role Key for Admin Actions to bypass RLS
 
@@ -148,12 +149,6 @@ export async function getAdminStats() {
 
     const typedOrders = (orders ?? []) as Order[]
 
-    const MATERIAL_PRICES_MAP: Record<string, number> = {
-        sugi: 12000,
-        hinoki: 15000,
-        walnut: 18000,
-    };
-
     let totalRevenue = 0;
     let pendingShipmentCount = 0;
     let totalSoldCount = 0;
@@ -168,7 +163,7 @@ export async function getAdminStats() {
         // Revenue (Current Month only)
         const orderDate = new Date(order.created_at);
         if (orderDate >= startOfMonth) {
-            const amount = order.total || MATERIAL_PRICES_MAP[order.material] || 0;
+            const amount = order.total || MATERIAL_PRICES[order.material as MaterialType] || 0;
             totalRevenue += amount;
         }
 
@@ -203,12 +198,6 @@ export async function getAdminCustomers() {
 
     const typedProfiles = (profiles ?? []) as ProfileWithOrders[]
 
-    const MATERIAL_PRICES_MAP: Record<string, number> = {
-        sugi: 12000,
-        hinoki: 15000,
-        walnut: 18000,
-    };
-
     // Aggregate Data
     const customers = typedProfiles.map((profile) => {
         const orders = profile.orders || [];
@@ -218,7 +207,7 @@ export async function getAdminCustomers() {
         );
 
         const totalSpend = paidOrders.reduce((sum, o) => {
-            return sum + (o.total || MATERIAL_PRICES_MAP[o.material] || 0);
+            return sum + (o.total || MATERIAL_PRICES[o.material as MaterialType] || 0);
         }, 0);
 
         // Find latest order date
