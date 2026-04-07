@@ -29,7 +29,6 @@ export type AdminCardListItem = {
     title: string | null
     status: string | null
     materialType: string | null
-    isPublished: boolean
     ownerId: string | null
     createdAt: string
 }
@@ -55,7 +54,7 @@ export async function getAdminCards(): Promise<AdminCardListItem[]> {
 
     const { data, error } = await adminDbClient
         .from('cards')
-        .select('id, slug, title, status, material_type, is_published, owner_id, created_at')
+        .select('id, slug, title, status, material_type, owner_id, created_at')
         .order('created_at', { ascending: false })
 
     if (error) {
@@ -69,7 +68,6 @@ export async function getAdminCards(): Promise<AdminCardListItem[]> {
         title: card.title,
         status: card.status,
         materialType: card.material_type,
-        isPublished: card.is_published,
         ownerId: card.owner_id,
         createdAt: card.created_at,
     }))
@@ -97,7 +95,6 @@ export async function generateBulkCards(count: number, materialType: string): Pr
             user_id: user.id,
             owner_id: null,
             status: 'draft',
-            is_published: false,
             slug: createBulkSlug(),
             material_type: normalizedMaterialType,
             title: null,

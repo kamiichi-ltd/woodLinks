@@ -19,8 +19,7 @@ export async function toggleCardStatus(cardId: string, isPublished: boolean) {
     const { data, error } = await supabase
         .from('cards')
         .update({
-            is_published: isPublished,
-            status: isPublished ? 'published' : 'draft', // Sync status column
+            status: isPublished ? 'published' : 'draft',
             updated_at: new Date().toISOString()
         })
         .eq('id', cardId)

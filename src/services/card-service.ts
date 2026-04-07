@@ -7,7 +7,44 @@ import type { Card, CardRow, CardContent } from '@/types/domain'
 
 export type { Card, CardContent } from '@/types/domain'
 
+export class AuthError extends Error {
+    constructor(message = 'Unauthorized') {
+        super(message)
+        this.name = 'AuthError'
+    }
+}
+
+export class PermissionError extends Error {
+    constructor(message = 'Permission denied') {
+        super(message)
+        this.name = 'PermissionError'
+    }
+}
+
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>
+
+async function requireAuth(supabase: SupabaseServerClient) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new AuthError()
+    return user
+}
+
+async function assertCardOwnership(supabase: SupabaseServerClient, cardId: string, userId: string) {
+    const { count } = await supabase
+        .from('cards')
+        .select('*', { count: 'exact', head: true })
+        .eq('id', cardId)
+        .eq('user_id', userId)
+    if (!count) throw new PermissionError('Card not found or access denied')
+}
+
+function normalizeCard(row: CardRow) {
+    return {
+        ...row,
+        status: row.status as Card['status'],
+        material_type: row.material_type as Card['material_type'],
+    }
+}
 
 // Helper to generate unique slug
 async function generateUniqueSlug(supabase: SupabaseServerClient, title: string): Promise<string> {
@@ -57,12 +94,9 @@ export async function getCards(): Promise<Card[]> {
 
     const rows = data as CardRow[]
 
-    // Map is_published to status for UI compatibility
     return rows.map(card => ({
-        ...card,
-        status: (card.is_published ? 'published' : 'draft') as Card['status'],
-        material_type: card.material_type as Card['material_type'],
-        view_count: 0 // Default to 0 as it's not in the table yet
+        ...normalizeCard(card),
+        view_count: 0
     }))
 }
 
@@ -102,9 +136,7 @@ export async function getCard(id: string) {
     }
 
     return {
-        ...cardRow,
-        status: (cardRow.is_published ? 'published' : 'draft') as Card['status'], // Polyfill status
-        material_type: cardRow.material_type as Card['material_type'],
+        ...normalizeCard(cardRow),
         contents: (contents as CardContent[]) || []
     }
 }
@@ -112,17 +144,12 @@ export async function getCard(id: string) {
 export async function getCardBySlug(slug: string) {
     const supabase = await createClient()
 
-    // No auth check needed for public access, RLS should handle 'is_published' check or we do it explicitly
-    // Explicit check is safer given we are in a server action/component context where RLS might depend on role
-    // But for public access using anon key, RLS for 'select' on 'cards' should allow if is_published is true.
-    // However, since we are using the service role or anon key server-side, it's best to be explicit in the query too.
-
+    // No auth required. Explicit status filter is the source of truth for public visibility.
     const cardResult = await supabase
         .from('cards')
         .select('*')
         .eq('slug', slug)
-        // .eq('status', 'published') // Wrong column
-        .eq('is_published', true) // Correct column from init_database.sql
+        .eq('status', 'published')
         .single()
 
     if (cardResult.error || !cardResult.data) {
@@ -150,9 +177,7 @@ export async function getCardBySlug(slug: string) {
         .single()
 
     return {
-        ...cardRow,
-        status: (cardRow.is_published ? 'published' : 'draft') as Card['status'], // Polyfill status
-        material_type: cardRow.material_type as Card['material_type'],
+        ...normalizeCard(cardRow),
         contents: (contents as CardContent[]) || [],
         avatar_url: profileResult.data?.avatar_url || null
     }
@@ -160,13 +185,7 @@ export async function getCardBySlug(slug: string) {
 
 export async function createCard(formData: FormData) {
     const supabase = await createClient()
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-        throw new Error('Unauthorized')
-    }
+    const user = await requireAuth(supabase)
 
     const title = formData.get('title') as string
 
@@ -180,7 +199,7 @@ export async function createCard(formData: FormData) {
         user_id: user.id,
         title,
         slug,
-        is_published: false, // Default to draft (false)
+        status: 'draft',
     }
 
     const { data, error } = await supabase
@@ -200,29 +219,15 @@ export async function createCard(formData: FormData) {
 
 export async function updateCard(id: string, updates: { title?: string; description?: string; status?: 'draft' | 'published' | 'lost_reissued' | 'disabled' | 'transferred'; slug?: string; material_type?: 'sugi' | 'hinoki' | 'walnut' }) {
     const supabase = await createClient()
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
+    const user = await requireAuth(supabase)
 
-    if (!user) {
-        throw new Error('Unauthorized')
-    }
-
-    // Map 'status' to 'is_published' if it exists in updates
-    // The signature uses 'status' string, but DB has 'is_published' boolean.
-    // We need to transform it.
     const { status, ...rest } = updates
 
     // We strictly type payload using the DB update type
     const updatePayload: Database['public']['Tables']['cards']['Update'] = { ...rest }
 
     if (status) {
-        if (status === 'published') {
-            updatePayload.is_published = true
-        } else {
-            // draft, disabled, etc map to false for now, or we need a status column if we want to differentiate
-            updatePayload.is_published = false
-        }
+        updatePayload.status = status
     }
 
     // Logic to ensure slug exists if not already, or if title changes and slug is empty (though slug is usually persistent)
@@ -269,13 +274,7 @@ export async function updateCard(id: string, updates: { title?: string; descript
 
 export async function deleteCard(id: string) {
     const supabase = await createClient()
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-        throw new Error('Unauthorized')
-    }
+    const user = await requireAuth(supabase)
 
     const { error } = await supabase
         .from('cards')
@@ -293,19 +292,9 @@ export async function deleteCard(id: string) {
 
 export async function addCardContent(cardId: string, type: 'sns_link' | 'text', content: Json) {
     const supabase = await createClient()
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
+    const user = await requireAuth(supabase)
 
-    if (!user) {
-        throw new Error('Unauthorized')
-    }
-
-    // Checking ownership
-    const { count } = await supabase.from('cards').select('*', { count: 'exact', head: true }).eq('id', cardId).eq('user_id', user.id)
-    if (!count) {
-        throw new Error('Card not found or access denied')
-    }
+    await assertCardOwnership(supabase, cardId, user.id)
 
     // Get current max order
     const { data: maxOrderData } = await supabase
@@ -342,22 +331,9 @@ export async function addCardContent(cardId: string, type: 'sns_link' | 'text', 
 
 export async function deleteCardContent(contentId: string, cardId: string) {
     const supabase = await createClient()
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
+    const user = await requireAuth(supabase)
 
-    if (!user) {
-        throw new Error('Unauthorized')
-    }
-
-    // Verify ownership of the card via the content relation is tricky without a join or multiple queries 
-    // or RLS (which should handle it, but we are in server action)
-    // Let's verify card ownership first
-    const { count } = await supabase.from('cards').select('*', { count: 'exact', head: true }).eq('id', cardId).eq('user_id', user.id)
-
-    if (!count) {
-        throw new Error('Card not found or access denied')
-    }
+    await assertCardOwnership(supabase, cardId, user.id)
 
     const { error } = await supabase
         .from('card_contents')
@@ -407,9 +383,7 @@ export async function getPublicCardById(id: string) {
         .single()
 
     return {
-        ...cardRow,
-        status: (cardRow.is_published ? 'published' : 'draft') as Card['status'], // Polyfill statuses
-        material_type: cardRow.material_type as Card['material_type'],
+        ...normalizeCard(cardRow),
         contents: (contents as CardContent[]) || [],
         avatar_url: profileResult.data?.avatar_url || null
     }
@@ -428,19 +402,9 @@ export async function incrementViewCount(id: string) {
 
 export async function reorderCardContents(cardId: string, items: { id: string; order_index: number }[]) {
     const supabase = await createClient()
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
+    const user = await requireAuth(supabase)
 
-    if (!user) {
-        throw new Error('Unauthorized')
-    }
-
-    // Verify ownership
-    const { count } = await supabase.from('cards').select('*', { count: 'exact', head: true }).eq('id', cardId).eq('user_id', user.id)
-    if (!count) {
-        throw new Error('Card not found or access denied')
-    }
+    await assertCardOwnership(supabase, cardId, user.id)
 
     const upsertPayload: Database['public']['Tables']['card_contents']['Insert'][] = items.map((item) => ({
         id: item.id,

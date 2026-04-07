@@ -15,7 +15,7 @@ type CardData = {
     wood_origin: string | null
     wood_age: string | null
     wood_story: string | null
-    is_published: boolean | null
+    status: string | null
 }
 
 const MATERIAL_OPTIONS = [
@@ -36,7 +36,7 @@ export function CardEditForm({ card }: { card: CardData }) {
         wood_origin: card.wood_origin || '',
         wood_age: card.wood_age || '',
         wood_story: card.wood_story || '',
-        is_published: card.is_published || false,
+        status: card.status || 'draft',
     })
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -52,7 +52,7 @@ export function CardEditForm({ card }: { card: CardData }) {
         const checked = e.target.checked
 
         // 1. Optimistic UI update
-        setFormData(prev => ({ ...prev, is_published: checked }))
+        setFormData(prev => ({ ...prev, status: checked ? 'published' : 'draft' }))
 
         try {
             // 2. Call specialized Server Action
@@ -61,7 +61,7 @@ export function CardEditForm({ card }: { card: CardData }) {
             console.error('❌ Toggle Failed:', error)
             alert('ステータスの変更に失敗しました')
             // Revert UI on failure
-            setFormData(prev => ({ ...prev, is_published: !checked }))
+            setFormData(prev => ({ ...prev, status: checked ? 'draft' : 'published' }))
         }
     }
 
@@ -74,8 +74,8 @@ export function CardEditForm({ card }: { card: CardData }) {
             // 2. Prepare data manually
             const payload = new FormData(e.currentTarget)
 
-            // Explicitly overwrite switch value match the state
-            payload.set('is_published', formData.is_published ? 'true' : 'false')
+            // Explicitly overwrite switch value to match the state
+            payload.set('status', formData.status)
             // Ensure ID is set
             payload.set('id', card.id)
 
@@ -124,20 +124,17 @@ export function CardEditForm({ card }: { card: CardData }) {
                     </div>
                     {/* Status Toggle / Badge */}
                     <div className="flex items-center gap-2">
-                        {/* Hidden input to ensure value exists in FormData if needed, but we override it in onSubmit anyway. Keeping it doesn't hurt. */}
-                        <input type="hidden" name="is_published" value={formData.is_published ? 'true' : 'false'} />
+                        <input type="hidden" name="status" value={formData.status} />
 
                         <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-lg border border-stone-200 shadow-sm hover:bg-stone-50 transition-colors">
                             <input
                                 type="checkbox"
-                                // name="is_published" // Removed to avoid duplicate/confusing values in FormData (handled manually)
-                                checked={formData.is_published}
-                                onChange={handleStatusToggle} // Use specialized handler
-                                name="is_published_checkbox" // dummy name
+                                checked={formData.status === 'published'}
+                                onChange={handleStatusToggle}
                                 className="w-5 h-5 rounded border-stone-300 text-stone-800 focus:ring-stone-500"
                             />
-                            <span className={`text-sm font-bold ${formData.is_published ? 'text-green-600' : 'text-stone-400'}`}>
-                                {formData.is_published ? '公開中' : '下書き'}
+                            <span className={`text-sm font-bold ${formData.status === 'published' ? 'text-green-600' : 'text-stone-400'}`}>
+                                {formData.status === 'published' ? '公開中' : '下書き'}
                             </span>
                         </label>
                     </div>

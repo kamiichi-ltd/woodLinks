@@ -32,11 +32,6 @@ async function verifyAdmin() {
     const { data: { user } } = await supabase.auth.getUser()
     const currentAdminEmail = process.env.ADMIN_EMAIL
 
-    console.log("=== Admin Security Check ===");
-    console.log("ログイン中のメール:", user?.email);
-    console.log("設定された管理者メール:", currentAdminEmail);
-    console.log("一致判定:", user?.email === currentAdminEmail);
-    console.log("===========================");
     if (!user || user.email !== currentAdminEmail) {
         throw new Error('Unauthorized: Admin access required')
     }
@@ -295,7 +290,7 @@ export async function updateAdminCard(
     }
 
     // Parse FormData
-    const is_published = formData.get('is_published') === 'true';
+    const isPublished = formData.get('status') === 'published';
 
     const updateData: Record<string, string | boolean> = {
         title: formData.get('title') as string,
@@ -304,9 +299,8 @@ export async function updateAdminCard(
         material_type: formData.get('material_type') as string,
         wood_origin: formData.get('wood_origin') as string,
         wood_age: formData.get('wood_age') as string,
-        wood_story: formData.get('wood_story') as string, // Optional field
-        is_published: is_published,
-        status: is_published ? 'published' : 'draft', // Sync status
+        wood_story: formData.get('wood_story') as string,
+        status: isPublished ? 'published' : 'draft',
         updated_at: new Date().toISOString()
     }
 

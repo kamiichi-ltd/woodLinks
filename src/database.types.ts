@@ -216,7 +216,6 @@ export interface Database {
                     avatar_url: string | null
                     material_type: string | null
                     is_public: boolean
-                    is_published: boolean
                     wood_origin: string | null
                     wood_age: string | null
                     wood_story: string | null
@@ -234,7 +233,6 @@ export interface Database {
                     avatar_url?: string | null
                     material_type?: string | null
                     is_public?: boolean
-                    is_published?: boolean
                     wood_origin?: string | null
                     wood_age?: string | null
                     wood_story?: string | null
@@ -252,7 +250,6 @@ export interface Database {
                     avatar_url?: string | null
                     material_type?: string | null
                     is_public?: boolean
-                    is_published?: boolean
                     wood_origin?: string | null
                     wood_age?: string | null
                     wood_story?: string | null
