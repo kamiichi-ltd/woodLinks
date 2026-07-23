@@ -76,10 +76,21 @@ export async function updateSession(request: NextRequest) {
         }
     }
 
-    // Example: Protected routes
+    if (request.nextUrl.pathname.startsWith('/dashboard')) {
+        if (!user) {
+            const loginUrl = new URL('/login', request.url)
+            loginUrl.searchParams.set('next', request.nextUrl.pathname)
+            return NextResponse.redirect(loginUrl)
+        }
+    }
+
     if (request.nextUrl.pathname.startsWith('/admin') && !request.nextUrl.pathname.startsWith('/admin/login')) {
         if (!user) {
             return NextResponse.redirect(new URL('/login', request.url))
+        }
+        const adminEmail = process.env.ADMIN_EMAIL
+        if (!adminEmail || user.email !== adminEmail) {
+            return NextResponse.redirect(new URL('/dashboard', request.url))
         }
     }
 

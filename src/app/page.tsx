@@ -582,6 +582,11 @@ export default function Home() {
             <img src="/logo.png" alt="WoodLinks Logo" className="h-8 w-8 object-contain opacity-80" />
             <span className="font-serif text-xl font-bold text-white tracking-wide">WoodLinks</span>
           </div>
+          <nav className="flex flex-wrap items-center justify-center gap-4 text-sm opacity-80">
+            <Link href="/terms" className="hover:text-white transition-colors">利用規約</Link>
+            <Link href="/privacy" className="hover:text-white transition-colors">プライバシーポリシー</Link>
+            <Link href="/tokushoho" className="hover:text-white transition-colors">特定商取引法表記</Link>
+          </nav>
           <p className="text-sm opacity-60">
             &copy; {new Date().getFullYear()} WoodLinks. All rights reserved.
           </p>
