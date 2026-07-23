@@ -1,4 +1,4 @@
-import { getCardBySlug } from '@/services/card-service'
+import { getCardBySlugUseCase } from '@/usecases/card-usecase'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import PublicCardClient from '@/components/public/public-card-client'
@@ -8,7 +8,8 @@ import { logEvent } from '@/app/actions/analytics'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params
-    const card = await getCardBySlug(slug)
+    const supabase = await createClient()
+    const card = await getCardBySlugUseCase(supabase, slug)
 
     if (!card) {
         return {
@@ -36,14 +37,14 @@ export default async function PublicCardPage({
 }) {
     const { slug } = await params
     const resolvedSearchParams = await searchParams
-    const card = await getCardBySlug(slug)
+    const supabase = await createClient()
+    const card = await getCardBySlugUseCase(supabase, slug)
 
     if (!card) {
         notFound()
     }
 
     // Check ownership
-    const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     // 1. Activation Check (If owner_id is NULL)

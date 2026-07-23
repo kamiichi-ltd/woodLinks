@@ -1,4 +1,4 @@
-import { getCard } from '@/services/card-service'
+import { getCardUseCase } from '@/usecases/card-usecase'
 import { notFound } from 'next/navigation'
 import ContentEditor, { ContentItem } from './content-editor'
 import CardSettingsForm from '@/components/forms/card-settings-form'
@@ -19,9 +19,9 @@ type Order = Database['public']['Tables']['orders']['Row']
 
 export default async function CardEditPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = await params
-    const card = await getCard(resolvedParams.id)
-
     const supabase = await createClient()
+    const card = await getCardUseCase(supabase, resolvedParams.id)
+
     const { data: orders } = await supabase
         .from('orders')
         .select('*')

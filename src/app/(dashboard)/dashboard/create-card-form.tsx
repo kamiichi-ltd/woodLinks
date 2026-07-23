@@ -1,6 +1,6 @@
 'use client'
 
-import { createCard } from '@/services/card-service'
+import { createCard } from '@/app/actions/cards'
 import { useRef, useState } from 'react'
 import { Plus, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'

@@ -1,6 +1,6 @@
-import { getCards } from '@/services/card-service'
 import { getDashboardAnalytics } from '@/services/analytics-service'
 import { createClient } from '@/utils/supabase/server'
+import { getCardsUseCase } from '@/usecases/card-usecase'
 import CreateCardForm from './create-card-form'
 import Link from 'next/link'
 import { DeleteProjectButton } from '@/components/dashboard/delete-project-button'
@@ -14,12 +14,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     const { data: { user } } = await supabase.auth.getUser()
     const params = await searchParams
 
-    if (!user) {
-        return <div>Please log in.</div>
-    }
-
-    const cards = await getCards()
-    const analytics = await getDashboardAnalytics(user.id)
+    const cards = await getCardsUseCase(supabase)
+    const analytics = await getDashboardAnalytics(user!.id)
 
     // Handle "create_from" baton pass
     let initialWood = undefined

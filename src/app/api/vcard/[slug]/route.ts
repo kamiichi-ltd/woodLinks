@@ -1,4 +1,5 @@
-import { getCardBySlug } from '@/services/card-service'
+import { createClient } from '@/utils/supabase/server'
+import { getCardBySlugUseCase } from '@/usecases/card-usecase'
 import { NextResponse } from 'next/server'
 import { CardContent } from '@/types/domain'
 
@@ -7,7 +8,8 @@ export async function GET(
     { params }: { params: Promise<{ slug: string }> }
 ) {
     const { slug } = await params
-    const card = await getCardBySlug(slug)
+    const supabase = await createClient()
+    const card = await getCardBySlugUseCase(supabase, slug)
 
     if (!card) {
         return new NextResponse('Card not found', { status: 404 })

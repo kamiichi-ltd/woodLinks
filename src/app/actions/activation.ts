@@ -47,6 +47,10 @@ export async function claimCard(cardId: string) {
 
     const updatePayload: Database['public']['Tables']['cards']['Update'] = {
         owner_id: user.id,
+        // Also transfer dashboard ownership. Bulk cards are created with user_id = admin as a
+        // placeholder; claiming a physical card must hand full ownership to the buyer so they
+        // can edit it (dashboard CRUD and RLS are user_id-based).
+        user_id: user.id,
         updated_at: new Date().toISOString()
     }
 
@@ -61,7 +65,9 @@ export async function claimCard(cardId: string) {
         throw new Error('Failed to claim card')
     }
 
-    // 4. Redirect to Edit Page
+    // 4. Redirect to the buyer's own card editor.
+    // Claim now transfers user_id too, so /dashboard/cards/[id] (user_id-based) is editable by
+    // the buyer. /admin/cards/[id] would be blocked by middleware for non-admins.
     // IMPORTANT: Redirect must be outside of any try-catch block.
-    redirect(`/admin/cards/${cardId}`)
+    redirect(`/dashboard/cards/${cardId}`)
 }

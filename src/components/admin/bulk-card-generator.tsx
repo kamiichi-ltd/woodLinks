@@ -8,11 +8,11 @@ import { BulkGeneratedCard, generateBulkCards } from '@/app/actions/admin-bulk'
 
 const COUNT_OPTIONS = [10, 50, 100]
 
+// Only priced materials (see constants/prices.ts) can be generated and sold.
 const MATERIAL_OPTIONS = [
     { value: 'sugi', label: '杉 (Sugi)' },
     { value: 'hinoki', label: 'ヒノキ (Hinoki)' },
     { value: 'walnut', label: 'ウォールナット (Walnut)' },
-    { value: 'maple', label: 'メープル (Maple)' },
 ]
 
 function escapeCsvValue(value: string) {
@@ -47,6 +47,7 @@ export function BulkCardGenerator() {
     const [isOpen, setIsOpen] = useState(false)
     const [count, setCount] = useState<number>(10)
     const [materialType, setMaterialType] = useState<string>('sugi')
+    const [mode, setMode] = useState<'published_unclaimed' | 'draft'>('published_unclaimed')
     const [error, setError] = useState<string | null>(null)
     const [generatedCards, setGeneratedCards] = useState<BulkGeneratedCard[]>([])
     const [isPending, startTransition] = useTransition()
@@ -56,7 +57,7 @@ export function BulkCardGenerator() {
 
         startTransition(async () => {
             try {
-                const cards = await generateBulkCards(count, materialType)
+                const cards = await generateBulkCards(count, materialType, mode)
                 setGeneratedCards(cards)
                 downloadCsv(cards)
                 setIsOpen(false)
@@ -175,6 +176,37 @@ export function BulkCardGenerator() {
                                                 </option>
                                             ))}
                                         </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="mb-3 block text-sm font-bold text-[#3d3126]">生成モード</label>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <button
+                                                type="button"
+                                                onClick={() => setMode('published_unclaimed')}
+                                                className={`rounded-2xl border px-4 py-3 text-sm font-bold transition-all ${
+                                                    mode === 'published_unclaimed'
+                                                        ? 'border-[#2c3e50] bg-[#2c3e50] text-white shadow-lg'
+                                                        : 'border-[#d4c5ae] bg-white text-[#3d3126] hover:border-[#8c7b6c]'
+                                                }`}
+                                            >
+                                                公開・未claim（検証用）
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setMode('draft')}
+                                                className={`rounded-2xl border px-4 py-3 text-sm font-bold transition-all ${
+                                                    mode === 'draft'
+                                                        ? 'border-[#2c3e50] bg-[#2c3e50] text-white shadow-lg'
+                                                        : 'border-[#d4c5ae] bg-white text-[#3d3126] hover:border-[#8c7b6c]'
+                                                }`}
+                                            >
+                                                下書き
+                                            </button>
+                                        </div>
+                                        <p className="mt-2 text-xs text-[#8c7b6c]">
+                                            「公開・未claim」はタップで即 Activation 可能。検証では標準。
+                                        </p>
                                     </div>
 
                                     {error && (

@@ -42,8 +42,9 @@ test.describe('Full Activation Flow', () => {
                 slug: cardSlug,
                 title: 'Activation Test Card',
                 description: 'E2E Test',
-                user_id: userId, // Created by this user
+                user_id: userId, // Created by this user (placeholder; claim transfers ownership)
                 owner_id: null,  // But not claimed yet
+                status: 'published', // published_unclaimed: activatable on tap
                 is_published: true
             })
             .select()
@@ -89,11 +90,12 @@ test.describe('Full Activation Flow', () => {
         // 7. Click Activate
         await activateButton.click();
 
-        // 8. Verify Redirect to Admin Dashboard
-        await page.waitForURL((url) => url.pathname.includes(`/admin/cards/${cardId}`), { timeout: 15000 });
+        // 8. Verify Redirect to the buyer's own card editor (claim transfers user_id)
+        await page.waitForURL((url) => url.pathname === `/dashboard/cards/${cardId}`, { timeout: 15000 });
 
-        // Verify owner_id was updated in DB
-        const { data: updatedCard } = await supabase.from('cards').select('owner_id').eq('id', cardId).single();
+        // Verify owner_id AND user_id were transferred to the claimer in DB
+        const { data: updatedCard } = await supabase.from('cards').select('owner_id, user_id').eq('id', cardId).single();
         expect(updatedCard?.owner_id).toBe(userId);
+        expect(updatedCard?.user_id).toBe(userId);
     });
 });

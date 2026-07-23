@@ -1,6 +1,6 @@
 'use client'
 
-import { addCardContent, deleteCardContent, reorderCardContents } from '@/services/card-service'
+import { addCardContent, deleteCardContent, reorderCardContents } from '@/app/actions/cards'
 import { useState, useTransition, useEffect } from 'react'
 import {
     DndContext,

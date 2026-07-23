@@ -1,4 +1,5 @@
-import { getPublicCardById } from '@/services/card-service'
+import { createClient } from '@/utils/supabase/server'
+import { getPublicCardByIdUseCase } from '@/usecases/card-usecase'
 import { NextRequest, NextResponse } from 'next/server'
 
 
@@ -23,7 +24,8 @@ export async function GET(
     context: { params: Promise<{ id: string }> }
 ) {
     const { id } = await context.params
-    const card = await getPublicCardById(id)
+    const supabase = await createClient()
+    const card = await getPublicCardByIdUseCase(supabase, id)
 
     if (!card) {
         return new NextResponse('Card not found', { status: 404 })

@@ -73,13 +73,22 @@ export async function getAdminCards(): Promise<AdminCardListItem[]> {
     }))
 }
 
-export async function generateBulkCards(count: number, materialType: string): Promise<BulkGeneratedCard[]> {
+export async function generateBulkCards(
+    count: number,
+    materialType: string,
+    mode: 'draft' | 'published_unclaimed' = 'published_unclaimed',
+): Promise<BulkGeneratedCard[]> {
     const user = await verifyAdmin()
 
     const normalizedCount = Number(count)
     const normalizedMaterialType = materialType.trim().toLowerCase()
+    // published_unclaimed: status 'published' + owner_id null → tap で即 Activation 可能（検証標準）。
+    // draft: /c/[id] が "Coming Soon" になり、出荷前に publish 昇格が必要。
+    const status = mode === 'draft' ? 'draft' : 'published'
     const allowedCounts = new Set([10, 50, 100])
-    const allowedMaterials = new Set(['sugi', 'hinoki', 'walnut', 'maple'])
+    // Only materials priced in MATERIAL_PRICES (sugi/hinoki/walnut) are allowed.
+    // 'maple' has no price, so a maple card would fail Stripe checkout with 'Invalid material'.
+    const allowedMaterials = new Set(['sugi', 'hinoki', 'walnut'])
 
     if (!allowedCounts.has(normalizedCount)) {
         throw new Error('Unsupported bulk generation count')
@@ -94,7 +103,7 @@ export async function generateBulkCards(count: number, materialType: string): Pr
         () => ({
             user_id: user.id,
             owner_id: null,
-            status: 'draft',
+            status,
             slug: createBulkSlug(),
             material_type: normalizedMaterialType,
             title: null,

@@ -18,9 +18,9 @@ type CardData = {
     status: string | null
 }
 
+// 価格のある素材のみ（constants/prices.ts と一致）。maple は検証対象外。
 const MATERIAL_OPTIONS = [
     { value: 'walnut', label: 'Walnut (ウォールナット)' },
-    { value: 'maple', label: 'Maple (メープル)' },
     { value: 'hinoki', label: 'Hinoki (檜)' },
     { value: 'sugi', label: 'Sugi (杉)' },
 ]

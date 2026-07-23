@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { updateCard } from '@/services/card-service'
+import { updateCard } from '@/app/actions/cards'
 import { useRouter } from 'next/navigation'
 import { toggleCardStatus } from '@/app/actions/card-status'
 

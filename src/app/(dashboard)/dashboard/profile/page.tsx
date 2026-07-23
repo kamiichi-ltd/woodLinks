@@ -1,24 +1,19 @@
 import { createClient } from '@/utils/supabase/server'
-import { redirect } from 'next/navigation'
 import AvatarEditor from './avatar-editor'
-import { getCards } from '@/services/card-service'
+import { getCardsUseCase } from '@/usecases/card-usecase'
 import CardSettingsForm from '@/components/forms/card-settings-form'
 
 export default async function SettingsPage() {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) {
-        redirect('/login')
-    }
-
     const { data: profile } = await supabase
         .from('profiles')
         .select('avatar_url')
-        .eq('id', user.id)
+        .eq('id', user!.id)
         .single() as { data: { avatar_url: string | null } | null }
 
-    const cards = await getCards()
+    const cards = await getCardsUseCase(supabase)
     const primaryCard = cards[0] // Assuming single card for now
 
     return (
@@ -29,7 +24,7 @@ export default async function SettingsPage() {
                 <section>
                     <h2 className="text-lg font-medium text-gray-900 mb-4">プロフィール画像</h2>
                     <AvatarEditor
-                        userId={user.id}
+                        userId={user!.id}
                         initialAvatarUrl={profile?.avatar_url || null}
                     />
                 </section>

@@ -1,4 +1,5 @@
-import { getPublicCardById } from '@/services/card-service'
+import { createClient } from '@/utils/supabase/server'
+import { getPublicCardByIdUseCase } from '@/usecases/card-usecase'
 import { redirect } from 'next/navigation'
 import { AlertCircle, Clock, Construction } from 'lucide-react'
 
@@ -8,7 +9,8 @@ import { AlertCircle, Clock, Construction } from 'lucide-react'
 
 export default async function PhysicalCardEntryPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
-    const card = await getPublicCardById(id)
+    const supabase = await createClient()
+    const card = await getPublicCardByIdUseCase(supabase, id)
 
     if (!card) {
         // Unknown card - could be an invalid ID or deleted card
