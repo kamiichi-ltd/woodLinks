@@ -22,16 +22,11 @@ export default async function InventoryPage({
     const resolvedParams = await searchParams
     const statusFilter = typeof resolvedParams.status === 'string' ? resolvedParams.status : undefined
 
-    let query = supabase
-        .from('wood_inventory')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-    if (statusFilter) {
-        query = query.eq('status', statusFilter)
-    }
-
-    const { data: inventory, error } = await query
+    const { data: inventory, error } = await (
+        statusFilter
+            ? supabase.from('wood_inventory').select('*').eq('status', statusFilter).order('created_at', { ascending: false })
+            : supabase.from('wood_inventory').select('*').order('created_at', { ascending: false })
+    )
 
     if (error) {
         console.error('Error fetching inventory:', error)

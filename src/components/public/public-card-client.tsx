@@ -49,13 +49,6 @@ const getMaterialTheme = (material: string = 'walnut') => {
             buttonClass: 'bg-amber-950 text-amber-50',
             textColor: 'text-amber-50', // Warm white
         },
-        maple: {
-            name: 'Maple',
-            headerBg: 'bg-amber-200', // Honey gold
-            textColor: 'text-amber-950',
-            buttonClass: 'bg-amber-200 text-amber-950',
-            texture: 'opacity-20 bg-[url("https://www.transparenttextures.com/patterns/wood-pattern.png")]',
-        },
         hinoki: {
             name: 'Hinoki',
             headerBg: 'bg-yellow-100', // Pale cream
@@ -256,11 +249,6 @@ export default function PublicCardClient({
                             onClick={() => setCurrentMaterial('walnut')}
                             className={`w-6 h-6 rounded-full bg-amber-950 ring-2 ring-offset-2 transition-all hover:scale-110 ${currentMaterial === 'walnut' ? 'ring-amber-950' : 'ring-transparent opacity-70 hover:opacity-100'}`}
                             title="Walnut"
-                        />
-                        <button
-                            onClick={() => setCurrentMaterial('maple')}
-                            className={`w-6 h-6 rounded-full bg-amber-200 ring-2 ring-offset-2 transition-all hover:scale-110 ${currentMaterial === 'maple' ? 'ring-amber-300' : 'ring-transparent opacity-70 hover:opacity-100'}`}
-                            title="Maple"
                         />
                         <button
                             onClick={() => setCurrentMaterial('hinoki')}
